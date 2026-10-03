@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Login | STYRIVA
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'login.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="auth-page">
+
+    <div class="auth-container">
+
+        <!-- Left Side -->
+
+        <div class="auth-left">
+
+            <div class="auth-brand">
+
+                <img src="{% static 'logo.png' %}"
+                     alt="STYRIVA Logo"
+                     class="auth-logo">
+
+                <span class="brand-name">
+                    STYRIVA
+                </span>
+
+            </div>
+
+            <span class="auth-badge">
+
+                AI Styling Concierge
+
+            </span>
+
+            <h1>
+
+                Welcome Back
+
+            </h1>
+
+            <p>
+
+                Continue your luxury styling journey.
+                Access your wardrobe, previous looks,
+                and AI-powered fashion recommendations.
+
+            </p>
+
+            <div class="feature-list">
+
+                <div class="feature-item">
+
+                    <span class="feature-icon">
+                        ✨
+                    </span>
+
+                    <div>
+
+                        <h4>
+                            AI Styling
+                        </h4>
+
+                        <p>
+                            Personalized luxury outfits.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="feature-item">
+
+                    <span class="feature-icon">
+                        👗
+                    </span>
+
+                    <div>
+
+                        <h4>
+                            Smart Wardrobe
+                        </h4>
+
+                        <p>
+                            Organize your fashion pieces.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="feature-item">
+
+                    <span class="feature-icon">
+                        💎
+                    </span>
+
+                    <div>
+
+                        <h4>
+                            Style Evolution
+                        </h4>
+
+                        <p>
+                            Upgrade every outfit intelligently.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right Side -->
+
+        <div class="auth-right">
+
+            <div class="auth-card">
+
+                <span class="card-label">
+
+                    Member Access
+
+                </span>
+
+                <h2>
+
+                    Login
+
+                </h2>
+
+                <p class="card-description">
+
+                    Sign in to continue exploring your
+                    personalized styling experience.
+
+                </p>
+
+                {% if messages %}
+
+                    {% for message in messages %}
+
+                        <div class="alert alert-{{ message.tags }}">
+
+                            {{ message }}
+
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                                        <div class="form-group">
+
+                        <label for="id_username">
+
+                            Email Address
+
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            id="id_email"
+                            placeholder="Enter your email"
+                            required
+                            autocomplete="email">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="id_password">
+
+                            Password
+
+                        </label>
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                name="password"
+                                id="id_password"
+                                placeholder="Enter your password"
+                                required
+                                autocomplete="current-password">
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                id="togglePassword">
+
+                                👁
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-options">
+
+                        <label class="remember-me">
+
+                            <input
+                                type="checkbox"
+                                name="remember">
+
+                            <span>
+
+                                Remember me
+
+                            </span>
+
+                        </label>
+
+                       
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary btn-full">
+
+                        Sign In
+
+                    </button>
+
+                </form>
+
+                <div class="auth-divider">
+
+                    <span>
+
+                        OR
+
+                    </span>
+
+                </div>
+
+                <div class="auth-footer">
+
+                    <p>
+
+                        Don't have an account?
+
+                        <a href="{% url 'signup' %}">
+
+                            Create one
+
+                        </a>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const password =
+        document.getElementById("id_password");
+
+    const toggle =
+        document.getElementById("togglePassword");
+
+    if(password && toggle){
+
+        toggle.addEventListener("click", () => {
+
+            if(password.type === "password"){
+
+                password.type = "text";
+
+                toggle.innerHTML = "🙈";
+
+            }
+
+            else{
+
+                password.type = "password";
+
+                toggle.innerHTML = "👁";
+
+            }
+
+        });
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

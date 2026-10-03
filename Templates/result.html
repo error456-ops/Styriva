@@ -1,0 +1,463 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Stryiva - Your Curated Look</title>
+
+    <link rel="stylesheet" href="{% static 'result.css' %}">
+    <script src="{% static 'result.js' %}" defer></script>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="navbar-container">
+        <a href="/" class="logo">
+            <img src="{% static 'logo.png' %}" alt="Stryiva Logo">
+        </a>
+        <div class="nav-right">
+            <span class="nav-text">
+                AI Styling Concierge
+            </span>
+        </div>
+    </div>
+</header>
+
+<main class="page">
+
+    <section class="hero">
+        <span class="hero-tag">
+            Your Strategy is Ready
+        </span>
+        <h1 class="hero-title">
+            The Winning Combination
+        </h1>
+        <p class="hero-description">
+            STYRIVA analyzed your 9-piece wardrobe matrix and selected a
+            <strong>{{ consultation.vibe }}</strong>
+            look for your
+            {{ consultation.occasion }}
+            under
+            {{ consultation.weather }}
+            conditions.
+        </p>
+    </section>
+
+    <section class="result-grid">
+
+        <div class="preview-card">
+            <div class="preview-image">
+                {% if generated_look.generated_image %}
+<img src="{{ generated_look.generated_image.url }}" alt="Generated Look">
+{% else %}
+                <div class="placeholder">
+                    <div class="placeholder-icon">✨</div>
+                    <p>Visual generation complete</p>
+                </div>
+                {% endif %}
+
+                <div class="vibe-badge">
+                    <span class="badge-label">Target Vibe</span>
+                    <span class="badge-value">{{ consultation.vibe }}</span>
+                </div>
+            </div>
+
+            <div class="preview-footer">
+                <span class="preview-label">Virtual Try-On Render</span>
+                <a href="{{ generated_look.generated_image.url }}" download class="download-btn">
+    Download Portrait ↓
+</a>
+            </div>
+        </div>
+
+        <div class="right-column">
+
+            <div class="card">
+                <h2 class="card-title">Selected Matrix Pieces</h2>
+
+                <div class="piece">
+                    <div class="piece-image">
+                        {% if selected_top_url %}
+                        <img src="{{ selected_top_url }}" alt="Top">
+                        {% else %}
+                        👕
+                        {% endif %}
+                    </div>
+                    <div class="piece-content">
+                        <span class="piece-label">Anchor Layer</span>
+                        <h3>{{ generated_look.selected_top }}</h3>
+                    </div>
+                </div>
+
+                <div class="piece">
+                    <div class="piece-image">
+                        {% if selected_bottom_url %}
+                        <img src="{{ selected_bottom_url }}" alt="Bottom">
+                        {% else %}
+                        👖
+                        {% endif %}
+                    </div>
+                    <div class="piece-content">
+                        <span class="piece-label">Silhouette Foundation</span>
+                        <h3>{{ generated_look.selected_bottom }}</h3>
+                    </div>
+                </div>
+
+                <div class="piece">
+                    <div class="piece-image">
+                        {% if selected_scarf_url %}
+                        <img src="{{ selected_scarf_url }}" alt="Scarf">
+                        {% else %}
+                        🧣
+                        {% endif %}
+                    </div>
+                    <div class="piece-content">
+                        <span class="piece-label">Grounding Element</span>
+                        <h3>{{ generated_look.selected_scarf }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note-card">
+                <div class="note-header">
+                    ✨ <span>Stylist Execution Note</span>
+                </div>
+                <p>{{generated_look.styling_rationale }}</p>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Styling Recommendations</h2>
+
+                <div class="recommendation">
+                    <h4>Makeup</h4>
+                    <p>{{  generated_look.makeup_recommendation }}</p>
+                </div>
+
+                <div class="recommendation">
+                    <h4>Hair</h4>
+                    <p>{{ generated_look.hair_recommendation }}</p>
+                </div>
+
+                <div class="recommendation">
+                    <h4>Accessories</h4>
+                    <p>{{ generated_look.accessory_recommendation }}</p>
+                </div>
+            </div>
+
+            <div class="button-wrapper">
+                <a href="{% url 'generate_style_look' %}" class="primary-btn">
+                    Run Alternative Simulation
+                </a>
+            </div>
+
+            <div class="evolution-card">
+                <div class="evolution-header">
+                    <div>
+                        <span class="new-label">NEW</span>
+                        <h2>Style Evolution</h2>
+                    </div>
+                    <div class="sparkle">✨</div>
+                </div>
+                <p class="evolution-description">
+                    Love this outfit? Let STYRIVA intelligently elevate it by
+                    adding premium pieces like blazers, jackets, scarves, luxury accessories
+                    and layered styling while preserving your personal identity and aesthetic.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="styleEvolutionSection" class="style-evolution-section">
+        <div class="style-evolution-card">
+            <div class="evolution-badge">✨ STYLE EVOLUTION</div>
+            <h2 class="evolution-title">Elevate Your Winning Look</h2>
+            <p class="evolution-description">
+                Your outfit has already been selected as the best combination from
+                your wardrobe. Style Evolution preserves this winning look while
+                intelligently enhancing it with additional pieces you already own.
+            </p>
+
+            <div class="evolution-highlight">
+                <div class="highlight-item">
+                    <span class="highlight-icon">✓</span>
+                    <span>Keep your winning outfit</span>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">✓</span>
+                    <span>Add luxury styling elements</span>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">✓</span>
+                    <span>Refine makeup & hairstyle</span>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-icon">✓</span>
+                    <span>Create a premium version of your look</span>
+                </div>
+            </div>
+
+            <button id="openEvolutionBtn" class="evolution-button">
+                ✨ Elevate My Look
+            </button>
+        </div>
+    </section>
+
+    <div id="evolutionWorkflow" style="display:none;">
+
+        <section id="evolutionFormSection" class="evolution-form-section">
+            <div class="evolution-form-card">
+                
+                <form id="styleEvolutionForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="consultationId" value="{{ consultation.id }}">
+
+                    <div class="section-heading">
+                        <h3>Personalize Your Style Evolution</h3>
+                        <p>Tell STYRIVA which additional fashion pieces you already own.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <h4>Outerwear</h4>
+                        <div class="checkbox-grid">
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="blazer">
+                                <span>Blazer</span>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="jacket">
+                                <span>Jacket</span>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="cardigan">
+                                <span>Cardigan</span>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="coat">
+                                <span>Long Coat</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <h4>Accessories</h4>
+                        <div class="checkbox-grid">
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="watch">
+                                <span>Watch</span>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="bracelet">
+                                <span>Bracelet</span>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="necklace">
+                                <span>Necklace</span>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="earrings">
+                                <span>Earrings</span>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="handbag">
+                                <span>Handbag</span>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="extras" value="belt">
+                                <span>Belt</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <h4>Styling Direction</h4>
+                        <div class="radio-grid">
+                            <label class="radio-card">
+                                <input type="radio" name="style_preference" value="minimal" checked>
+                                <span>Minimal Luxury</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="style_preference" value="elegant">
+                                <span>Elegant Evening</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="style_preference" value="statement">
+                                <span>Statement Fashion</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="generate-area">
+                        <button type="submit" id="generateEvolutionBtn" class="generate-evolution-btn">
+                            Generate Style Evolution
+                        </button>
+                    </div>
+                    
+                </form> 
+            </div>
+        </section>
+
+        <section id="evolutionLoading" class="evolution-loading">
+            <div class="loading-card">
+                <div class="loading-spinner"></div>
+                <h3>Creating Your Luxury Look...</h3>
+                <ul>
+                    <li>✓ Preserving your winning outfit</li>
+                    <li>✓ Understanding your wardrobe</li>
+                    <li>✓ Selecting premium enhancements</li>
+                    <li>✓ Refining makeup and hairstyle</li>
+                    <li>✓ Generating your evolved portrait</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="styleEvolutionResult" class="style-evolution-result">
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-badge">✨ STYLE EVOLUTION COMPLETE</span>
+                    <h2>Your Elevated Look</h2>
+                    <p>We've preserved your winning outfit while enhancing it with premium styling elements.</p>
+                </div>
+
+                <div class="evolved-portrait">
+                    <img id="evolvedPortrait" src="" alt="Style Evolution">
+                </div>
+
+                <div class="changes-card">
+                    <h3>What's New</h3>
+                    <ul id="evolutionChanges"></ul>
+                </div>
+
+                <div class="evolution-notes">
+                    <h3>Luxury Styling Notes</h3>
+                    <p id="evolutionReasoning"></p>
+                </div>
+
+                <div class="result-actions">
+                    <button id="compareLooksBtn">Compare Looks</button>
+                    <button id="downloadEvolutionBtn">Download Portrait</button>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+    <!-- ==========================================
+    PREMIUM UPGRADE MODAL
+    ========================================== -->
+    <div id="premiumModal" class="premium-modal">
+        <div class="premium-overlay"></div>
+        <div class="premium-card">
+            <button
+                class="premium-close"
+                onclick="closePremiumModal()">
+                ✕
+            </button>
+            <div class="premium-logo">
+                <img
+                    src="{% static 'images/logo.png' %}"
+                    alt="STYRIVA">
+            </div>
+            <div class="premium-tag">
+                STYRIVA PREMIUM
+            </div>
+            <h2>
+                Continue Your Styling Journey
+            </h2>
+            <p class="premium-description">
+                You've experienced the power of your personal AI stylist.
+                Unlock unlimited styling sessions and exclusive premium
+                fashion intelligence.
+            </p>
+            <div class="premium-divider"></div>
+            <div class="premium-benefits">
+                <div class="premium-item">
+                    <span>✦</span>
+                    <div>
+                        <strong>Unlimited AI Looks</strong>
+                        <small>Create unlimited outfit generations.</small>
+                    </div>
+                </div>
+                <div class="premium-item">
+                    <span>✦</span>
+                    <div>
+                        <strong>Unlimited Style Evolution</strong>
+                        <small>Evolve every outfit without limits.</small>
+                    </div>
+                </div>
+                <div class="premium-item">
+                    <span>✦</span>
+                    <div>
+                        <strong>Priority Generation</strong>
+                        <small>Faster rendering and premium queue.</small>
+                    </div>
+                </div>
+                <div class="premium-item">
+                    <span>✦</span>
+                    <div>
+                        <strong>Premium Features</strong>
+                        <small>Access every future luxury feature.</small>
+                    </div>
+                </div>
+            </div>
+           <button
+    type="button"
+    id="upgradePremiumButton"
+    class="premium-upgrade"
+    onclick="window.location.href='{% url 'premium' %}'">
+    Upgrade to Premium
+</button>
+            <button
+                class="premium-later"
+                onclick="closePremiumModal()">
+                Maybe Later
+            </button>
+            <p class="premium-footer">
+                Crafted exclusively for the STYRIVA experience.
+            </p>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <p>© {% now "Y" %} STYRIVA. AI-powered personal styling.</p>
+
+    <div class="footer-links">
+
+        <a href="{% url 'splash' %}">Home</a>
+        <span>·</span>
+
+        <a href="{% url 'about' %}">About</a>
+        <span>·</span>
+
+        <a href="{% url 'how_it_works' %}">How It Works</a>
+        <span>·</span>
+
+        <a href="{% url 'guides' %}">Styling Guides</a>
+        <span>·</span>
+
+        <a href="{% url 'faq' %}">FAQ</a>
+        <span>·</span>
+
+        <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+        <span>·</span>
+
+        <a href="{% url 'terms' %}">Terms & Conditions</a>
+        <span>·</span>
+
+        <a href="{% url 'cookies' %}">Cookie Policy</a>
+        <span>·</span>
+
+        <a href="{% url 'disclaimer' %}">Disclaimer</a>
+        <span>·</span>
+
+        <a href="{% url 'contact' %}">Contact</a>
+
+    </div>
+</footer>
+</body>
+</html>

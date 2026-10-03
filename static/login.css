@@ -1,0 +1,959 @@
+/*=========================================================
+    STYRIVA LOGIN
+    PART 1
+=========================================================*/
+
+
+/*=========================================================
+    PAGE
+=========================================================*/
+
+.auth-page{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:80px 0;
+
+}
+
+
+.auth-container{
+
+    width:min(1350px,92%);
+
+    display:grid;
+
+    grid-template-columns:1.1fr .9fr;
+
+    gap:80px;
+
+    align-items:center;
+
+}
+
+
+/*=========================================================
+    LEFT SIDE
+=========================================================*/
+
+.auth-left{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+}
+
+
+.auth-brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    margin-bottom:40px;
+
+}
+
+
+.auth-logo{
+
+    width:72px;
+
+    height:72px;
+
+    object-fit:contain;
+
+}
+
+
+.brand-name{
+
+    font-size:2.6rem;
+
+    font-weight:800;
+
+    letter-spacing:4px;
+
+    color:var(--gold);
+
+}
+
+
+.auth-badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    width:fit-content;
+
+    padding:10px 22px;
+
+    border-radius:999px;
+
+    background:rgba(212,175,55,.08);
+
+    border:1px solid rgba(212,175,55,.18);
+
+    color:var(--gold);
+
+    font-size:14px;
+
+    font-weight:600;
+
+    margin-bottom:26px;
+
+}
+
+
+.auth-left h1{
+
+    font-size:4rem;
+
+    line-height:1.1;
+
+    margin-bottom:24px;
+
+    color:var(--white);
+
+}
+
+
+.auth-left>p{
+
+    max-width:560px;
+
+    font-size:1.12rem;
+
+    color:var(--muted);
+
+    line-height:1.9;
+
+    margin-bottom:50px;
+
+}
+
+
+/*=========================================================
+    FEATURES
+=========================================================*/
+
+.feature-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:28px;
+
+}
+
+
+.feature-item{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:18px;
+
+}
+
+
+.feature-icon{
+
+    width:58px;
+
+    height:58px;
+
+    border-radius:18px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:26px;
+
+    background:rgba(212,175,55,.08);
+
+    border:1px solid rgba(212,175,55,.15);
+
+    flex-shrink:0;
+
+}
+
+
+.feature-item h4{
+
+    color:var(--white);
+
+    font-size:1.2rem;
+
+    margin-bottom:6px;
+
+}
+
+
+.feature-item p{
+
+    color:var(--muted);
+
+    line-height:1.7;
+
+}
+
+
+/*=========================================================
+    RIGHT SIDE
+=========================================================*/
+
+.auth-right{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+.auth-card{
+
+    width:100%;
+
+    max-width:520px;
+
+    background:rgba(255,255,255,.04);
+
+    backdrop-filter:blur(24px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:32px;
+
+    padding:55px;
+
+    box-shadow:0 30px 70px rgba(0,0,0,.45);
+
+}
+
+
+.card-label{
+
+    display:inline-block;
+
+    color:var(--gold);
+
+    text-transform:uppercase;
+
+    letter-spacing:3px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    margin-bottom:18px;
+
+}
+
+
+.auth-card h2{
+
+    font-size:3rem;
+
+    color:var(--white);
+
+    margin-bottom:18px;
+
+}
+
+
+.card-description{
+
+    color:var(--muted);
+
+    line-height:1.8;
+
+    margin-bottom:40px;
+
+}
+
+
+
+/*=========================================================
+    STYRIVA LOGIN
+    PART 2
+=========================================================*/
+
+
+/*=========================================================
+    FORM
+=========================================================*/
+
+.auth-card form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+}
+
+.form-group{
+
+    margin-bottom:0;
+
+}
+
+.form-group label{
+
+    display:block;
+
+    margin-bottom:12px;
+
+    color:var(--white);
+
+    font-weight:600;
+
+    font-size:15px;
+
+}
+
+
+.form-group input{
+
+    width:100%;
+
+    height:58px;
+
+    padding:0 20px;
+
+    background:#161616;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:16px;
+
+    color:var(--white);
+
+    font-size:15px;
+
+    transition:.30s ease;
+
+}
+
+
+.form-group input::placeholder{
+
+    color:#7d7d7d;
+
+}
+
+
+.form-group input:focus{
+
+    outline:none;
+
+    border-color:var(--gold);
+
+    box-shadow:
+
+        0 0 0 4px rgba(212,175,55,.12);
+
+    background:#1c1c1c;
+
+}
+
+
+/*=========================================================
+    PASSWORD
+=========================================================*/
+
+.password-wrapper{
+
+    position:relative;
+
+}
+
+
+.password-wrapper input{
+
+    padding-right:60px;
+
+}
+
+
+.password-toggle{
+
+    position:absolute;
+
+    right:18px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    border:none;
+
+    background:none;
+
+    color:var(--muted);
+
+    cursor:pointer;
+
+    font-size:20px;
+
+    transition:.25s;
+
+}
+
+
+.password-toggle:hover{
+
+    color:var(--gold);
+
+}
+
+
+/*=========================================================
+    REMEMBER
+=========================================================*/
+
+.form-options{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:-6px;
+
+}
+
+
+.remember-me{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    cursor:pointer;
+
+    color:var(--muted);
+
+    font-size:14px;
+
+}
+
+
+.remember-me input{
+
+    width:18px;
+
+    height:18px;
+
+    accent-color:var(--gold);
+
+}
+
+
+/*=========================================================
+    BUTTON
+=========================================================*/
+
+.btn{
+
+    border:none;
+
+    cursor:pointer;
+
+    transition:.30s ease;
+
+}
+
+
+.btn-full{
+
+    width:100%;
+
+}
+
+
+.btn-primary{
+
+    height:60px;
+
+    border-radius:18px;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            var(--gold-light),
+            var(--gold)
+        );
+
+    color:#000;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    box-shadow:
+
+        0 16px 40px rgba(212,175,55,.28);
+
+}
+
+
+.btn-primary:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+
+        0 22px 45px rgba(212,175,55,.38);
+
+}
+
+
+.btn-primary:active{
+
+    transform:scale(.98);
+
+}
+
+
+/*=========================================================
+    DIVIDER
+=========================================================*/
+
+.auth-divider{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    margin:38px 0;
+
+}
+
+
+.auth-divider::before,
+
+.auth-divider::after{
+
+    content:"";
+
+    flex:1;
+
+    height:1px;
+
+    background:rgba(255,255,255,.08);
+
+}
+
+
+.auth-divider span{
+
+    color:var(--muted);
+
+    font-size:13px;
+
+    letter-spacing:2px;
+
+}
+
+
+/*=========================================================
+    FOOTER
+=========================================================*/
+
+.auth-footer{
+
+    text-align:center;
+
+}
+
+
+.auth-footer p{
+
+    color:var(--muted);
+
+}
+
+
+.auth-footer a{
+
+    color:var(--gold);
+
+    font-weight:600;
+
+}
+
+
+.auth-footer a:hover{
+
+    color:var(--gold-light);
+
+}
+
+
+/*=========================================================
+    ALERTS
+=========================================================*/
+
+.auth-card .alert{
+
+    border-radius:16px;
+
+    padding:16px 20px;
+
+    margin-bottom:24px;
+
+    font-weight:600;
+
+}
+
+
+.alert-success{
+
+    background:rgba(34,197,94,.12);
+
+    border:1px solid rgba(34,197,94,.20);
+
+    color:#8df2b0;
+
+}
+
+
+.alert-error{
+
+    background:rgba(239,68,68,.12);
+
+    border:1px solid rgba(239,68,68,.20);
+
+    color:#ffb4b4;
+
+}
+
+
+.alert-warning{
+
+    background:rgba(245,158,11,.12);
+
+    border:1px solid rgba(245,158,11,.20);
+
+    color:#ffd27d;
+
+}
+
+
+/*=========================================================
+    STYRIVA LOGIN
+    PART 3
+=========================================================*/
+
+
+/*=========================================================
+    CARD ANIMATION
+=========================================================*/
+
+.auth-card{
+
+    transition:.35s ease;
+
+}
+
+.auth-card:hover{
+
+    transform:translateY(-6px);
+
+    border-color:rgba(212,175,55,.22);
+
+    box-shadow:
+        0 35px 80px rgba(0,0,0,.55),
+        0 0 40px rgba(212,175,55,.08);
+
+}
+
+.feature-item{
+
+    transition:.30s ease;
+
+}
+
+.feature-item:hover{
+
+    transform:translateX(10px);
+
+}
+
+.feature-item:hover .feature-icon{
+
+    transform:scale(1.08);
+
+    background:rgba(212,175,55,.15);
+
+    border-color:rgba(212,175,55,.35);
+
+}
+
+.feature-icon{
+
+    transition:.30s ease;
+
+}
+
+
+/*=========================================================
+    LINKS
+=========================================================*/
+
+a{
+
+    transition:.25s ease;
+
+    text-decoration:none;
+
+}
+
+a:hover{
+
+    text-decoration:none;
+
+}
+
+
+/*=========================================================
+    SELECTION
+=========================================================*/
+
+::selection{
+
+    background:rgba(212,175,55,.35);
+
+    color:#fff;
+
+}
+
+
+/*=========================================================
+    SCROLLBAR
+=========================================================*/
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#111;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:rgba(212,175,55,.45);
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:var(--gold);
+
+}
+
+
+/*=========================================================
+    RESPONSIVE
+=========================================================*/
+
+@media (max-width:1100px){
+
+    .auth-container{
+
+        gap:50px;
+
+        grid-template-columns:1fr;
+
+    }
+
+    .auth-left{
+
+        text-align:center;
+
+        align-items:center;
+
+    }
+
+    .auth-left>p{
+
+        max-width:650px;
+
+    }
+
+    .feature-list{
+
+        width:100%;
+
+        max-width:600px;
+
+    }
+
+}
+
+
+@media (max-width:768px){
+
+    .auth-page{
+
+        padding:40px 20px;
+
+    }
+
+    .auth-container{
+
+        width:100%;
+
+    }
+
+    .auth-left{
+
+        display:none;
+
+    }
+
+    .auth-card{
+
+        padding:35px 25px;
+
+        border-radius:24px;
+
+    }
+
+    .auth-card h2{
+
+        font-size:2.2rem;
+
+    }
+
+    .card-description{
+
+        font-size:.95rem;
+
+    }
+
+    .form-group input{
+
+        height:54px;
+
+    }
+
+    .btn-primary{
+
+        height:56px;
+
+    }
+
+}
+
+
+@media (max-width:480px){
+
+    .auth-page{
+
+        padding:20px 15px;
+
+    }
+
+    .auth-card{
+
+        padding:25px 18px;
+
+    }
+
+    .auth-card h2{
+
+        font-size:1.9rem;
+
+    }
+
+    .card-label{
+
+        letter-spacing:2px;
+
+    }
+
+    .remember-me{
+
+        font-size:13px;
+
+    }
+
+}
+
+
+/*=========================================================
+    FADE IN
+=========================================================*/
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(30px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+.auth-left{
+
+    animation:fadeUp .7s ease;
+
+}
+
+.auth-card{
+
+    animation:fadeUp .8s ease;
+
+}

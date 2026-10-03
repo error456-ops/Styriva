@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+My Profile | STYRIVA
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="profile-page">
+
+    <!-- =========================
+         PROFILE HERO
+    ========================== -->
+
+    <div class="profile-hero">
+
+        <span class="profile-label">
+            MY PROFILE
+        </span>
+
+        <h1 class="profile-name">
+            {{ request.user.username }}
+        </h1>
+
+        <p class="profile-email">
+            {{ request.user.email }}
+        </p>
+
+        <p class="profile-member">
+            Member since {{ profile.created_at|date:"F d, Y" }}
+        </p>
+
+    </div>
+
+    <!-- =========================
+         STATS
+    ========================== -->
+
+    <section class="stats-section">
+
+        <div class="stat-card">
+
+            <span class="stat-number">
+                {{ consultation_count }}
+            </span>
+
+            <span class="stat-title">
+                Consultations
+            </span>
+
+        </div>
+
+        <div class="stat-card">
+
+            <span class="stat-number">
+                {{ generated_look_count }}
+            </span>
+
+            <span class="stat-title">
+                AI Looks
+            </span>
+
+        </div>
+
+        <div class="stat-card">
+
+            <span class="stat-number">
+                {{ evolved_look_count }}
+            </span>
+
+            <span class="stat-title">
+                Evolutions
+            </span>
+
+        </div>
+
+        <!-- NEW: CREDITS CARD -->
+        <div class="stat-card">
+
+            <span class="stat-number">
+                {{ request.user.profile.credits }}
+            </span>
+
+            <span class="stat-title">
+                Credits
+            </span>
+
+            <a href="/premium/" class="buy-more-link">
+                Buy More
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         RECENT LOOKS
+    ========================== -->
+
+    <section class="recent-section">
+
+        <div class="section-header">
+
+            <span class="section-label">
+                RECENT LOOKS
+            </span>
+
+            <h2 class="section-title">
+                Your Latest AI Creations
+            </h2>
+
+        </div>
+
+        <div class="looks-grid">
+
+            {% for look in recent_looks %}
+
+            <div class="look-card">
+
+                {% if look.generated_image %}
+
+                    <img
+                        src="{{ look.generated_image.url }}"
+                        alt="{{ look.title }}"
+                        class="look-image"
+                    >
+
+                {% else %}
+
+                    <div class="look-placeholder">
+
+                        ✨
+
+                    </div>
+
+                {% endif %}
+
+                <div class="look-content">
+
+                    <h3>
+
+                        {% if look.title %}
+                            {{ look.title }}
+                        {% else %}
+                            AI Styled Look
+                        {% endif %}
+
+                    </h3>
+
+                    <p>
+
+                        {% if look.consultation %}
+                            {{ look.consultation.occasion }}
+                        {% endif %}
+
+                    </p>
+
+                    <span>
+
+                        {{ look.created_at|date:"M d, Y" }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="empty-state">
+
+                <h3>
+                    No Looks Yet
+                </h3>
+
+                <p>
+                    Your generated AI outfits will appear here.
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         QUICK ACTIONS
+    ========================== -->
+
+    <section class="actions-section">
+
+        <div class="section-header">
+
+            <span class="section-label">
+                QUICK ACTIONS
+            </span>
+
+            <h2 class="section-title">
+                Continue Your Style Journey
+            </h2>
+
+        </div>
+
+        <div class="action-buttons">
+
+            <a href="{% url 'generate_style_look' %}" class="action-btn primary-action">
+
+                ✨ Generate New Look
+
+            </a>
+
+            <!-- NEW: BUY CREDITS BUTTON -->
+            <a href="/premium/" class="action-btn secondary-action">
+
+                🪙 Buy Credits
+
+            </a>
+
+            <a href="{% url 'logout' %}" class="action-btn secondary-action">
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </section>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'profile.js' %}"></script>
+{% endblock %}

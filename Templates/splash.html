@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STYRIVA - Your Virtual Stylist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth fade-in animation for elements */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom progress bar animation */
+        @keyframes loadingBar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 1.2s ease-out forwards;
+        }
+        .animate-loading-bar {
+            animation: loadingBar 1.8s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-[#fbf9f6] min-h-screen flex items-center justify-center m-0 overflow-hidden">
+
+    <div id="splash-container" class="text-center opacity-100 transition-opacity duration-1000 ease-out">
+        
+        <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center animate-fade-in">
+            <img src="{% static 'logo.png' %}" alt="STYRIVA Logo" class="max-w-full max-h-full object-contain">
+        </div>
+
+        <div class="animate-fade-in" style="animation-delay: 0.3s;">
+            <h1 class="text-4xl font-serif text-[#3a3530] tracking-[0.3em] uppercase font-light mb-1">Stryiva</h1>
+            <p class="text-[10px] text-stone-400 tracking-[0.5em] uppercase font-medium">Your Intelligent Wardrobe</p>
+        </div>
+        
+        <div class="mt-10 w-24 h-[1px] bg-stone-200 mx-auto relative overflow-hidden animate-fade-in" style="animation-delay: 0.6s;">
+            <div class="absolute inset-0 bg-[#3a3530] animate-loading-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // Step 1: Wait 3 seconds for the luxury brand intro to show
+            setTimeout(() => {
+                const splash = document.getElementById('splash-container');
+                splash.style.opacity = '0'; // Starts the smooth 1-second fade out
+                
+                // Step 2: Wait exactly 1 second (1000ms) for the fade-out to finish, then go!
+                setTimeout(() => {
+                    window.location.href = "{%url 'generate_style_look' %}";
+                }, 1000); 
+
+            }, 3000); // 3000ms total showcase time
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cookie Policy | STYRIVA</title>
+
+    <meta
+        name="description"
+        content="Learn how STYRIVA uses cookies and similar technologies on its website."
+    >
+
+    <meta name="robots" content="index, follow">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Helvetica, Arial, sans-serif;
+            background: #faf9f7;
+            color: #1d1d1d;
+            line-height: 1.7;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .navbar {
+            width: 100%;
+            border-bottom: 1px solid #e8e5e0;
+            background: rgba(250, 249, 247, 0.96);
+        }
+
+        .nav-container {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 20px 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 14px;
+        }
+
+        .nav-links a {
+            color: #555;
+        }
+
+        .nav-links a:hover {
+            color: #111;
+        }
+
+        .nav-button {
+            padding: 10px 18px;
+            border-radius: 999px;
+            background: #1d1d1d;
+            color: white !important;
+        }
+
+        .hero {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 85px 24px 55px;
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #777;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 6vw, 60px);
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 18px;
+        }
+
+        .hero p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .content {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 0 24px 90px;
+        }
+
+        .section {
+            padding: 42px 0;
+            border-top: 1px solid #e6e2dc;
+        }
+
+        .section h2 {
+            font-size: 27px;
+            line-height: 1.3;
+            margin-bottom: 16px;
+        }
+
+        .section p {
+            color: #555;
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        .section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .section ul {
+            padding-left: 22px;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .section li {
+            margin-bottom: 9px;
+        }
+
+        .updated {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 13px;
+            border-radius: 999px;
+            background: #f1efeb;
+            color: #777;
+            font-size: 12px;
+        }
+
+        .note {
+            margin-top: 24px;
+            padding: 22px 24px;
+            background: #f1efeb;
+            border-left: 3px solid #1d1d1d;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .note p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        footer {
+            border-top: 1px solid #e6e2dc;
+            background: #f5f3ef;
+        }
+
+        .footer-container {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 45px 24px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        .footer-brand h3 {
+            letter-spacing: 3px;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .footer-brand p {
+            max-width: 330px;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px 25px;
+            justify-content: flex-end;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .footer-links a:hover {
+            color: #111;
+        }
+
+        .copyright {
+            text-align: center;
+            padding: 18px 24px;
+            border-top: 1px solid #e6e2dc;
+            color: #888;
+            font-size: 12px;
+        }
+
+        @media (max-width: 700px) {
+
+            .nav-container {
+                padding: 18px;
+            }
+
+            .nav-links {
+                gap: 14px;
+                font-size: 12px;
+            }
+
+            .nav-links a:not(.nav-button) {
+                display: none;
+            }
+
+            .hero {
+                padding: 65px 20px 45px;
+            }
+
+            .content {
+                padding: 0 20px 60px;
+            }
+
+            .footer-container {
+                flex-direction: column;
+            }
+
+            .footer-links {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="nav-container">
+
+        <a href="/" class="logo">
+            STYRIVA
+        </a>
+
+        <div class="nav-links">
+
+            <a href="/">
+                Home
+            </a>
+
+            <a href="/about/">
+                About
+            </a>
+
+            <a href="/how-it-works/">
+                How It Works
+            </a>
+
+            <a href="/guides/">
+                Guides
+            </a>
+
+            <a href="/faq/">
+                FAQ
+            </a>
+
+            <a href="/contact/">
+                Contact
+            </a>
+
+            <a href="/generate/" class="nav-button">
+                Create Your Look
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<header class="hero">
+
+    <div class="eyebrow">
+        STYRIVA
+    </div>
+
+    <h1>
+        Cookie Policy
+    </h1>
+
+    <p>
+        This page explains how STYRIVA may use cookies and similar
+        technologies when you visit or use our website.
+    </p>
+
+    <span class="updated">
+        Last updated: August 11, 2026
+    </span>
+
+</header>
+
+
+<main class="content">
+
+
+    <!-- 1 -->
+
+    <section class="section">
+
+        <h2>
+            1. What are cookies?
+        </h2>
+
+        <p>
+            Cookies are small pieces of information that websites can
+            store on your device when you visit them. They can help a
+            website remember information, maintain necessary sessions,
+            understand how the service is used, and support certain
+            website features.
+        </p>
+
+    </section>
+
+
+    <!-- 2 -->
+
+    <section class="section">
+
+        <h2>
+            2. How STYRIVA may use cookies
+        </h2>
+
+        <p>
+            STYRIVA may use cookies or similar technologies for purposes
+            such as:
+        </p>
+
+        <ul>
+            <li>Supporting essential website functionality.</li>
+            <li>Maintaining necessary website sessions.</li>
+            <li>Remembering certain preferences where applicable.</li>
+            <li>Understanding website usage and performance where applicable.</li>
+            <li>Supporting advertising and measurement technologies when applicable.</li>
+        </ul>
+
+        <p>
+            STYRIVA does not currently use cookies to maintain user
+            login accounts because an account or login is not required
+            to use the styling service.
+        </p>
+
+    </section>
+
+
+    <!-- 3 -->
+
+    <section class="section">
+
+        <h2>
+            3. Essential cookies
+        </h2>
+
+        <p>
+            Some cookies may be necessary for the website to function
+            correctly. For example, Django may use cookies to maintain
+            necessary sessions and help protect forms and requests.
+        </p>
+
+        <p>
+            These cookies may be used for technical and security purposes
+            rather than for maintaining a user account.
+        </p>
+
+        <p>
+            Disabling essential cookies may cause some parts of STYRIVA
+            to stop working correctly.
+        </p>
+
+    </section>
+
+
+    <!-- 4 -->
+
+    <section class="section">
+
+        <h2>
+            4. Analytics cookies
+        </h2>
+
+        <p>
+            If analytics services are enabled on STYRIVA, cookies or
+            similar technologies may be used to understand information
+            such as how visitors navigate the website, which pages are
+            used, and whether technical problems occur.
+        </p>
+
+        <p>
+            Analytics information can help us improve the functionality
+            and usability of STYRIVA.
+        </p>
+
+    </section>
+
+
+    <!-- 5 -->
+
+    <section class="section">
+
+        <h2>
+            5. Advertising cookies
+        </h2>
+
+        <p>
+            STYRIVA may use third-party advertising services, such as
+            Google AdSense, if advertising is enabled on the website.
+        </p>
+
+        <p>
+            Advertising providers may use cookies or similar technologies
+            to provide, measure, and personalize advertisements in
+            accordance with their own policies and applicable requirements.
+        </p>
+
+        <div class="note">
+
+            <p>
+                Advertising is not assumed to be active simply because
+                this Cookie Policy mentions it. Advertising technologies
+                will only be used if they are actually implemented on
+                STYRIVA.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- 6 -->
+
+    <section class="section">
+
+        <h2>
+            6. Third-party services
+        </h2>
+
+        <p>
+            Some services used by STYRIVA may place or access cookies or
+            similar technologies. The specific services used may change
+            as the website develops.
+        </p>
+
+        <p>
+            Third-party services operate according to their own privacy
+            and cookie policies.
+        </p>
+
+    </section>
+
+
+    <!-- 7 -->
+
+    <section class="section">
+
+        <h2>
+            7. Managing cookies
+        </h2>
+
+        <p>
+            Most modern web browsers allow you to control or delete
+            cookies through their settings.
+        </p>
+
+        <p>
+            You can generally choose to block cookies, delete existing
+            cookies, or receive a notification before a cookie is stored.
+            However, blocking essential cookies may affect the
+            functionality of STYRIVA.
+        </p>
+
+    </section>
+
+
+    <!-- 8 -->
+
+    <section class="section">
+
+        <h2>
+            8. Changes to this Cookie Policy
+        </h2>
+
+        <p>
+            We may update this Cookie Policy when our website,
+            technologies, services, or legal requirements change.
+        </p>
+
+        <p>
+            Any updated version will be published on this page with a
+            revised update date.
+        </p>
+
+    </section>
+
+
+    <!-- 9 -->
+
+    <section class="section">
+
+        <h2>
+            9. Contact us
+        </h2>
+
+        <p>
+            If you have questions about this Cookie Policy or how cookies
+            are used on STYRIVA, please visit our
+            <a href="/contact/" style="text-decoration: underline;">
+                Contact
+            </a>
+            page.
+        </p>
+
+        <p>
+            You can also review our
+            <a href="/privacy/" style="text-decoration: underline;">
+                Privacy Policy
+            </a>
+            for more information about how information is handled.
+        </p>
+
+    </section>
+
+
+</main>
+
+
+<footer>
+
+    <div class="footer-container">
+
+        <div class="footer-brand">
+
+            <h3>
+                STYRIVA
+            </h3>
+
+            <p>
+                An AI-powered styling assistant designed to help you
+                make simpler, more personalized outfit decisions.
+            </p>
+
+        </div>
+
+
+      
+<div class="footer-links">
+
+    <a href="{% url 'splash' %}">
+        Home
+    </a>
+
+    <a href="{% url 'about' %}">
+        About
+    </a>
+
+    <a href="{% url 'how_it_works' %}">
+        How It Works
+    </a>
+
+    <a href="{% url 'guides' %}">
+        Styling Guides
+    </a>
+
+    <a href="{% url 'faq' %}">
+        FAQ
+    </a>
+
+    <a href="{% url 'contact' %}">
+        Contact
+    </a>
+
+    <a href="{% url 'privacy_policy' %}">
+        Privacy Policy
+    </a>
+
+    <a href="{% url 'terms' %}">
+        Terms & Conditions
+    </a>
+
+    <a href="{% url 'cookies' %}">
+        Cookie Policy
+    </a>
+
+    <a href="{% url 'disclaimer' %}">
+        Disclaimer
+    </a>
+
+</div>
+
+
+
+    <div class="copyright">
+        © {% now "Y" %} STYRIVA. All rights reserved.
+    </div>
+
+</footer>
+
+</body>
+</html>
+

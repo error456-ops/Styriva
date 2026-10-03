@@ -1,0 +1,342 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Creating Your Luxury Look</title>
+
+    <link rel="stylesheet"
+          href="{% static 'loading.css' %}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Inter:wght@400;500&display=swap"
+          rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="background-glow"></div>
+
+<div class="loading-card">
+
+    <div class="sparkle"
+         id="status-icon">
+        ✨
+    </div>
+
+    <div class="spinner"
+         id="loading-spinner">
+    </div>
+
+    <h1 id="loading-title">
+        Creating Your Luxury Look
+    </h1>
+
+    <p id="loading-message">
+        Our AI stylist is carefully creating your perfect look.
+        Please wait a few moments.
+    </p>
+
+    <div class="dots"
+         id="loading-dots">
+
+        <span></span>
+        <span></span>
+        <span></span>
+
+    </div>
+
+    <small id="loading-status">
+        Preparing your styling experience...
+    </small>
+
+</div>
+
+
+<script>
+
+    // =====================================================
+    // STYRIVA GENERATION STATUS POLLING
+    // =====================================================
+
+    const consultationId =
+        "{{ consultation.id }}";
+
+    const statusIcon =
+        document.getElementById(
+            "status-icon"
+        );
+
+    const loadingSpinner =
+        document.getElementById(
+            "loading-spinner"
+        );
+
+    const loadingTitle =
+        document.getElementById(
+            "loading-title"
+        );
+
+    const loadingMessage =
+        document.getElementById(
+            "loading-message"
+        );
+
+    const loadingDots =
+        document.getElementById(
+            "loading-dots"
+        );
+
+    const loadingStatus =
+        document.getElementById(
+            "loading-status"
+        );
+
+
+    // =====================================================
+    // Polling State
+    // =====================================================
+
+    let pollingStopped = false;
+
+
+    // =====================================================
+    // Stop Loading Animation
+    // =====================================================
+
+    function stopLoadingAnimation() {
+
+        loadingSpinner.style.display =
+            "none";
+
+        loadingDots.style.display =
+            "none";
+
+    }
+
+
+    // =====================================================
+    // Show Failure State
+    // =====================================================
+
+    function showFailure(
+        message
+    ) {
+
+        pollingStopped = true;
+
+        stopLoadingAnimation();
+
+        statusIcon.innerHTML =
+            "⚠️";
+
+        loadingTitle.innerHTML =
+            "We Couldn't Create Your Look";
+
+        loadingMessage.innerHTML =
+            message ||
+            "Something went wrong while creating your look.";
+
+        loadingStatus.innerHTML =
+            "Please try creating your look again.";
+
+    }
+
+
+    // =====================================================
+    // Update Processing Message
+    // =====================================================
+
+    function showProcessingStatus(
+        status
+    ) {
+
+        if (
+            status === "pending"
+        ) {
+
+            loadingStatus.innerHTML =
+                "Your request is waiting for our AI stylist...";
+
+            return;
+
+        }
+
+        if (
+            status === "processing"
+        ) {
+
+            loadingStatus.innerHTML =
+                "Our AI stylist is working on your look...";
+
+        }
+
+    }
+
+
+    // =====================================================
+    // Check Generation Status
+    // =====================================================
+
+    async function checkGenerationStatus() {
+
+        if (
+            pollingStopped
+        ) {
+
+            return;
+
+        }
+
+        try {
+
+            const response =
+                await fetch(
+
+                    `/generation-status/${consultationId}/`,
+
+                    {
+                        cache: "no-store"
+                    }
+
+                );
+
+
+            // -------------------------------------------------
+            // HTTP Error
+            // -------------------------------------------------
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    "Unable to check generation status."
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            // -------------------------------------------------
+            // Generation Completed
+            // -------------------------------------------------
+
+            if (
+                data.completed ||
+                data.status === "completed"
+            ) {
+
+                pollingStopped = true;
+
+                loadingStatus.innerHTML =
+                    "Your look is ready. Opening your results...";
+
+                window.location.href =
+                    `/result/${consultationId}/`;
+
+                return;
+
+            }
+
+
+            // -------------------------------------------------
+            // Generation Failed
+            // -------------------------------------------------
+
+            if (
+                data.status === "failed"
+            ) {
+
+                showFailure(
+
+                    data.message ||
+                    "Style generation failed. Please try again."
+
+                );
+
+                return;
+
+            }
+
+
+            // -------------------------------------------------
+            // Generation Pending / Processing
+            // -------------------------------------------------
+
+            showProcessingStatus(
+                data.status
+            );
+
+        }
+
+        catch (
+            error
+        ) {
+
+            console.error(
+                "Generation status error:",
+                error
+            );
+
+            /*
+            A temporary network error should NOT immediately
+            mark the AI generation as failed.
+
+            We keep polling because the worker may still
+            be successfully processing the job.
+            */
+
+            loadingStatus.innerHTML =
+                "Still waiting for your styling result...";
+
+        }
+
+    }
+
+
+    // =====================================================
+    // Start Polling
+    // =====================================================
+
+    checkGenerationStatus();
+
+    const pollingInterval =
+        setInterval(
+
+            () => {
+
+                if (
+                    pollingStopped
+                ) {
+
+                    clearInterval(
+                        pollingInterval
+                    );
+
+                    return;
+
+                }
+
+                checkGenerationStatus();
+
+            },
+
+            3000
+
+        );
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Account | STYRIVA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'base.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="signup-page">
+
+    <div class="signup-background"></div>
+
+    <div class="signup-card">
+
+        <div class="signup-header">
+
+            <h1>Create your account</h1>
+
+            <p>
+                Unlock your personal AI stylist and elevate your fashion journey.
+            </p>
+
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" novalidate id="signupForm">
+
+            {% csrf_token %}
+
+            <div class="form-group">
+
+                <label for="{{ form.username.id_for_label }}">
+                    Username
+                </label>
+
+                {{ form.username }}
+
+                {% if form.username.errors %}
+                    <small class="error">
+                        {{ form.username.errors.0 }}
+                    </small>
+                {% endif %}
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="{{ form.email.id_for_label }}">
+                    Email Address
+                </label>
+
+                {{ form.email }}
+
+                {% if form.email.errors %}
+                    <small class="error">
+                        {{ form.email.errors.0 }}
+                    </small>
+                {% endif %}
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="{{ form.password1.id_for_label }}">
+                    Password
+                </label>
+
+                <div class="password-wrapper">
+
+                    {{ form.password1 }}
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        data-target="{{ form.password1.id_for_label }}"
+                    >
+                        👁
+                    </button>
+
+                </div>
+
+                {% if form.password1.errors %}
+                    <small class="error">
+                        {{ form.password1.errors.0 }}
+                    </small>
+                {% endif %}
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="{{ form.password2.id_for_label }}">
+                    Confirm Password
+                </label>
+
+                <div class="password-wrapper">
+
+                    {{ form.password2 }}
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        data-target="{{ form.password2.id_for_label }}"
+                    >
+                        👁
+                    </button>
+
+                </div>
+
+                {% if form.password2.errors %}
+                    <small class="error">
+                        {{ form.password2.errors.0 }}
+                    </small>
+                {% endif %}
+
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="error-box">
+
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+
+                </div>
+            {% endif %}
+
+            <button
+                type="submit"
+                id="signupButton"
+                class="signup-button"
+            >
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <div class="login-link">
+
+            Already have an account?
+
+            <a href="{% url 'login' %}">
+                Login
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'base.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,1085 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>How STYRIVA Works | AI Styling Assistant</title>
+
+    <meta
+        name="description"
+        content="Learn how STYRIVA creates personalized AI styling recommendations using your clothing choices, occasion, vibe, and weather."
+    >
+
+    <meta name="robots" content="index, follow">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Helvetica, Arial, sans-serif;
+            background: #faf9f7;
+            color: #1d1d1d;
+            line-height: 1.7;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* NAVIGATION */
+
+        .navbar {
+            width: 100%;
+            border-bottom: 1px solid #e8e5e0;
+            background: rgba(250, 249, 247, 0.96);
+        }
+
+        .nav-container {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 20px 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 14px;
+        }
+
+        .nav-links a {
+            color: #555;
+            transition: 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: #111;
+        }
+
+        .nav-button {
+            padding: 10px 18px;
+            border-radius: 999px;
+            background: #1d1d1d;
+            color: white !important;
+        }
+
+        .nav-button:hover {
+            opacity: 0.85;
+        }
+
+        /* HERO */
+
+        .hero {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 90px 24px 70px;
+            text-align: center;
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #777;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 7vw, 70px);
+            line-height: 1.05;
+            letter-spacing: -2px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .hero p {
+            max-width: 720px;
+            margin: 0 auto;
+            color: #666;
+            font-size: 18px;
+        }
+
+        /* CONTENT */
+
+        .content {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 0 24px 90px;
+        }
+
+        .section {
+            padding: 60px 0;
+            border-top: 1px solid #e6e2dc;
+        }
+
+        .section:first-child {
+            border-top: none;
+        }
+
+        .section h2 {
+            font-size: 30px;
+            line-height: 1.2;
+            font-weight: 600;
+            margin-bottom: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-intro {
+            color: #666;
+            font-size: 16px;
+            max-width: 720px;
+            margin-bottom: 30px;
+        }
+
+        /* STEPS */
+
+        .steps {
+            display: grid;
+            gap: 18px;
+        }
+
+        .step {
+            display: flex;
+            gap: 22px;
+            align-items: flex-start;
+
+            background: white;
+            border: 1px solid #e7e3dd;
+            border-radius: 18px;
+            padding: 28px;
+        }
+
+        .step-number {
+            min-width: 44px;
+            height: 44px;
+
+            border-radius: 50%;
+            background: #1d1d1d;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .step h3 {
+            font-size: 19px;
+            margin-bottom: 7px;
+        }
+
+        .step p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* INPUT GRID */
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-top: 30px;
+        }
+
+        .input-card {
+            background: white;
+            border: 1px solid #e7e3dd;
+            border-radius: 18px;
+            padding: 27px;
+        }
+
+        .input-card h3 {
+            font-size: 18px;
+            margin-bottom: 9px;
+        }
+
+        .input-card p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* AI SECTION */
+
+        .ai-box {
+            background: #f1efeb;
+            border-radius: 20px;
+            padding: 32px;
+            margin-top: 30px;
+        }
+
+        .ai-box h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .ai-box p {
+            color: #555;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .ai-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* RESULT */
+
+        .result-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border: 1px solid #e7e3dd;
+            border-radius: 18px;
+            padding: 25px;
+        }
+
+        .result-card h3 {
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .result-card p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* NOTE */
+
+        .note {
+            margin-top: 30px;
+            padding: 24px 26px;
+            border-left: 3px solid #1d1d1d;
+            background: #f1efeb;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .note p {
+            color: #555;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* CTA */
+
+        .cta {
+            margin-top: 30px;
+            padding: 48px 30px;
+            border-radius: 24px;
+            background: #1d1d1d;
+            color: white;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .cta p {
+            color: #d0d0d0;
+            max-width: 620px;
+            margin: 0 auto 25px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 13px 25px;
+            background: white;
+            color: #1d1d1d;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+
+        /* FOOTER */
+
+        footer {
+            border-top: 1px solid #e6e2dc;
+            background: #f5f3ef;
+        }
+
+        .footer-container {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 45px 24px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        .footer-brand h3 {
+            letter-spacing: 3px;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .footer-brand p {
+            max-width: 330px;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px 25px;
+            justify-content: flex-end;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .footer-links a:hover {
+            color: #111;
+        }
+
+        .copyright {
+            text-align: center;
+            padding: 18px 24px;
+            border-top: 1px solid #e6e2dc;
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            .nav-container {
+                padding: 18px;
+            }
+
+            .nav-links {
+                gap: 14px;
+                font-size: 12px;
+            }
+
+            .nav-links a:not(.nav-button) {
+                display: none;
+            }
+
+            .hero {
+                padding: 70px 20px 55px;
+            }
+
+            .hero h1 {
+                font-size: 45px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .content {
+                padding: 0 20px 60px;
+            }
+
+            .section {
+                padding: 45px 0;
+            }
+
+            .section h2 {
+                font-size: 26px;
+            }
+
+            .input-grid,
+            .result-box {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-container {
+                flex-direction: column;
+            }
+
+            .footer-links {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVIGATION -->
+
+<nav class="navbar">
+
+    <div class="nav-container">
+
+        <a href="/" class="logo">
+            STYRIVA
+        </a>
+
+        <div class="nav-links">
+
+            <a href="/">
+                Home
+            </a>
+
+            <a href="/about/">
+                About
+            </a>
+
+            <a href="/guides/">
+                Guides
+            </a>
+
+            <a href="/faq/">
+                FAQ
+            </a>
+
+            <a href="/contact/">
+                Contact
+            </a>
+
+            <a href="/generate/" class="nav-button">
+                Create Your Look
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- HERO -->
+
+<header class="hero">
+
+    <div class="eyebrow">
+        STYRIVA
+    </div>
+
+    <h1>
+        How STYRIVA Works
+    </h1>
+
+    <p>
+        STYRIVA combines the clothing options you provide with your
+        occasion, preferred vibe, and weather to create a personalized
+        styling recommendation.
+    </p>
+
+</header>
+
+
+<main class="content">
+
+
+    <!-- INTRODUCTION -->
+
+    <section class="section">
+
+        <h2>
+            From your wardrobe to a curated look
+        </h2>
+
+        <p class="section-intro">
+            You don't need a completely new wardrobe to create a good
+            outfit. STYRIVA is designed to work with the options you
+            already have and help you decide how they can work together.
+        </p>
+
+        <div class="steps">
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    1
+                </div>
+
+                <div>
+
+                    <h3>
+                        Choose your occasion
+                    </h3>
+
+                    <p>
+                        Start by telling STYRIVA what kind of situation
+                        you're dressing for. The occasion provides context
+                        for the styling recommendation.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    2
+                </div>
+
+                <div>
+
+                    <h3>
+                        Select your vibe
+                    </h3>
+
+                    <p>
+                        Choose the visual direction you want your outfit
+                        to have. Your selected vibe helps guide the overall
+                        styling approach.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    3
+                </div>
+
+                <div>
+
+                    <h3>
+                        Add the weather
+                    </h3>
+
+                    <p>
+                        Provide the relevant weather conditions so that
+                        practical factors can be considered alongside
+                        appearance.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    4
+                </div>
+
+                <div>
+
+                    <h3>
+                        Upload your options
+                    </h3>
+
+                    <p>
+                        Provide the clothing and accessory choices you
+                        want STYRIVA to consider when creating the look.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    5
+                </div>
+
+                <div>
+
+                    <h3>
+                        Let STYRIVA analyze the choices
+                    </h3>
+
+                    <p>
+                        The styling system evaluates the available
+                        combinations against the information you've
+                        provided.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    6
+                </div>
+
+                <div>
+
+                    <h3>
+                        Receive your recommendation
+                    </h3>
+
+                    <p>
+                        STYRIVA presents a curated styling result designed
+                        around your selected options and preferences.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- NO ACCOUNT / USAGE -->
+
+    <section class="section">
+
+        <h2>
+            No account required
+        </h2>
+
+        <p class="section-intro">
+            STYRIVA is designed to let you explore and use the styling
+            experience without creating an account or signing in.
+        </p>
+
+        <div class="input-grid">
+
+            <div class="input-card">
+
+                <h3>
+                    No signup
+                </h3>
+
+                <p>
+                    You don't need to create a user account before using
+                    the available styling features.
+                </p>
+
+            </div>
+
+
+            <div class="input-card">
+
+                <h3>
+                    No login
+                </h3>
+
+                <p>
+                    You can access the styling workflow directly without
+                    entering account credentials.
+                </p>
+
+            </div>
+
+
+            <div class="input-card">
+
+                <h3>
+                    Free to use
+                </h3>
+
+                <p>
+                    STYRIVA is currently available as a free service with
+                    no active premium subscription or payment requirement.
+                </p>
+
+            </div>
+
+
+            <div class="input-card">
+
+                <h3>
+                    2 generations per day
+                </h3>
+
+                <p>
+                    The current service allows up to 2 AI styling
+                    generations per day. After reaching the limit,
+                    you can return the next day.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- INPUTS -->
+
+    <section class="section">
+
+        <h2>
+            What information does STYRIVA use?
+        </h2>
+
+        <p class="section-intro">
+            The recommendation is based on the information and options
+            you provide during the styling process.
+        </p>
+
+        <div class="input-grid">
+
+
+            <div class="input-card">
+
+                <h3>
+                    Clothing
+                </h3>
+
+                <p>
+                    The clothing pieces you make available to STYRIVA
+                    form the starting point for the outfit combinations.
+                </p>
+
+            </div>
+
+
+            <div class="input-card">
+
+                <h3>
+                    Accessories
+                </h3>
+
+                <p>
+                    Available accessories can be considered as part of
+                    the overall styling combination.
+                </p>
+
+            </div>
+
+
+            <div class="input-card">
+
+                <h3>
+                    Occasion
+                </h3>
+
+                <p>
+                    The intended occasion helps the system determine
+                    whether a combination suits the context.
+                </p>
+
+            </div>
+
+
+            <div class="input-card">
+
+                <h3>
+                    Vibe
+                </h3>
+
+                <p>
+                    Your selected vibe gives the recommendation a
+                    particular visual direction.
+                </p>
+
+            </div>
+
+
+            <div class="input-card">
+
+                <h3>
+                    Weather
+                </h3>
+
+                <p>
+                    Weather conditions can influence the practicality
+                    and suitability of the recommended combination.
+                </p>
+
+            </div>
+
+
+            <div class="input-card">
+
+                <h3>
+                    Your provided images
+                </h3>
+
+                <p>
+                    Images you upload allow STYRIVA's styling system to
+                    work with the specific items you want to use.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- AI -->
+
+    <section class="section">
+
+        <h2>
+            How AI helps with the recommendation
+        </h2>
+
+        <p class="section-intro">
+            STYRIVA uses AI as part of its styling process to help evaluate
+            the available choices and produce a recommendation.
+        </p>
+
+        <div class="ai-box">
+
+            <h3>
+                From multiple choices to one curated direction
+            </h3>
+
+            <p>
+                When several clothing options are available, there can be
+                many possible combinations. STYRIVA's styling process is
+                designed to evaluate those possibilities against factors
+                such as the occasion, vibe, weather, and visual harmony.
+            </p>
+
+            <p>
+                The goal is to narrow those choices into a practical,
+                personalized styling direction rather than simply listing
+                every possible combination.
+            </p>
+
+            <p>
+                AI-generated recommendations are suggestions. Personal
+                preference, comfort, fit, and real-world circumstances
+                should always be considered when deciding what to wear.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- RESULT -->
+
+    <section class="section">
+
+        <h2>
+            What happens after you generate a look?
+        </h2>
+
+        <p class="section-intro">
+            Once the styling process is complete, STYRIVA takes you to
+            your result where you can review the recommended combination
+            and the accompanying styling guidance.
+        </p>
+
+        <div class="result-box">
+
+
+            <div class="result-card">
+
+                <h3>
+                    Curated combination
+                </h3>
+
+                <p>
+                    See the clothing and accessory combination selected
+                    from the options you provided.
+                </p>
+
+            </div>
+
+
+            <div class="result-card">
+
+                <h3>
+                    Styling guidance
+                </h3>
+
+                <p>
+                    Review the reasoning and practical suggestions
+                    associated with the recommended look.
+                </p>
+
+            </div>
+
+
+            <div class="result-card">
+
+                <h3>
+                    A starting point
+                </h3>
+
+                <p>
+                    Use the recommendation as inspiration and adjust it
+                    according to your own personal taste and comfort.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- PRIVACY -->
+
+    <section class="section">
+
+        <h2>
+            What about your uploaded images?
+        </h2>
+
+        <p>
+            STYRIVA may process images and other information that you
+            provide while using the styling service. How this information
+            is collected, used, stored, and handled is explained in our
+            <a href="/privacy/" style="text-decoration: underline;">
+                Privacy Policy
+            </a>.
+        </p>
+
+        <p>
+            We recommend reviewing the Privacy Policy before using the
+            service so you understand how your information is handled.
+        </p>
+
+    </section>
+
+
+    <!-- CTA -->
+
+    <section class="section">
+
+        <div class="cta">
+
+            <h2>
+                Ready to try STYRIVA?
+            </h2>
+
+            <p>
+                Upload your options, choose your occasion and vibe,
+                and let STYRIVA help you create a look.
+            </p>
+
+            <a href="/generate/" class="cta-button">
+                Create Your Look
+            </a>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    <div class="footer-container">
+
+        <div class="footer-brand">
+
+            <h3>
+                STYRIVA
+            </h3>
+
+            <p>
+                An AI-powered styling assistant designed to help you
+                make simpler, more personalized outfit decisions.
+            </p>
+
+        </div>
+
+
+
+<div class="footer-links">
+
+    <a href="{% url 'splash' %}">
+        Home
+    </a>
+
+    <a href="{% url 'about' %}">
+        About
+    </a>
+
+    <a href="{% url 'how_it_works' %}">
+        How It Works
+    </a>
+
+    <a href="{% url 'guides' %}">
+        Styling Guides
+    </a>
+
+    <a href="{% url 'faq' %}">
+        FAQ
+    </a>
+
+    <a href="{% url 'contact' %}">
+        Contact
+    </a>
+
+    <a href="{% url 'privacy_policy' %}">
+        Privacy Policy
+    </a>
+
+    <a href="{% url 'terms' %}">
+        Terms & Conditions
+    </a>
+
+    <a href="{% url 'cookies' %}">
+        Cookie Policy
+    </a>
+
+    <a href="{% url 'disclaimer' %}">
+        Disclaimer
+    </a>
+
+</div>
+
+
+
+
+    <div class="copyright">
+        © {% now "Y" %} STYRIVA. All rights reserved.
+    </div>
+
+</footer>
+
+</body>
+</html>
+

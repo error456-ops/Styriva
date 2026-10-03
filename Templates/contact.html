@@ -1,0 +1,542 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Contact STYRIVA | AI Styling</title>
+
+    <meta
+        name="description"
+        content="Contact STYRIVA for questions, support, privacy requests, or feedback about our AI styling platform."
+    >
+
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Contact STYRIVA">
+    <meta
+        property="og:description"
+        content="Get in touch with the STYRIVA team."
+    >
+    <meta property="og:type" content="website">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: #0b0b0d;
+            color: #eeeeee;
+            line-height: 1.7;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            background: rgba(11, 11, 13, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-container {
+            width: min(1180px, calc(100% - 40px));
+            margin: 0 auto;
+
+            min-height: 76px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .logo {
+            text-decoration: none;
+
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+
+            color: #ffffff;
+        }
+
+        .back-link {
+            text-decoration: none;
+
+            color: #bdbdc4;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #ffffff;
+        }
+
+        .hero {
+            width: min(900px, calc(100% - 40px));
+            margin: 0 auto;
+
+            padding: 90px 0 55px;
+
+            text-align: center;
+        }
+
+        .eyebrow {
+            display: inline-block;
+
+            margin-bottom: 18px;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+
+            color: #b9b9c2;
+        }
+
+        .hero h1 {
+            font-size: clamp(38px, 6vw, 64px);
+            line-height: 1.05;
+
+            letter-spacing: -0.04em;
+
+            margin-bottom: 24px;
+
+            color: #ffffff;
+        }
+
+        .hero p {
+            max-width: 680px;
+            margin: 0 auto;
+
+            color: #a9a9b2;
+
+            font-size: 17px;
+        }
+
+        .content {
+            width: min(1000px, calc(100% - 40px));
+            margin: 0 auto;
+
+            padding-bottom: 100px;
+        }
+
+        .contact-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 24px;
+        }
+
+        .contact-card {
+            padding: 38px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.055),
+                    rgba(255, 255, 255, 0.018)
+                );
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            border-radius: 24px;
+
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.25);
+        }
+
+        .contact-card.full {
+            grid-column: 1 / -1;
+        }
+
+        .icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 22px;
+
+            border-radius: 14px;
+
+            background: rgba(255, 255, 255, 0.06);
+
+            font-size: 21px;
+        }
+
+        .contact-card h2 {
+            margin-bottom: 12px;
+
+            font-size: 24px;
+
+            color: #ffffff;
+        }
+
+        .contact-card p {
+            margin-bottom: 18px;
+
+            color: #a9a9b2;
+
+            font-size: 15px;
+        }
+
+        .email-link {
+            display: inline-block;
+
+            color: #ffffff;
+
+            font-size: 16px;
+            font-weight: 600;
+
+            text-decoration: none;
+
+            word-break: break-word;
+        }
+
+        .email-link:hover {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .note {
+            padding: 20px;
+
+            margin-top: 10px;
+
+            background: rgba(255, 255, 255, 0.035);
+
+            border-left: 3px solid #ffffff;
+
+            border-radius: 0 12px 12px 0;
+        }
+
+        .note p {
+            margin: 0;
+        }
+
+        .footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+            padding: 38px 20px;
+        }
+
+        .footer-container {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 25px;
+        }
+
+        .footer-brand {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+        }
+
+        .footer-copy {
+            color: #707078;
+            font-size: 13px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #85858d;
+
+            font-size: 13px;
+
+            text-decoration: none;
+
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        @media (max-width: 750px) {
+
+            .nav-container {
+                min-height: 68px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .back-link {
+                font-size: 13px;
+            }
+
+            .hero {
+                padding: 65px 0 40px;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-card.full {
+                grid-column: auto;
+            }
+
+            .contact-card {
+                padding: 28px 22px;
+                border-radius: 18px;
+            }
+
+            .footer-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .footer-links {
+                gap: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVBAR
+    ========================= -->
+
+    <header class="navbar">
+
+        <div class="nav-container">
+
+            <a href="/" class="logo">
+                STYRIVA
+            </a>
+
+            <a href="/" class="back-link">
+                ← Back to STYRIVA
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         HERO
+    ========================= -->
+
+    <section class="hero">
+
+        <span class="eyebrow">
+            STYRIVA • Support
+        </span>
+
+        <h1>
+            Let's Talk.
+        </h1>
+
+        <p>
+            Have a question about STYRIVA, need help with the platform,
+            or want to report a problem? We'd love to hear from you.
+        </p>
+
+    </section>
+
+
+    <!-- =========================
+         CONTACT CONTENT
+    ========================= -->
+
+    <main class="content">
+
+        <div class="contact-grid">
+
+
+            <!-- SUPPORT -->
+
+            <section class="contact-card">
+
+                <div class="icon">
+                    ✉
+                </div>
+
+                <h2>
+                    General Support
+                </h2>
+
+                <p>
+                    For questions about using STYRIVA, AI styling,
+                    technical problems, or feedback about the platform.
+                </p>
+
+                <a
+                    href="mailto:YOUR_EMAIL@example.com"
+                    class="email-link"
+                >
+                    YOUR_EMAIL@example.com
+                </a>
+
+            </section>
+
+
+            <!-- PRIVACY -->
+
+            <section class="contact-card">
+
+                <div class="icon">
+                    🔒
+                </div>
+
+                <h2>
+                    Privacy
+                </h2>
+
+                <p>
+                    For privacy questions, personal information requests,
+                    or questions about how STYRIVA handles your data.
+                </p>
+
+                <a
+                    href="mailto:YOUR_EMAIL@example.com"
+                    class="email-link"
+                >
+                    Contact Privacy Support
+                </a>
+
+            </section>
+
+
+            <!-- ABOUT -->
+
+            <section class="contact-card full">
+
+                <div class="icon">
+                    ✦
+                </div>
+
+                <h2>
+                    About STYRIVA
+                </h2>
+
+                <p>
+                    STYRIVA is an AI-powered styling platform designed
+                    to help people create personalized fashion looks
+                    using their own clothing, preferences, and styling
+                    choices.
+                </p>
+
+                <div class="note">
+
+                    <p>
+                        STYRIVA does not currently require an account
+                        or login to use its styling features. For
+                        support, privacy requests, or other inquiries,
+                        please use the official STYRIVA contact email
+                        listed above.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================= -->
+
+    <footer class="footer">
+
+        <div class="footer-container">
+
+            <div>
+
+                <div class="footer-brand">
+                    STYRIVA
+                </div>
+
+                <div class="footer-copy">
+                    © {% now "Y" %} STYRIVA. All rights reserved.
+                </div>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="/">
+                    Home
+                </a>
+
+                <a href="{% url 'privacy_policy' %}">
+                    Privacy Policy
+                </a>
+
+                <a href="{% url 'terms' %}">
+                    Terms
+                </a>
+
+                <a href="{% url 'contact' %}">
+                    Contact
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+</html>
