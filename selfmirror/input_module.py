@@ -3,6 +3,10 @@ from .models import StyleConsultation
 
 class InputModule:
 
+    # Every clothing slot the form can send
+    GARMENT_PREFIXES = ("top", "bottom", "dress")
+    ACCESSORY_PREFIXES = ("shoe", "scarf")
+
     def __init__(self, consultation_id):
 
         self.consultation = StyleConsultation.objects.get(
@@ -15,26 +19,26 @@ class InputModule:
 
     def check(self):
 
-        required_fields = [
+        # The user's own photo is always required
+        if not self.consultation.user_model_photo:
 
-            self.consultation.user_model_photo,
+            raise ValueError(
+                "Missing the user's photo."
+            )
 
-            self.consultation.top_1,
-            self.consultation.top_2,
-            self.consultation.top_3,
+        # At least one top, bottom or one-piece is required
+        has_garment = any(
+            getattr(self.consultation, f"{prefix}_{i}")
+            for prefix in self.GARMENT_PREFIXES
+            for i in range(1, 4)
+        )
 
-            self.consultation.bottom_1,
-            self.consultation.bottom_2,
-            self.consultation.bottom_3,
-        ]
+        if not has_garment:
 
-        for field in required_fields:
-
-            if not field:
-
-                raise ValueError(
-                    "Missing image for one of the required fields."
-                )
+            raise ValueError(
+                "Please upload at least one top, "
+                "bottom or one-piece."
+            )
 
     # =====================================================
     # Build AI Input
@@ -59,69 +63,48 @@ class InputModule:
                 self.consultation.weather,
 
             "user_model_photo":
-                self.consultation.user_model_photo.path,
-
-            "top_1":
-                self.consultation.top_1.path,
-
-            "top_2":
-                self.consultation.top_2.path,
-
-            "top_3":
-                self.consultation.top_3.path,
-
-            "bottom_1":
-                self.consultation.bottom_1.path,
-
-            "bottom_2":
-                self.consultation.bottom_2.path,
-
-            "bottom_3":
-                self.consultation.bottom_3.path,
+                self.consultation.user_model_photo.url,
         }
 
         # ==========================================
-        # Optional Shoes (NEW)
+        # Tops, bottoms, one-pieces, shoes, scarves
+        # Only the ones the user uploaded are added.
         # ==========================================
 
-        if self.consultation.shoe_1:
+        for prefix in (
+            self.GARMENT_PREFIXES
+            + self.ACCESSORY_PREFIXES
+        ):
 
-            data["shoe_1"] = (
-                self.consultation.shoe_1.path
-            )
+            for i in range(1, 4):
 
-        if self.consultation.shoe_2:
+                field_name = f"{prefix}_{i}"
 
-            data["shoe_2"] = (
-                self.consultation.shoe_2.path
-            )
+                field = getattr(
+                    self.consultation,
+                    field_name
+                )
 
-        if self.consultation.shoe_3:
+                if field:
 
-            data["shoe_3"] = (
-                self.consultation.shoe_3.path
-            )
+                    data[field_name] = field.url
 
         # ==========================================
-        # Optional Scarves
+        # Helper flags for the next modules
         # ==========================================
 
-        if self.consultation.scarf_1:
+        has_top = any(f"top_{i}" in data for i in range(1, 4))
+        has_bottom = any(f"bottom_{i}" in data for i in range(1, 4))
+        has_dress = any(f"dress_{i}" in data for i in range(1, 4))
 
-            data["scarf_1"] = (
-                self.consultation.scarf_1.path
-            )
+        data["has_top"] = has_top
+        data["has_bottom"] = has_bottom
+        data["has_dress"] = has_dress
 
-        if self.consultation.scarf_2:
-
-            data["scarf_2"] = (
-                self.consultation.scarf_2.path
-            )
-
-        if self.consultation.scarf_3:
-
-            data["scarf_3"] = (
-                self.consultation.scarf_3.path
-            )
+        # "onepiece"  -> a dress/frock/gown was uploaded
+        # "separates" -> tops and/or bottoms only
+        data["outfit_mode"] = (
+            "onepiece" if has_dress else "separates"
+        )
 
         return data

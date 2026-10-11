@@ -10,6 +10,8 @@ from PIL import Image
 
 from media_manager.manager import MediaManager
 
+from .image_utils import local_path
+
 
 class LookRenderer:
     """
@@ -21,6 +23,11 @@ class LookRenderer:
     - Generate the final styled portrait.
     - Save the generated image through MediaManager.
     - Automatically clean temporary conversion files.
+
+    Supports:
+    - One-piece outfits (dress, long frock, gown)
+    - Top + bottom, top only, or bottom only
+    - Optional shoes and scarf
     """
 
     def __init__(
@@ -42,42 +49,66 @@ class LookRenderer:
     # Render
     # =====================================================
 
+    def _item_path(self, kind):
+        """Returns the image path for an outfit slot, or None."""
+
+        item = self.winning_outfit.get(kind)
+
+        if item and item.get("image_path"):
+            return item["image_path"]
+
+        return None
+
     def render(self):
 
-        top_path = self.winning_outfit[
-            "top"
-        ]["image_path"]
+        dress_path = self._item_path("dress")
+        top_path = self._item_path("top")
+        bottom_path = self._item_path("bottom")
+        shoe_path = self._item_path("shoe")
+        scarf_path = self._item_path("scarf")
 
-        bottom_path = self.winning_outfit[
-            "bottom"
-        ]["image_path"]
-
-        # NEW: optional shoe
-        shoe = self.winning_outfit.get("shoe")
-        shoe_path = (
-            shoe.get("image_path")
-            if shoe and shoe.get("image_path")
-            else None
-        )
-
-        scarf = self.winning_outfit.get("scarf")
-        scarf_path = (
-            scarf.get("image_path")
-            if scarf and scarf.get("image_path")
-            else None
-        )
-
+        print("DRESS:", dress_path)
         print("TOP:", top_path)
         print("BOTTOM:", bottom_path)
         print("SHOE:", shoe_path)
         print("SCARF:", scarf_path)
 
+        # Ordered list of the clothing images that will be sent.
+        # Image 1 is always the user, then these in order.
+        items = []
+
+        if dress_path:
+
+            # A one-piece is the full outfit by itself
+            items.append(("one-piece", dress_path))
+
+        else:
+
+            if top_path:
+                items.append(("top", top_path))
+
+            if bottom_path:
+                items.append(("bottom", bottom_path))
+
+        if shoe_path:
+            items.append(("shoes", shoe_path))
+
+        if scarf_path:
+            items.append(("scarf", scarf_path))
+
+        if not any(
+            kind in ("one-piece", "top", "bottom")
+            for kind, _ in items
+        ):
+
+            raise ValueError(
+                "LookRenderer: the winning outfit has no "
+                "top, bottom or one-piece to render."
+            )
+
         return self.generate_tryon(
             self.selfie_path,
-            top_path,
-            bottom_path,
-            shoe_path,
-            scarf_path
+            items
         )
 
     # =====================================================
@@ -86,10 +117,8 @@ class LookRenderer:
 
     def get_file_path(self, file_or_path):
 
-        if hasattr(file_or_path, "path"):
-            return file_or_path.path
-
-        return str(file_or_path)
+        # CLOUDINARY: download to a temp file when needed
+        return local_path(file_or_path)
 
     # =====================================================
     # Temporary PNG Conversion
@@ -143,7 +172,7 @@ Evaluate the outfit using men's fashion conventions.
 Prefer masculine or gender-neutral silhouettes, proportions, and styling.
 Consider men's-appropriate layering, color coordination, garment proportions, and overall presentation.
 Hair, grooming, and accessories should be appropriate for a man's look.
-Do not introduce dresses, skirts, feminine silhouettes, or feminine styling elements.
+Only use the clothing from the provided images. Do not add dresses, skirts, or feminine styling elements that were not provided.
 A scarf may be used only when it genuinely complements the men's outfit and the occasion; otherwise ignore it.
 """
 
@@ -161,7 +190,11 @@ A scarf may be used when it genuinely complements the outfit and occasion.
     # Prompt
     # =====================================================
 
-    def build_prompt(self, has_shoe, has_scarf):
+    def build_prompt(self, items):
+        """
+        items = ordered list of (kind, path) AFTER the user photo.
+        Image 1 is the user. Items start at Image 2.
+        """
 
         title = self.styling_result.get(
             "title",
@@ -190,49 +223,60 @@ A scarf may be used when it genuinely complements the outfit and occasion.
 
         styling_rules = self.build_styling_rules()
 
+        kinds = [kind for kind, _ in items]
+
+        has_dress = "one-piece" in kinds
+        has_top = "top" in kinds
+        has_bottom = "bottom" in kinds
+        has_shoe = "shoes" in kinds
+        has_scarf = "scarf" in kinds
+
         # -------------------------------------------------
-        # Image numbering changes depending on what exists.
-        # Order is always: user, top, bottom, [shoe], [scarf]
+        # Image numbering follows exactly what was sent.
         # -------------------------------------------------
 
-        image_lines = [
-            "1 = user",
-            "2 = top",
-            "3 = bottom",
-        ]
+        image_lines = ["1 = user"]
+        put_on_lines = []
 
-        put_on_lines = [
-            "the exact top from Image 2",
-            "the exact bottom from Image 3",
-        ]
+        for number, kind in enumerate(kinds, start=2):
 
-        next_number = 4
-
-        if has_shoe:
-
-            image_lines.append(f"{next_number} = shoes")
+            image_lines.append(f"{number} = {kind}")
 
             put_on_lines.append(
-                f"the exact shoes from Image {next_number}"
+                f"the exact {kind} from Image {number}"
             )
-
-            next_number += 1
-
-        if has_scarf:
-
-            image_lines.append(f"{next_number} = scarf")
-
-            put_on_lines.append(
-                f"the exact scarf from Image {next_number}"
-            )
-
-            next_number += 1
 
         images_text = "\n".join(image_lines)
 
         put_on_text = ",\n".join(put_on_lines)
 
+        # -------------------------------------------------
+        # What is intentionally NOT part of the outfit
+        # -------------------------------------------------
+
         not_included = []
+
+        if has_dress:
+
+            not_included.append(
+                "a separate top or bottom (the one-piece is "
+                "the complete outfit; do not add anything "
+                "under or over it)"
+            )
+
+        else:
+
+            if not has_top:
+                not_included.append(
+                    "a new top (keep the top the person is "
+                    "already wearing in Image 1)"
+                )
+
+            if not has_bottom:
+                not_included.append(
+                    "a new bottom (keep the bottom the person is "
+                    "already wearing in Image 1)"
+                )
 
         if not has_shoe:
             not_included.append(
@@ -268,12 +312,26 @@ onto the person.
 {not_included_text}
 """
 
-        shoe_instruction = (
-            "The shoes must be clearly visible and match "
-            "the shoe image exactly."
-            if has_shoe
-            else ""
-        )
+        # -------------------------------------------------
+        # Extra instructions
+        # -------------------------------------------------
+
+        extra_lines = []
+
+        if has_dress:
+            extra_lines.append(
+                "Show the one-piece at its full length, "
+                "including the hem, so the whole garment "
+                "is visible."
+            )
+
+        if has_shoe:
+            extra_lines.append(
+                "The shoes must be clearly visible and match "
+                "the shoe image exactly."
+            )
+
+        extra_text = "\n".join(extra_lines)
 
         return f"""
 STYRIVA virtual try-on.
@@ -292,7 +350,7 @@ Match every garment exactly.
 
 Do not redesign any clothing.
 
-{shoe_instruction}
+{extra_text}
 
 Keep unchanged:
 
@@ -338,10 +396,7 @@ Do not crop:
     def generate_tryon(
         self,
         selfie_path,
-        top_path,
-        bottom_path,
-        shoe_path=None,
-        scarf_path=None
+        items
     ):
 
         try:
@@ -350,18 +405,10 @@ Do not crop:
                 prefix="styriva_render_"
             ) as temp_directory:
 
-                # Order matters: user, top, bottom, [shoe], [scarf]
-                ordered_paths = [
-                    selfie_path,
-                    top_path,
-                    bottom_path,
+                # Order matters: user first, then the items
+                ordered_paths = [selfie_path] + [
+                    path for _kind, path in items
                 ]
-
-                if shoe_path:
-                    ordered_paths.append(shoe_path)
-
-                if scarf_path:
-                    ordered_paths.append(scarf_path)
 
                 png_paths = [
                     self.convert_to_png(
@@ -392,10 +439,7 @@ Do not crop:
 
                         image=image_files,
 
-                        prompt=self.build_prompt(
-                            has_shoe=shoe_path is not None,
-                            has_scarf=scarf_path is not None,
-                        ),
+                        prompt=self.build_prompt(items),
 
                         size="1024x1536",
 

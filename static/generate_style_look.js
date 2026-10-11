@@ -7,6 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextBtn = document.getElementById("next-btn");
     const prevBtn = document.getElementById("prev-btn");
 
+    const SUBMIT_LABEL = "Create My Look ✨";
+
+    // Longest side (in pixels) photos are shrunk to before uploading.
+    // Smaller uploads = a much faster "Create My Look" click.
+    const MAX_EDGE_USER_PHOTO = 1600;
+    const MAX_EDGE_CLOTHING = 1200;
+
     updateSidebar(1);
 
     /* ==========================================
@@ -15,22 +22,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     nextBtn.addEventListener("click", () => {
 
+        if (nextBtn.disabled) return;
+
         if (currentStep < totalSteps) {
 
             const inputName = getInputName(currentStep);
 
-            const input = document.getElementById(
-                `input-${inputName}`
-            );
+            const input = document.getElementById(`input-${inputName}`);
 
             if (input && !input.value) {
-
                 input.focus();
-
                 input.style.borderColor = "#dc2626";
-
                 return;
-
             }
 
             // Reset border color once a valid value is chosen
@@ -41,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
             goToStep(currentStep + 1);
 
             return;
-
         }
 
         validateUploads();
@@ -55,9 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     prevBtn.addEventListener("click", () => {
 
         if (currentStep > 1) {
-
             goToStep(currentStep - 1);
-
         }
 
     });
@@ -88,25 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateSidebar(currentStep);
 
-        if (currentStep === 1) {
+        prevBtn.style.visibility = currentStep === 1 ? "hidden" : "visible";
 
-            prevBtn.style.visibility = "hidden";
-
-        } else {
-
-            prevBtn.style.visibility = "visible";
-
-        }
-
-        if (currentStep === totalSteps) {
-
-            nextBtn.innerHTML = "Create My Look ✨";
-
-        } else {
-
-            nextBtn.innerHTML = "Next";
-
-        }
+        nextBtn.innerHTML =
+            currentStep === totalSteps ? SUBMIT_LABEL : "Next";
 
     }
 
@@ -118,21 +103,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         for (let i = 1; i <= 4; i++) {
 
-            const item = document.getElementById(
-                `summary-step-${i}`
-            );
+            const item = document.getElementById(`summary-step-${i}`);
 
             if (!item) continue;
 
-            item.style.color =
-                i === step
-                    ? "#78350f"
-                    : "#9ca3af";
-
-            item.style.fontWeight =
-                i === step
-                    ? "700"
-                    : "500";
+            item.style.color = i === step ? "#78350f" : "#9ca3af";
+            item.style.fontWeight = i === step ? "700" : "500";
 
         }
 
@@ -145,9 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function getInputName(step) {
 
         if (step === 1) return "occasion";
-
         if (step === 2) return "vibe";
-
         if (step === 3) return "weather";
 
         return null;
@@ -155,75 +129,191 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ==========================================
-       FILE VALIDATION
+       BUSY BUTTON
+       Shows progress while photos are prepared and
+       uploaded, and blocks double-clicks (which would
+       create two looks and spend two credits).
     ========================================== */
 
-    function validateUploads() {
+    function setBusy(isBusy, label) {
 
-        const required = [
+        nextBtn.disabled = isBusy;
 
-            ["file-user-pic", "Your Photo"],
+        nextBtn.style.opacity = isBusy ? "0.7" : "";
 
-            ["file-top1", "Top 1"],
-            ["file-top2", "Top 2"],
-            ["file-top3", "Top 3"],
+        nextBtn.style.cursor = isBusy ? "wait" : "";
 
-            ["file-bottom1", "Bottom 1"],
-            ["file-bottom2", "Bottom 2"],
-            ["file-bottom3", "Bottom 3"],
+        nextBtn.innerHTML = isBusy
+            ? (label || "Uploading your photos…")
+            : SUBMIT_LABEL;
 
-        ];
+        prevBtn.disabled = isBusy;
 
-        const missing = [];
+    }
 
-        required.forEach(item => {
+    /* ==========================================
+       SHRINK PHOTOS BEFORE UPLOAD
+       Phone photos are often 3-8 MB. Resizing them in
+       the browser makes the upload to Cloudinary much
+       faster. If anything goes wrong (for example an
+       unsupported format) the original file is used.
+    ========================================== */
 
-            const input =
-                document.getElementById(item[0]);
+    async function shrinkImage(file, maxEdge) {
 
-            if (!input.files.length) {
+        try {
 
-                missing.push(item[1]);
+            if (!file || !file.type || !file.type.startsWith("image/")) {
+                return file;
+            }
+
+            const bitmap = await createImageBitmap(file);
+
+            const longest = Math.max(bitmap.width, bitmap.height);
+
+            // Already small enough: keep the original
+            if (longest <= maxEdge && file.size <= 1.5 * 1024 * 1024) {
+                if (bitmap.close) bitmap.close();
+                return file;
+            }
+
+            const scale = Math.min(1, maxEdge / longest);
+
+            const width = Math.round(bitmap.width * scale);
+            const height = Math.round(bitmap.height * scale);
+
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+
+            const context = canvas.getContext("2d");
+
+            // White background so transparent PNGs don't turn black
+            context.fillStyle = "#ffffff";
+            context.fillRect(0, 0, width, height);
+
+            context.drawImage(bitmap, 0, 0, width, height);
+
+            if (bitmap.close) bitmap.close();
+
+            const blob = await new Promise((resolve) => {
+                canvas.toBlob(resolve, "image/jpeg", 0.88);
+            });
+
+            // Only use the new file if it is actually smaller
+            if (!blob || blob.size >= file.size) {
+                return file;
+            }
+
+            const newName =
+                (file.name || "photo").replace(/\.[^.]+$/, "") + ".jpg";
+
+            return new File([blob], newName, { type: "image/jpeg" });
+
+        } catch (error) {
+
+            console.warn("Could not shrink image, using original:", error);
+
+            return file;
+
+        }
+
+    }
+
+    async function buildFormData() {
+
+        const formData = new FormData(form);
+
+        const jobs = [];
+
+        for (const [name, value] of Array.from(formData.entries())) {
+
+            if (value instanceof File && value.size > 0) {
+
+                const maxEdge =
+                    name === "user_model_photo"
+                        ? MAX_EDGE_USER_PHOTO
+                        : MAX_EDGE_CLOTHING;
+
+                jobs.push(
+                    shrinkImage(value, maxEdge).then((smaller) => {
+                        formData.set(name, smaller, smaller.name);
+                    })
+                );
 
             }
 
+        }
+
+        await Promise.all(jobs);
+
+        return formData;
+
+    }
+
+    /* ==========================================
+       FILE VALIDATION
+       Rules:
+       - Your Photo is required
+       - At least ONE garment is required
+         (a top, a bottom, or a one-piece)
+       - Shoes and scarves are always optional
+    ========================================== */
+
+    function hasFile(id) {
+
+        const input = document.getElementById(id);
+
+        return !!(input && input.files && input.files.length);
+
+    }
+
+    function showWarning(messages) {
+
+        const warning = document.getElementById("capsule-warning");
+        const list = document.getElementById("missing-items");
+
+        warning.classList.remove("hidden");
+
+        list.innerHTML = "";
+
+        messages.forEach(text => {
+
+            const div = document.createElement("div");
+
+            div.innerHTML = "• " + text;
+
+            list.appendChild(div);
+
         });
 
-        if (missing.length > 0) {
+        warning.scrollIntoView({ behavior: "smooth" });
 
-            const warning =
-                document.getElementById(
-                    "capsule-warning"
-                );
+    }
 
-            const list =
-                document.getElementById(
-                    "missing-items"
-                );
+    function validateUploads() {
 
-            warning.classList.remove("hidden");
+        const problems = [];
 
-            list.innerHTML = "";
+        if (!hasFile("file-user-pic")) {
+            problems.push("Your Photo");
+        }
 
-            missing.forEach(item => {
+        const garmentIds = [
+            "file-top1", "file-top2", "file-top3",
+            "file-bottom1", "file-bottom2", "file-bottom3",
+            "file-dress1", "file-dress2", "file-dress3"
+        ];
 
-                const div =
-                    document.createElement("div");
+        const hasGarment = garmentIds.some(hasFile);
 
-                div.innerHTML = "• " + item;
+        if (!hasGarment) {
+            problems.push("At least one top, bottom, or one-piece");
+        }
 
-                list.appendChild(div);
-
-            });
-
-            warning.scrollIntoView({
-
-                behavior: "smooth"
-
-            });
-
+        if (problems.length > 0) {
+            showWarning(problems);
             return;
-
         }
 
         document
@@ -237,50 +327,48 @@ document.addEventListener("DOMContentLoaded", () => {
            of letting the browser follow a normal form POST.
         ========================================== */
 
-        fetch(form.action, {
-            method: "POST",
-            body: new FormData(form),
+        setBusy(true, "Preparing your photos…");
+
+        buildFormData()
+        .then((body) => {
+
+            setBusy(true, "Uploading your photos…");
+
+            return fetch(form.action, {
+                method: "POST",
+                body: body,
+            });
+
         })
         .then(async (response) => {
 
             const data = await response.json();
 
-            // -----------------------------------------
+            // Unlock the button again unless we are leaving the page
+            if (!data.success) {
+                setBusy(false);
+            }
+
             // Complimentary guest finished
-            // -----------------------------------------
             if (response.status === 403 && data.requires_signup) {
-
                 showSignupModal(data.message, data.redirect_url);
-
                 return;
-
             }
 
-            // -----------------------------------------
             // Premium Upgrade
-            // -----------------------------------------
             if (response.status === 403 && data.requires_upgrade) {
-
                 showPremiumModal();
-
                 return;
-
             }
 
-            // -----------------------------------------
             // Generation started successfully
-            // -----------------------------------------
             if (data.success) {
-
+                nextBtn.innerHTML = "Starting your look…";
                 window.location.href = data.redirect_url;
-
                 return;
-
             }
 
-            // -----------------------------------------
             // Unexpected server response
-            // -----------------------------------------
             alert(
                 data.message ||
                 "Sorry, we couldn't create your look. Please try again."
@@ -294,37 +382,22 @@ document.addEventListener("DOMContentLoaded", () => {
         // block above if you want the 2-per-day flow again)
         // -----------------------------------------
         // .then(async (response) => {
-        //
         //     const data = await response.json();
-        //
-        //     if (
-        //         response.status === 403 &&
-        //         data.daily_limit_reached
-        //     ) {
-        //
+        //     if (response.status === 403 && data.daily_limit_reached) {
         //         showDailyLimitModal(data.message);
-        //
         //         return;
-        //
         //     }
-        //
         //     if (data.success) {
-        //
         //         window.location.href = data.redirect_url;
-        //
         //         return;
-        //
         //     }
-        //
-        //     alert(
-        //         data.message ||
-        //         "Sorry, we couldn't create your look. Please try again."
-        //     );
-        //
+        //     alert(data.message || "Sorry, we couldn't create your look. Please try again.");
         // })
         .catch((error) => {
 
             console.error(error);
+
+            setBusy(false);
 
             alert(
                 "We couldn't connect. Please check your internet and try again."
@@ -339,25 +412,21 @@ document.addEventListener("DOMContentLoaded", () => {
     ========================================== */
 
     function registerUpload(
-
         fileId,
         textId,
         iconId,
         isPortrait = false,
         defaultText = "",
         defaultIcon = ""
-
     ) {
 
-        const input =
-            document.getElementById(fileId);
+        const input = document.getElementById(fileId);
 
         if (!input) return;
 
         input.addEventListener("change", function () {
 
-            const label =
-                this.closest("label");
+            const label = this.closest("label");
 
             if (this.files.length) {
 
@@ -365,30 +434,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (isPortrait) {
 
-                    document.getElementById(
-                        textId
-                    ).innerHTML =
-                        "Photo Uploaded";
-
-                    document.getElementById(
-                        iconId
-                    ).innerHTML = "📸";
-
-                    document
-                        .getElementById(
-                            "badge-user-pic"
-                        )
-                        .innerHTML =
-                        "Done ✓";
+                    document.getElementById(textId).innerHTML = "Photo Uploaded";
+                    document.getElementById(iconId).innerHTML = "📸";
+                    document.getElementById("badge-user-pic").innerHTML = "Done ✓";
 
                 } else {
 
-                    document.getElementById(
-                        textId
-                    ).innerHTML =
-                        "Uploaded ✓";
+                    document.getElementById(textId).innerHTML = "Uploaded ✓";
 
                 }
+
+                // Hide the warning as soon as the user adds something
+                const warning = document.getElementById("capsule-warning");
+                if (warning) warning.classList.add("hidden");
 
             } else {
 
@@ -397,25 +455,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Restore original text/icon/badge when file is cleared
                 if (isPortrait) {
 
-                    document.getElementById(
-                        textId
-                    ).innerHTML = defaultText || "Upload your photo";
+                    document.getElementById(textId).innerHTML =
+                        defaultText || "Upload your photo";
 
-                    document.getElementById(
-                        iconId
-                    ).innerHTML = defaultIcon || "👤";
+                    document.getElementById(iconId).innerHTML =
+                        defaultIcon || "👤";
 
-                    document
-                        .getElementById(
-                            "badge-user-pic"
-                        )
-                        .innerHTML = "Required";
+                    document.getElementById("badge-user-pic").innerHTML =
+                        "Required";
 
                 } else {
 
-                    document.getElementById(
-                        textId
-                    ).innerHTML = defaultText;
+                    document.getElementById(textId).innerHTML = defaultText;
 
                 }
 
@@ -446,7 +497,11 @@ document.addEventListener("DOMContentLoaded", () => {
     registerUpload("file-bottom2", "text-bottom2", "icon-bottom2", false, "Bottom 2");
     registerUpload("file-bottom3", "text-bottom3", "icon-bottom3", false, "Bottom 3");
 
-    // Shoes (these were missing before, so they never showed "Uploaded ✓")
+    // One-piece (NEW)
+    registerUpload("file-dress1", "text-dress1", "icon-dress1", false, "One-piece 1");
+    registerUpload("file-dress2", "text-dress2", "icon-dress2", false, "One-piece 2");
+    registerUpload("file-dress3", "text-dress3", "icon-dress3", false, "One-piece 3");
+
     registerUpload("file-shoe1", "text-shoe1", "icon-shoe1", false, "Shoes 1");
     registerUpload("file-shoe2", "text-shoe2", "icon-shoe2", false, "Shoes 2");
     registerUpload("file-shoe3", "text-shoe3", "icon-shoe3", false, "Shoes 3");
@@ -467,9 +522,9 @@ document.addEventListener("DOMContentLoaded", () => {
 const profileButton = document.getElementById("profileButton");
 const profileMenu = document.getElementById("profileMenu");
 
-if(profileButton){
+if (profileButton) {
 
-    profileButton.addEventListener("click",function(e){
+    profileButton.addEventListener("click", function (e) {
 
         e.stopPropagation();
 
@@ -479,14 +534,14 @@ if(profileButton){
 
 }
 
-document.addEventListener("click",function(){
+document.addEventListener("click", function () {
 
     // Guard against profileMenu being null (avoids breaking other click handlers)
     if (profileMenu) profileMenu.classList.remove("show");
 
 });
 
-function showSignupModal(message, redirectUrl){
+function showSignupModal(message, redirectUrl) {
 
     document.querySelector("#signupModal p").textContent = message;
 
@@ -538,9 +593,7 @@ function showDailyLimitModal(message) {
 
 function closeDailyLimitModal() {
 
-    const modal = document.getElementById(
-        "dailyLimitModal"
-    );
+    const modal = document.getElementById("dailyLimitModal");
 
     if (!modal) return;
 
@@ -556,9 +609,7 @@ function closeDailyLimitModal() {
 
 function showPremiumModal() {
 
-    document
-        .getElementById("premiumModal")
-        .classList.add("show");
+    document.getElementById("premiumModal").classList.add("show");
 
     document.body.style.overflow = "hidden";
 
@@ -566,16 +617,13 @@ function showPremiumModal() {
 
 function closePremiumModal() {
 
-    document
-        .getElementById("premiumModal")
-        .classList.remove("show");
+    document.getElementById("premiumModal").classList.remove("show");
 
     document.body.style.overflow = "";
 
 }
 
-const premiumOverlay =
-    document.querySelector(".premium-overlay");
+const premiumOverlay = document.querySelector(".premium-overlay");
 
 if (premiumOverlay) {
 
@@ -587,9 +635,9 @@ if (premiumOverlay) {
 
 }
 
-document.addEventListener("keydown", function(e){
+document.addEventListener("keydown", function (e) {
 
-    if(e.key === "Escape"){
+    if (e.key === "Escape") {
 
         closePremiumModal();
 

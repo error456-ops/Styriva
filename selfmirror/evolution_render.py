@@ -9,6 +9,8 @@ from PIL import Image
 
 from media_manager.manager import MediaManager
 
+from .image_utils import local_path
+
 
 class EvolutionRenderer:
     """
@@ -49,10 +51,8 @@ class EvolutionRenderer:
         into a usable local filesystem path.
         """
 
-        if hasattr(file_or_path, "path"):
-            return file_or_path.path
-
-        return str(file_or_path)
+        # CLOUDINARY: download to a temp file when needed
+        return local_path(file_or_path)
 
     # =====================================================
     # Temporary PNG Conversion
@@ -115,6 +115,21 @@ class EvolutionRenderer:
     # Prompt
     # =====================================================
 
+    def _selected(self, field_name):
+        """
+        Reads a selected_* field from the GeneratedLook.
+        getattr keeps old saved looks working.
+        """
+
+        return (
+            getattr(
+                self.styling_result,
+                field_name,
+                ""
+            )
+            or ""
+        )
+
     def build_prompt(self):
 
         added_items = (
@@ -161,36 +176,54 @@ class EvolutionRenderer:
 
         # GeneratedLook model fields
 
-        selected_top = (
-            self.styling_result.selected_top
-            or ""
-        )
-
-        selected_bottom = (
-            self.styling_result.selected_bottom
-            or ""
-        )
-
-        # NEW: shoes (getattr keeps old saved looks working)
-        selected_shoe = (
-            getattr(
-                self.styling_result,
-                "selected_shoe",
-                ""
-            )
-            or ""
-        )
-
-        selected_scarf = (
-            self.styling_result.selected_scarf
-            or ""
-        )
+        selected_top = self._selected("selected_top")
+        selected_bottom = self._selected("selected_bottom")
+        selected_dress = self._selected("selected_dress")
+        selected_shoe = self._selected("selected_shoe")
+        selected_scarf = self._selected("selected_scarf")
 
         added_items_text = (
             ", ".join(added_items)
             if added_items
             else "none"
         )
+
+        # -------------------------------------------------
+        # Describe the outfit that must stay exactly the same
+        # -------------------------------------------------
+
+        outfit_lines = []
+
+        if selected_dress:
+
+            outfit_lines.append(
+                f"One-piece: {selected_dress}"
+            )
+
+            outfit_lines.append(
+                "(the one-piece is the complete outfit; "
+                "do not add a separate top or bottom)"
+            )
+
+        else:
+
+            outfit_lines.append(
+                f"Top: {selected_top or 'as already worn'}"
+            )
+
+            outfit_lines.append(
+                f"Bottom: {selected_bottom or 'as already worn'}"
+            )
+
+        outfit_lines.append(
+            f"Shoes: {selected_shoe or 'None'}"
+        )
+
+        outfit_lines.append(
+            f"Scarf: {selected_scarf or 'None'}"
+        )
+
+        outfit_text = "\n".join(outfit_lines)
 
         return f"""
 STYRIVA EVOLUTION
@@ -211,10 +244,7 @@ Keep unchanged:
 
 Keep this outfit EXACTLY:
 
-Top: {selected_top}
-Bottom: {selected_bottom}
-Shoes: {selected_shoe or "None"}
-Scarf: {selected_scarf or "None"}
+{outfit_text}
 
 Never replace or redesign the outfit.
 Never change the shoes.

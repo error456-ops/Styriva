@@ -1,14 +1,25 @@
 import cv2
 
+from .image_utils import local_path
+
 
 class VisionModel:
+
+    # Maps each upload slot to the image type it represents
+    ITEM_TYPES = {
+        "top": "top",
+        "bottom": "bottom",
+        "dress": "dress",   # one-piece: dress, long frock, gown
+        "shoe": "shoe",
+        "scarf": "scarf",
+    }
 
     def __init__(self, ai_input):
         self.ai_input = ai_input
 
     def analyze_image(self, image_path, image_type):
 
-        image = cv2.imread(image_path)
+        image = cv2.imread(local_path(image_path))
 
         if image is None:
             raise ValueError(
@@ -45,72 +56,27 @@ class VisionModel:
                     self.ai_input["user_model_photo"],
                     "selfie"
                 ),
-
-            "top_1_analysis":
-                self.analyze_image(
-                    self.ai_input["top_1"],
-                    "top"
-                ),
-
-            "top_2_analysis":
-                self.analyze_image(
-                    self.ai_input["top_2"],
-                    "top"
-                ),
-
-            "top_3_analysis":
-                self.analyze_image(
-                    self.ai_input["top_3"],
-                    "top"
-                ),
-
-            "bottom_1_analysis":
-                self.analyze_image(
-                    self.ai_input["bottom_1"],
-                    "bottom"
-                ),
-
-            "bottom_2_analysis":
-                self.analyze_image(
-                    self.ai_input["bottom_2"],
-                    "bottom"
-                ),
-
-            "bottom_3_analysis":
-                self.analyze_image(
-                    self.ai_input["bottom_3"],
-                    "bottom"
-                ),
         }
 
         # ==========================================
-        # Optional Shoes (NEW)
+        # Tops, bottoms, one-pieces, shoes, scarves
+        # Only the items the user actually uploaded
+        # are analyzed. Missing ones are skipped.
         # ==========================================
 
-        for key in ("shoe_1", "shoe_2", "shoe_3"):
+        for prefix, image_type in self.ITEM_TYPES.items():
 
-            if self.ai_input.get(key):
+            for i in range(1, 4):
 
-                results[f"{key}_analysis"] = (
-                    self.analyze_image(
-                        self.ai_input[key],
-                        "shoe"
+                key = f"{prefix}_{i}"
+
+                if self.ai_input.get(key):
+
+                    results[f"{key}_analysis"] = (
+                        self.analyze_image(
+                            self.ai_input[key],
+                            image_type
+                        )
                     )
-                )
-
-        # ==========================================
-        # Optional Scarves
-        # ==========================================
-
-        for key in ("scarf_1", "scarf_2", "scarf_3"):
-
-            if self.ai_input.get(key):
-
-                results[f"{key}_analysis"] = (
-                    self.analyze_image(
-                        self.ai_input[key],
-                        "scarf"
-                    )
-                )
 
         return results

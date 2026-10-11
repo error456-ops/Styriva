@@ -3,26 +3,15 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stryiva — Your Personal AI Stylist</title>
 
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
-          rel="stylesheet">
-
-    <link rel="stylesheet"
-          href="{% static 'generate_style_look.css' %}">
+    <link rel="stylesheet" href="{% static 'generate_style_look.css' %}">
 
     <!-- Photo note styles (you can move this into generate_style_look.css later) -->
     <style>
@@ -40,13 +29,7 @@
             line-height: 1.6;
             color: #444;
         }
-
-        .photo-note-icon {
-            font-size: 20px;
-            line-height: 1;
-            margin-top: 2px;
-        }
-
+        .photo-note-icon { font-size: 20px; line-height: 1; margin-top: 2px; }
         .photo-note strong {
             display: block;
             margin-bottom: 4px;
@@ -54,15 +37,10 @@
             letter-spacing: 0.3px;
             color: #111827;
         }
-
-        .photo-note p {
-            margin: 0;
-        }
+        .photo-note p { margin: 0; }
     </style>
 
-    <script src="{% static 'generate_style_look.js' %}"
-            defer></script>
-
+    <script src="{% static 'generate_style_look.js' %}" defer></script>
 </head>
 
 <body>
@@ -70,86 +48,40 @@
 <!-- ==========================================
 NAVBAR
 ========================================== -->
-
 <nav class="top-navbar">
 
     <a href="{% url 'generate_style_look' %}" class="navbar-logo">
-
-        <img
-            src="{% static 'logo.png' %}"
-            alt="STYRIVA Logo"
-        >
-
+        <img src="{% static 'logo.png' %}" alt="STYRIVA Logo">
         <span>STYRIVA</span>
-
     </a>
 
-    <div class="nav-badge">
-
-        Your Personal Stylist
-
-    </div>
+    <div class="nav-badge">Your Personal Stylist</div>
 
     <div class="navbar-right">
 
         <div class="legal-links">
-            <a href="{% url 'about' %}">
-                About
-            </a>
-            <a href="{% url 'how_it_works' %}">
-                How It Works
-            </a>
-            <a href="{% url 'guides' %}">
-                Guides
-            </a>
-            <a href="{% url 'faq' %}">
-                FAQ
-            </a>
-            <a href="{% url 'contact' %}">
-                Contact
-            </a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'how_it_works' %}">How It Works</a>
+            <a href="{% url 'guides' %}">Guides</a>
+            <a href="{% url 'faq' %}">FAQ</a>
+            <a href="{% url 'contact' %}">Contact</a>
         </div>
 
         {% if request.user.is_authenticated %}
             <div class="profile-dropdown">
-
-                <button
-                    class="profile-button"
-                    id="profileButton"
-                >
-
-                    <img
-                        src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=111827&color=ffffff"
-                        alt="Profile"
-                    >
-
+                <button class="profile-button" id="profileButton">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=111827&color=ffffff" alt="Profile">
                 </button>
 
-                <div
-                    class="dropdown-menu"
-                    id="profileMenu"
-                >
-
+                <div class="dropdown-menu" id="profileMenu">
                     <div class="dropdown-user">
-
                         <strong>{{ request.user.username }}</strong>
-
                         <small>{{ request.user.email }}</small>
-
                     </div>
-
                     <hr>
-
-                    <a href="{% url 'profile' %}">
-                        My Profile
-                    </a>
-
-                    <a href="{% url 'logout' %}">
-                        Logout
-                    </a>
-
+                    <a href="{% url 'profile' %}">My Profile</a>
+                    <a href="{% url 'logout' %}">Logout</a>
                 </div>
-
             </div>
         {% endif %}
     </div>
@@ -159,113 +91,55 @@ NAVBAR
 <!-- ==========================================
 MAIN LAYOUT
 ========================================== -->
-
 <main class="layout">
 
-    <!-- ======================================
-         LEFT SIDEBAR
-    ======================================= -->
-
+    <!-- LEFT SIDEBAR -->
     <aside class="sidebar">
 
         <div class="sidebar-content">
 
             <div class="gold-line"></div>
 
-            <h1>
-
-                Your Personal
-                <br>
-                Style Studio
-
-            </h1>
+            <h1>Your Personal<br>Style Studio</h1>
 
             <p>
-    Tell us where you're going, what style you like,
-    and what the weather is like. Upload your photo and
-    your clothes, and STYRIVA will put together a look
-    for you, with simple tips for your hair, makeup,
-    and accessories.
-</p>
+                Tell us where you're going, what style you like,
+                and what the weather is like. Upload your photo and
+                your clothes, and STYRIVA will put together a look
+                for you, with simple tips for your hair, makeup,
+                and accessories.
+            </p>
 
             <div class="sidebar-steps">
-
-                <span id="summary-step-1">
-
-                    01. Where You're Going
-
-                </span>
-
-                <span id="summary-step-2">
-
-                    02. Your Style
-
-                </span>
-
-                <span id="summary-step-3">
-
-                    03. The Weather
-
-                </span>
-
-                <span id="summary-step-4">
-
-                    04. Upload Photos
-
-                </span>
-
+                <span id="summary-step-1">01. Where You're Going</span>
+                <span id="summary-step-2">02. Your Style</span>
+                <span id="summary-step-3">03. The Weather</span>
+                <span id="summary-step-4">04. Upload Photos</span>
             </div>
 
         </div>
 
-        <div class="sidebar-footer">
-
-            STYRIVA v2.6
-
-        </div>
+        <div class="sidebar-footer">STYRIVA v2.6</div>
 
     </aside>
 
-    <!-- ======================================
-         CONTENT
-    ======================================= -->
-
+    <!-- CONTENT -->
     <section class="content">
 
         <div class="content-inner">
 
             <!-- Progress -->
-
             <div class="progress">
-
-                <span class="progress-title">
-
-                    Progress
-
-                </span>
-
+                <span class="progress-title">Progress</span>
                 <div class="progress-dots">
-
-                    <div id="dot-1"
-                         class="dot active"></div>
-
-                    <div id="dot-2"
-                         class="dot"></div>
-
-                    <div id="dot-3"
-                         class="dot"></div>
-
-                    <div id="dot-4"
-                         class="dot"></div>
-
+                    <div id="dot-1" class="dot active"></div>
+                    <div id="dot-2" class="dot"></div>
+                    <div id="dot-3" class="dot"></div>
+                    <div id="dot-4" class="dot"></div>
                 </div>
-
             </div>
 
-            <!-- ======================================
-                 FORM
-            ======================================= -->
-
+            <!-- FORM -->
             <form method="POST"
                   enctype="multipart/form-data"
                   action="{% url 'generate_style_look' %}"
@@ -274,334 +148,105 @@ MAIN LAYOUT
 
                 {% csrf_token %}
 
-                <!-- ===============================
-                     STEP 1
-                ================================ -->
+                <!-- STEP 1 -->
+                <div id="step-1" class="step-content step-active">
 
-                <div id="step-1"
-                     class="step-content step-active">
+                    <div class="step-label">Step 1 of 4</div>
 
-                    <div class="step-label">
-
-                        Step 1 of 4
-
-                    </div>
-
-                    <h2>
-
-                        Who is this
-                        look for?
-
-                    </h2>
+                    <h2>Who is this look for?</h2>
 
                     <div class="select-wrapper">
-
-                        <select name="gender"
-                                id="input-gender"
-                                required>
-
-                            <option value=""
-                                    disabled
-                                    selected>
-
-                                Choose one...
-
-                            </option>
-
-                            <option value="women">
-
-                                Women
-
-                            </option>
-
-                            <option value="men">
-
-                                Men
-
-                            </option>
-
+                        <select name="gender" id="input-gender" required>
+                            <option value="" disabled selected>Choose one...</option>
+                            <option value="women">Women</option>
+                            <option value="men">Men</option>
                         </select>
-
                     </div>
 
-                    <h2 class="step-subheading">
-
-                        Where are you
-                        going today?
-
-                    </h2>
+                    <h2 class="step-subheading">Where are you going today?</h2>
 
                     <div class="select-wrapper">
-
-                        <select name="occasion"
-                                id="input-occasion"
-                                required>
-
-                            <option value=""
-                                    disabled
-                                    selected>
-
-                                Choose where you're going...
-
-                            </option>
-
-                            <option value="Brunch">
-
-                                Sunday Brunch
-
-                            </option>
-
-                            <option value="Cocktail Party">
-
-                                Evening Party
-
-                            </option>
-
-                            <option value="Business Meeting">
-
-                                Office or Business Meeting
-
-                            </option>
-
-                            <option value="Casual Day Out">
-
-                                Casual Day Out
-
-                            </option>
-
-                            <option value="Date Night">
-
-                                Date Night
-
-                            </option>
-
-                            <option value="Wedding">
-
-                                Wedding or Festive Event
-
-                            </option>
-
+                        <select name="occasion" id="input-occasion" required>
+                            <option value="" disabled selected>Choose where you're going...</option>
+                            <option value="Brunch">Sunday Brunch</option>
+                            <option value="Cocktail Party">Evening Party</option>
+                            <option value="Business Meeting">Office or Business Meeting</option>
+                            <option value="Casual Day Out">Casual Day Out</option>
+                            <option value="Date Night">Date Night</option>
+                            <option value="Wedding">Wedding or Festive Event</option>
                         </select>
-
                     </div>
 
                 </div>
 
-                <!-- ===============================
-                     STEP 2
-                ================================ -->
+                <!-- STEP 2 -->
+                <div id="step-2" class="step-content step-hidden">
 
-                <div id="step-2"
-                     class="step-content step-hidden">
+                    <div class="step-label">Step 2 of 4</div>
 
-                    <div class="step-label">
-
-                        Step 2 of 4
-
-                    </div>
-
-                    <h2>
-
-                        What style
-                        do you want?
-
-                    </h2>
+                    <h2>What style do you want?</h2>
 
                     <div class="select-wrapper">
-
-                        <select name="vibe"
-                                id="input-vibe"
-                                required>
-
-                            <option value=""
-                                    disabled
-                                    selected>
-
-                                Choose a style...
-
-                            </option>
-
-                            <option value="Minimalist">
-
-                                Minimalist (Clean & Simple)
-
-                            </option>
-
-                            <option value="Old Money">
-
-                                Old Money (Classy & Elegant)
-
-                            </option>
-
-                            <option value="Edgy Rock">
-
-                                Rock & Edgy (Bold & Dark)
-
-                            </option>
-
-                            <option value="Boho Chic">
-
-                                Boho (Relaxed & Colorful)
-
-                            </option>
-
-                            <option value="Traditional">
-
-                                Traditional (Classic & Cultural)
-
-                            </option>
-
-                            <option value="Glamorous">
-
-                                Glamorous (Shiny & Eye-catching)
-
-                            </option>
-
+                        <select name="vibe" id="input-vibe" required>
+                            <option value="" disabled selected>Choose a style...</option>
+                            <option value="Minimalist">Minimalist (Clean & Simple)</option>
+                            <option value="Old Money">Old Money (Classy & Elegant)</option>
+                            <option value="Edgy Rock">Rock & Edgy (Bold & Dark)</option>
+                            <option value="Boho Chic">Boho (Relaxed & Colorful)</option>
+                            <option value="Traditional">Traditional (Classic & Cultural)</option>
+                            <option value="Glamorous">Glamorous (Shiny & Eye-catching)</option>
                         </select>
-
                     </div>
 
                 </div>
 
-                <!-- ===============================
-                     STEP 3
-                ================================ -->
+                <!-- STEP 3 -->
+                <div id="step-3" class="step-content step-hidden">
 
-                <div id="step-3"
-                     class="step-content step-hidden">
+                    <div class="step-label">Step 3 of 4</div>
 
-                    <div class="step-label">
-
-                        Step 3 of 4
-
-                    </div>
-
-                    <h2>
-
-                        What's the weather
-                        like?
-
-                    </h2>
+                    <h2>What's the weather like?</h2>
 
                     <div class="select-wrapper">
-
-                        <select name="weather"
-                                id="input-weather"
-                                required>
-
-                            <option value=""
-                                    disabled
-                                    selected>
-
-                                Choose the weather...
-
-                            </option>
-
-                            <option value="Hot & Sunny">
-
-                                Hot and Sunny
-
-                            </option>
-
-                            <option value="Chilly AC">
-
-                                Cold (Winter or Strong AC)
-
-                            </option>
-
-                            <option value="Rainy & Humid">
-
-                                Rainy and Humid
-
-                            </option>
-
-                            <option value="Pleasant Evening">
-
-                                Pleasant Evening
-
-                            </option>
-
+                        <select name="weather" id="input-weather" required>
+                            <option value="" disabled selected>Choose the weather...</option>
+                            <option value="Hot & Sunny">Hot and Sunny</option>
+                            <option value="Chilly AC">Cold (Winter or Strong AC)</option>
+                            <option value="Rainy & Humid">Rainy and Humid</option>
+                            <option value="Pleasant Evening">Pleasant Evening</option>
                         </select>
-
                     </div>
 
                 </div>
 
-                <!-- ===============================
-                     STEP 4
-                ================================ -->
+                <!-- STEP 4 -->
+                <div id="step-4" class="step-content step-hidden">
 
-                <div id="step-4"
-                     class="step-content step-hidden">
+                    <div class="step-label">Step 4 of 4</div>
 
-                    <div class="step-label">
-
-                        Step 4 of 4
-
-                    </div>
-
-                    <h2>
-
-                        Upload Your Photos
-
-                    </h2>
+                    <h2>Upload Your Photos</h2>
 
                     <p class="step-description">
-
-                        Upload a photo of yourself and photos of your
-                        clothes. STYRIVA will pick the best outfit and
-                        show it on your photo.
-
+                        Upload your photo, then add any clothes you want styled.
+                        You can upload just a dress, just a top, or a top with
+                        shoes and a scarf. STYRIVA will style whatever you upload.
                     </p>
 
-                    <!-- ==========================
-                         PORTRAIT
-                    ========================== -->
-
+                    <!-- 1. YOUR PHOTO -->
                     <div class="upload-section">
 
-                        <span class="upload-title">
-
-                            1. Your Photo
-
-                        </span>
+                        <span class="upload-title">1. Your Photo</span>
 
                         <label class="upload-large">
-
                             <div class="upload-left">
-
-                                <div id="icon-user-pic"
-                                     class="upload-icon">
-
-                                    👤
-
-                                </div>
-
+                                <div id="icon-user-pic" class="upload-icon">👤</div>
                                 <div>
-
-                                    <span id="text-user-pic"
-                                          class="upload-name">
-
-                                        Upload your photo
-
-                                    </span>
-
-                                    <span class="upload-description">
-
-                                        Full-body photo, head to toe
-
-                                    </span>
-
+                                    <span id="text-user-pic" class="upload-name">Upload your photo</span>
+                                    <span class="upload-description">Full-body photo, head to toe</span>
                                 </div>
-
                             </div>
 
-                            <span id="badge-user-pic"
-                                  class="upload-badge">
-
-                                Required
-
-                            </span>
+                            <span id="badge-user-pic" class="upload-badge">Required</span>
 
                             <input type="file"
                                    id="file-user-pic"
@@ -609,18 +254,12 @@ MAIN LAYOUT
                                    accept="image/*"
                                    required
                                    hidden>
-
                         </label>
 
-                        <!-- Photo guidelines note -->
                         <div class="photo-note">
-
                             <span class="photo-note-icon">📸</span>
-
                             <div>
-
                                 <strong>Tips for a great result</strong>
-
                                 <p>
                                     Please upload a <b>full photo from head to toe</b>,
                                     with your <b>shoes clearly visible</b>. Stand straight,
@@ -628,342 +267,190 @@ MAIN LAYOUT
                                     background so we can style your whole look
                                     properly.
                                 </p>
-
                             </div>
+                        </div>
 
+                        <div class="photo-note">
+                            <span class="photo-note-icon">💡</span>
+                            <div>
+                                <strong>Upload only what you have</strong>
+                                <p>
+                                    Wearing a <b>long frock, dress or gown</b>? Use the One-piece
+                                    section and skip Tops and Bottoms. Wearing separates? Use Tops
+                                    and Bottoms. Shoes and scarves are always optional.
+                                </p>
+                            </div>
                         </div>
 
                     </div>
 
-                    <!-- ==========================
-                         TOPS
-                    ========================== -->
-
+                    <!-- 2. TOPS (OPTIONAL) -->
                     <div class="upload-section">
 
-                        <span class="upload-title">
-
-                            2. Your Tops (Shirts, T-shirts, Kurtas)
-
-                        </span>
+                        <span class="upload-title">2. Tops (Optional): Shirts, T-shirts, Kurtas</span>
 
                         <div class="upload-grid">
 
                             <label class="upload-box">
-
                                 <span id="icon-top1">👕</span>
-
-                                <span id="text-top1">
-
-                                    Top 1
-
-                                </span>
-
-                                <input type="file"
-                                       id="file-top1"
-                                       name="top_1"
-                                       accept="image/*"
-                                       hidden
-                                       required>
-
+                                <span id="text-top1">Top 1</span>
+                                <input type="file" id="file-top1" name="top_1" accept="image/*" hidden>
                             </label>
 
                             <label class="upload-box">
-
                                 <span id="icon-top2">👕</span>
-
-                                <span id="text-top2">
-
-                                    Top 2
-
-                                </span>
-
-                                <input type="file"
-                                       id="file-top2"
-                                       name="top_2"
-                                       accept="image/*"
-                                       hidden
-                                       required>
-
+                                <span id="text-top2">Top 2</span>
+                                <input type="file" id="file-top2" name="top_2" accept="image/*" hidden>
                             </label>
 
                             <label class="upload-box">
-
                                 <span id="icon-top3">👕</span>
-
-                                <span id="text-top3">
-
-                                    Top 3
-
-                                </span>
-
-                                <input type="file"
-                                       id="file-top3"
-                                       name="top_3"
-                                       accept="image/*"
-                                       hidden
-                                       required>
-
+                                <span id="text-top3">Top 3</span>
+                                <input type="file" id="file-top3" name="top_3" accept="image/*" hidden>
                             </label>
 
                         </div>
 
                     </div>
 
-                    <!-- ==========================
-                         BOTTOMS
-                    ========================== -->
-
+                    <!-- 3. BOTTOMS (OPTIONAL) -->
                     <div class="upload-section">
 
-                        <span class="upload-title">
-
-                            3. Your Bottoms (Pants, Jeans, Skirts)
-
-                        </span>
+                        <span class="upload-title">3. Bottoms (Optional): Pants, Jeans, Skirts</span>
 
                         <div class="upload-grid">
 
                             <label class="upload-box">
-
                                 <span id="icon-bottom1">👖</span>
-
-                                <span id="text-bottom1">
-                                    Bottom 1
-                                </span>
-
-                                <input type="file"
-                                       id="file-bottom1"
-                                       name="bottom_1"
-                                       accept="image/*"
-                                       hidden
-                                       required>
-
+                                <span id="text-bottom1">Bottom 1</span>
+                                <input type="file" id="file-bottom1" name="bottom_1" accept="image/*" hidden>
                             </label>
 
                             <label class="upload-box">
-
                                 <span id="icon-bottom2">👖</span>
-
-                                <span id="text-bottom2">
-                                    Bottom 2
-                                </span>
-
-                                <input type="file"
-                                       id="file-bottom2"
-                                       name="bottom_2"
-                                       accept="image/*"
-                                       hidden
-                                       required>
-
+                                <span id="text-bottom2">Bottom 2</span>
+                                <input type="file" id="file-bottom2" name="bottom_2" accept="image/*" hidden>
                             </label>
 
                             <label class="upload-box">
-
                                 <span id="icon-bottom3">👖</span>
-
-                                <span id="text-bottom3">
-                                    Bottom 3
-                                </span>
-
-                                <input type="file"
-                                       id="file-bottom3"
-                                       name="bottom_3"
-                                       accept="image/*"
-                                       hidden
-                                       required>
-
+                                <span id="text-bottom3">Bottom 3</span>
+                                <input type="file" id="file-bottom3" name="bottom_3" accept="image/*" hidden>
                             </label>
 
                         </div>
 
                     </div>
 
-                    <!-- ==========================
-                         SHOES (NEW)
-                    ========================== -->
-
+                    <!-- 4. ONE-PIECE (NEW, OPTIONAL) -->
                     <div class="upload-section">
 
-                        <span class="upload-title">
-
-                            4. Your Shoes (Optional)
-
-                        </span>
+                        <span class="upload-title">4. One-piece (Optional): Long Frock, Dress, Gown</span>
 
                         <div class="upload-grid">
 
                             <label class="upload-box">
+                                <span id="icon-dress1">👗</span>
+                                <span id="text-dress1">One-piece 1</span>
+                                <input type="file" id="file-dress1" name="dress_1" accept="image/*" hidden>
+                            </label>
 
+                            <label class="upload-box">
+                                <span id="icon-dress2">👗</span>
+                                <span id="text-dress2">One-piece 2</span>
+                                <input type="file" id="file-dress2" name="dress_2" accept="image/*" hidden>
+                            </label>
+
+                            <label class="upload-box">
+                                <span id="icon-dress3">👗</span>
+                                <span id="text-dress3">One-piece 3</span>
+                                <input type="file" id="file-dress3" name="dress_3" accept="image/*" hidden>
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <!-- 5. SHOES (OPTIONAL) -->
+                    <div class="upload-section">
+
+                        <span class="upload-title">5. Shoes (Optional)</span>
+
+                        <div class="upload-grid">
+
+                            <label class="upload-box">
                                 <span id="icon-shoe1">👟</span>
-
-                                <span id="text-shoe1">
-                                    Shoes 1
-                                </span>
-
-                                <input type="file"
-                                       id="file-shoe1"
-                                       name="shoe_1"
-                                       accept="image/*"
-                                       hidden>
-
+                                <span id="text-shoe1">Shoes 1</span>
+                                <input type="file" id="file-shoe1" name="shoe_1" accept="image/*" hidden>
                             </label>
 
                             <label class="upload-box">
-
                                 <span id="icon-shoe2">👟</span>
-
-                                <span id="text-shoe2">
-                                    Shoes 2
-                                </span>
-
-                                <input type="file"
-                                       id="file-shoe2"
-                                       name="shoe_2"
-                                       accept="image/*"
-                                       hidden>
-
+                                <span id="text-shoe2">Shoes 2</span>
+                                <input type="file" id="file-shoe2" name="shoe_2" accept="image/*" hidden>
                             </label>
 
                             <label class="upload-box">
-
                                 <span id="icon-shoe3">👟</span>
-
-                                <span id="text-shoe3">
-                                    Shoes 3
-                                </span>
-
-                                <input type="file"
-                                       id="file-shoe3"
-                                       name="shoe_3"
-                                       accept="image/*"
-                                       hidden>
-
+                                <span id="text-shoe3">Shoes 3</span>
+                                <input type="file" id="file-shoe3" name="shoe_3" accept="image/*" hidden>
                             </label>
 
                         </div>
 
                     </div>
 
-                    <!-- ==========================
-                         SCARVES
-                    ========================== -->
-
+                    <!-- 6. SCARVES (OPTIONAL) -->
                     <div class="upload-section">
 
-                        <span class="upload-title">
-
-                            5. Your Scarves (Optional)
-
-                        </span>
+                        <span class="upload-title">6. Scarves (Optional)</span>
 
                         <div class="upload-grid">
 
                             <label class="upload-box">
-
                                 <span id="icon-scarf1">🧣</span>
-
-                                <span id="text-scarf1">
-                                    Scarf 1
-                                </span>
-
-                                <input type="file"
-                                       id="file-scarf1"
-                                       name="scarf_1"
-                                       accept="image/*"
-                                       hidden
-                                       >
-
+                                <span id="text-scarf1">Scarf 1</span>
+                                <input type="file" id="file-scarf1" name="scarf_1" accept="image/*" hidden>
                             </label>
 
                             <label class="upload-box">
-
                                 <span id="icon-scarf2">🧣</span>
-
-                                <span id="text-scarf2">
-                                    Scarf 2
-                                </span>
-
-                                <input type="file"
-                                       id="file-scarf2"
-                                       name="scarf_2"
-                                       accept="image/*"
-                                       hidden
-                                       >
-
+                                <span id="text-scarf2">Scarf 2</span>
+                                <input type="file" id="file-scarf2" name="scarf_2" accept="image/*" hidden>
                             </label>
 
                             <label class="upload-box">
-
                                 <span id="icon-scarf3">🧣</span>
-
-                                <span id="text-scarf3">
-                                    Scarf 3
-                                </span>
-
-                                <input type="file"
-                                       id="file-scarf3"
-                                       name="scarf_3"
-                                       accept="image/*"
-                                       hidden
-                                       >
-
+                                <span id="text-scarf3">Scarf 3</span>
+                                <input type="file" id="file-scarf3" name="scarf_3" accept="image/*" hidden>
                             </label>
 
                         </div>
 
                     </div>
 
-                    <!-- ==========================
-                         CAPSULE WARNING
-                    ========================== -->
+                    <!-- WARNING -->
+                    <div id="capsule-warning" class="capsule-warning hidden">
 
-                    <div id="capsule-warning"
-                         class="capsule-warning hidden">
-
-                        <h3>
-
-                            Some Photos Are Missing
-
-                        </h3>
+                        <h3>Please Add At Least One Clothing Item</h3>
 
                         <p>
-
-                            Please upload all the required tops and
-                            bottoms so STYRIVA can create your look.
-
+                            Upload at least one top, bottom, or one-piece
+                            so STYRIVA can create your look.
                         </p>
 
-                        <div id="missing-items"
-                             class="missing-items">
-
-                        </div>
+                        <div id="missing-items" class="missing-items"></div>
 
                     </div>
 
                 </div>
 
-                <!-- ==========================
-                     FORM FOOTER
-                ========================== -->
-
+                <!-- FORM FOOTER -->
                 <div class="form-footer">
 
-                    <button type="button"
-                            id="prev-btn"
-                            class="btn-back">
+                    <button type="button" id="prev-btn" class="btn-back">← Back</button>
 
-                        ← Back
-
-                    </button>
-
-                    <button type="button"
-                            id="next-btn"
-                            class="btn-next">
-
-                        Next
-
-                    </button>
+                    <button type="button" id="next-btn" class="btn-next">Next</button>
 
                 </div>
 
@@ -975,6 +462,7 @@ MAIN LAYOUT
 
 </main>
 
+<!-- SIGNUP MODAL -->
 <div id="signupModal" class="signup-modal">
 
     <div class="signup-card">
@@ -990,44 +478,24 @@ MAIN LAYOUT
         </p>
 
         <div class="signup-buttons">
-
-            <button class="btn-secondary" onclick="closeSignupModal()">
-                Maybe Later
-            </button>
-
-            <button id="signupBtn" class="btn-primary">
-    Create Free Account
-</button>
+            <button class="btn-secondary" onclick="closeSignupModal()">Maybe Later</button>
+            <button id="signupBtn" class="btn-primary">Create Free Account</button>
         </div>
 
     </div>
 
 </div>
 
-<!-- ==========================================
-PREMIUM UPGRADE MODAL
-========================================== -->
-
+<!-- PREMIUM UPGRADE MODAL -->
 <div id="premiumModal" class="premium-modal">
     <div class="premium-overlay"></div>
     <div class="premium-card">
-        <button
-            class="premium-close"
-            onclick="closePremiumModal()">
-            ✕
-        </button>
+        <button class="premium-close" onclick="closePremiumModal()">✕</button>
         <div class="premium-logo">
-
-            <img
-                src="{% static 'images/logo.png' %}"
-                alt="STYRIVA">
+            <img src="{% static 'images/logo.png' %}" alt="STYRIVA">
         </div>
-        <div class="premium-tag">
-            STYRIVA PREMIUM
-        </div>
-        <h2>
-            Want More Looks?
-        </h2>
+        <div class="premium-tag">STYRIVA PREMIUM</div>
+        <h2>Want More Looks?</h2>
         <p class="premium-description">
             You've tried your personal AI stylist.
             Upgrade to Premium and create as many looks
@@ -1064,67 +532,33 @@ PREMIUM UPGRADE MODAL
                 </div>
             </div>
         </div>
-        <button
-    id="upgradePremiumButton"
-    class="premium-upgrade"
-    data-premium-url="{% url 'premium' %}">
-    Upgrade to Premium
-</button>
-        <button
-            class="premium-later"
-            onclick="closePremiumModal()">
-            Maybe Later
+        <button id="upgradePremiumButton"
+                class="premium-upgrade"
+                data-premium-url="{% url 'premium' %}">
+            Upgrade to Premium
         </button>
-        <p class="premium-footer">
-            Made with care by STYRIVA.
-        </p>
+        <button class="premium-later" onclick="closePremiumModal()">Maybe Later</button>
+        <p class="premium-footer">Made with care by STYRIVA.</p>
     </div>
 </div>
 
-
-<!-- ==========================================
-     DAILY FREE LIMIT MODAL
-========================================== -->
+<!-- DAILY FREE LIMIT MODAL -->
 <div id="dailyLimitModal" class="daily-limit-modal">
     <div class="daily-limit-overlay"></div>
     <div class="daily-limit-card">
-        <button
-            class="daily-limit-close"
-            onclick="closeDailyLimitModal()">
-            ✕
-        </button>
-        <div class="daily-limit-icon">
-            ✨
-        </div>
-        <div class="daily-limit-tag">
-            DAILY LIMIT REACHED
-        </div>
-        <h2>
-            You're Done for Today
-        </h2>
-        <p>
-            You've used both of your free looks
-            for today.
-        </p>
-        <p class="daily-limit-highlight">
-            Come back tomorrow for 2 more free looks.
-        </p>
+        <button class="daily-limit-close" onclick="closeDailyLimitModal()">✕</button>
+        <div class="daily-limit-icon">✨</div>
+        <div class="daily-limit-tag">DAILY LIMIT REACHED</div>
+        <h2>You're Done for Today</h2>
+        <p>You've used both of your free looks for today.</p>
+        <p class="daily-limit-highlight">Come back tomorrow for 2 more free looks.</p>
         <div class="daily-limit-divider"></div>
-        <div class="daily-limit-note">
-            We'll be here when you're back.
-        </div>
-        <button
-            class="daily-limit-button"
-            onclick="closeDailyLimitModal()">
-            OK, See You Tomorrow
-        </button>
+        <div class="daily-limit-note">We'll be here when you're back.</div>
+        <button class="daily-limit-button" onclick="closeDailyLimitModal()">OK, See You Tomorrow</button>
     </div>
 </div>
 
-<!-- ==========================================
-FOOTER
-========================================== -->
-
+<!-- FOOTER -->
 <footer class="footer">
     <div class="footer-content">
         <div class="footer-brand">
@@ -1133,39 +567,20 @@ FOOTER
             AI-powered personal styling.
         </div>
         <div class="footer-links">
-            <a href="{% url 'splash' %}">
-                Home
-            </a>
-            <a href="{% url 'about' %}">
-                About
-            </a>
-            <a href="{% url 'how_it_works' %}">
-                How It Works
-            </a>
-            <a href="{% url 'guides' %}">
-                Styling Guides
-            </a>
-            <a href="{% url 'faq' %}">
-                FAQ
-            </a>
-            <a href="{% url 'privacy_policy' %}">
-                Privacy Policy
-            </a>
-            <a href="{% url 'terms' %}">
-                Terms & Conditions
-            </a>
-            <a href="{% url 'cookies' %}">
-                Cookie Policy
-            </a>
-            <a href="{% url 'disclaimer' %}">
-                Disclaimer
-            </a>
-            <a href="{% url 'contact' %}">
-                Contact
-            </a>
+            <a href="{% url 'splash' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'how_it_works' %}">How It Works</a>
+            <a href="{% url 'guides' %}">Styling Guides</a>
+            <a href="{% url 'faq' %}">FAQ</a>
+            <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+            <a href="{% url 'terms' %}">Terms & Conditions</a>
+            <a href="{% url 'cookies' %}">Cookie Policy</a>
+            <a href="{% url 'disclaimer' %}">Disclaimer</a>
+            <a href="{% url 'contact' %}">Contact</a>
         </div>
     </div>
 </footer>
+
 </body>
 
 </html>

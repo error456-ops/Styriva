@@ -1,168 +1,111 @@
+
 import shutil
+import tempfile
 import uuid
 from pathlib import Path
 
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 
 class Storage:
-    """
-    Handles all file storage operations for STYRIVA.
-    """
+    """Cloudinary-backed storage for STYRIVA."""
 
     def __init__(self):
         self.storage = default_storage
         self.media_root = Path(settings.MEDIA_ROOT)
 
     def save(self, path, file):
-        """
-        Save a file and return its relative path.
-        """
-        return self.storage.save(path, file)
+        """Save a file through Django's configured storage."""
+        return self.storage.save(str(path), file)
 
+    
     def delete(self, path):
-        """
-        Delete a file if it exists.
-        """
-        if self.storage.exists(path):
-            self.storage.delete(path)
+        """Delete a file through Django's configured storage."""
+        self.storage.delete(str(path))
+        return not self.storage.exists(str(path))
 
     def exists(self, path):
-        """
-        Check whether a file exists.
-        """
         return self.storage.exists(path)
 
     def open(self, path, mode="rb"):
-        """
-        Open a stored file.
-        """
         return self.storage.open(path, mode)
 
     def url(self, path):
-        """
-        Return the public URL of a file.
-        """
         return self.storage.url(path)
 
     def path(self, path):
         """
-        Return the absolute filesystem path.
+        Cloudinary assets do not have a permanent local path.
+        Download the asset to a temporary file instead.
+        The caller is responsible for deleting that file.
         """
-        return self.storage.path(path)
+        suffix = Path(str(path)).suffix or ".tmp"
+
+        with self.storage.open(path, "rb") as source:
+            with tempfile.NamedTemporaryFile(
+                suffix=suffix,
+                delete=False,
+            ) as destination:
+                shutil.copyfileobj(source, destination)
+                return destination.name
 
     def size(self, path):
-        """
-        Return the file size in bytes.
-        """
         return self.storage.size(path)
 
     def copy(self, source, destination):
-        """
-        Copy a file to another location.
-        """
-        source_path = Path(self.path(source))
-        destination_path = Path(self.path(destination))
-
-        destination_path.parent.mkdir(parents=True, exist_ok=True)
-
-        shutil.copy2(source_path, destination_path)
-
-        return destination
+        """Copy a stored file by reading and saving its contents."""
+        with self.storage.open(source, "rb") as source_file:
+            saved_path = self.storage.save(
+                destination,
+                ContentFile(
+                    source_file.read(),
+                    name=Path(destination).name,
+                ),
+            )
+        return saved_path
 
     def move(self, source, destination):
-        """
-        Move a file to another location.
-        """
-        source_path = Path(self.path(source))
-        destination_path = Path(self.path(destination))
-
-        destination_path.parent.mkdir(parents=True, exist_ok=True)
-
-        shutil.move(source_path, destination_path)
-
-        return destination
+        """Copy to the destination, then delete the source."""
+        saved_path = self.copy(source, destination)
+        self.storage.delete(source)
+        return saved_path
 
     def rename(self, source, new_name):
-        """
-        Rename a file while keeping it in the same folder.
-        """
-        source_path = Path(self.path(source))
-
-        destination = source_path.parent / new_name
-
-        shutil.move(source_path, destination)
-
-        return str(destination)
+        """Rename by copying to a new path and deleting the old asset."""
+        destination = str(Path(source).parent / new_name)
+        return self.move(source, destination)
 
     def create_directory(self, directory):
         """
-        Create a directory if it doesn't exist.
+        Cloudinary folders are virtual.
+        Return the intended folder name without creating a local folder.
         """
-        directory_path = self.media_root / directory
-
-        directory_path.mkdir(parents=True, exist_ok=True)
-
-        return directory_path
+        return str(directory).strip("/")
 
     def directory_exists(self, directory):
-        """
-        Check whether a directory exists.
-        """
-        return (self.media_root / directory).exists()
+        """Cloudinary folders are virtual; local folder checks are not valid."""
+        return False
 
     def list_files(self, directory):
         """
-        Return all files inside a directory.
+        Local directory enumeration is unavailable for Cloudinary.
         """
-        directory_path = self.media_root / directory
-
-        if not directory_path.exists():
-            return []
-
-        return [
-            file
-            for file in directory_path.iterdir()
-            if file.is_file()
-        ]
+        return []
 
     def list_directories(self, directory):
         """
-        Return all subdirectories inside a directory.
+        Local directory enumeration is unavailable for Cloudinary.
         """
-        directory_path = self.media_root / directory
-
-        if not directory_path.exists():
-            return []
-
-        return [
-            folder
-            for folder in directory_path.iterdir()
-            if folder.is_dir()
-        ]
+        return []
 
     def directory_size(self, directory):
         """
-        Return the total size of a directory in bytes.
+        Local filesystem size is not Cloudinary storage usage.
         """
-        directory_path = self.media_root / directory
-
-        total = 0
-
-        if not directory_path.exists():
-            return total
-
-        for file in directory_path.rglob("*"):
-            if file.is_file():
-                total += file.stat().st_size
-
-        return total
+        return 0
 
     def unique_filename(self, filename):
-        """
-        Generate a unique filename while preserving its extension.
-        """
         extension = Path(filename).suffix
-
         return f"{uuid.uuid4().hex}{extension}"

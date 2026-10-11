@@ -21,11 +21,19 @@ class EvolutionBrain:
 
         print("\n========== BUILD PROMPT ==========")
 
-        selected_top = self.styling_result.selected_top or ""
-        selected_bottom = self.styling_result.selected_bottom or ""
-        selected_scarf = self.styling_result.selected_scarf or ""
-
-        # NEW: shoes (getattr keeps old saved looks working)
+        # getattr keeps old saved looks working
+        selected_top = (
+            getattr(self.styling_result, "selected_top", "") or ""
+        )
+        selected_bottom = (
+            getattr(self.styling_result, "selected_bottom", "") or ""
+        )
+        selected_dress = (
+            getattr(self.styling_result, "selected_dress", "") or ""
+        )
+        selected_scarf = (
+            getattr(self.styling_result, "selected_scarf", "") or ""
+        )
         selected_shoe = (
             getattr(self.styling_result, "selected_shoe", "") or ""
         )
@@ -52,29 +60,66 @@ class EvolutionBrain:
             else "No additional wardrobe pieces selected."
         )
 
-        shoe_text = (
-            f"Shoes: {selected_shoe}"
-            if selected_shoe
-            else "Shoes: None"
-        )
+        # -------------------------------------------------
+        # CURRENT LOOK and RULES, built from what the
+        # winning outfit actually contains
+        # -------------------------------------------------
 
-        shoe_rule = (
-            "- NEVER change the selected shoes."
-            if selected_shoe
-            else "- No shoes are part of the winning outfit."
-        )
+        look_lines = []
+        rule_lines = []
 
-        scarf_text = (
-            f"Scarf: {selected_scarf}"
-            if selected_scarf
-            else "Scarf: None"
-        )
+        if selected_dress:
 
-        scarf_rule = (
-            "- NEVER change the selected scarf."
-            if selected_scarf
-            else "- No scarf is part of the winning outfit."
-        )
+            look_lines.append(f"One-piece: {selected_dress}")
+
+            rule_lines.append(
+                "- NEVER change the selected one-piece."
+            )
+            rule_lines.append(
+                "- Do NOT add a separate top or bottom. "
+                "The one-piece is the complete outfit."
+            )
+
+        else:
+
+            if selected_top:
+                look_lines.append(f"Top: {selected_top}")
+                rule_lines.append("- NEVER change the selected top.")
+            else:
+                look_lines.append(
+                    "Top: None (the person keeps the top "
+                    "from their own photo)"
+                )
+
+            if selected_bottom:
+                look_lines.append(f"Bottom: {selected_bottom}")
+                rule_lines.append("- NEVER change the selected bottom.")
+            else:
+                look_lines.append(
+                    "Bottom: None (the person keeps the bottom "
+                    "from their own photo)"
+                )
+
+        if selected_shoe:
+            look_lines.append(f"Shoes: {selected_shoe}")
+            rule_lines.append("- NEVER change the selected shoes.")
+        else:
+            look_lines.append("Shoes: None")
+            rule_lines.append(
+                "- No shoes are part of the winning outfit."
+            )
+
+        if selected_scarf:
+            look_lines.append(f"Scarf: {selected_scarf}")
+            rule_lines.append("- NEVER change the selected scarf.")
+        else:
+            look_lines.append("Scarf: None")
+            rule_lines.append(
+                "- No scarf is part of the winning outfit."
+            )
+
+        current_look_text = "\n".join(look_lines)
+        rules_text = "\n".join(rule_lines)
 
         prompt = f"""
 You are STYRIVA EVOLUTION.
@@ -85,10 +130,7 @@ Your mission is to elevate the existing winning outfit.
 
 CURRENT LOOK
 
-Top: {selected_top}
-Bottom: {selected_bottom}
-{shoe_text}
-{scarf_text}
+{current_look_text}
 
 ORIGINAL STYLING
 
@@ -122,10 +164,7 @@ ORIGINAL REASONING
 
 RULES
 
-- NEVER change the selected top.
-- NEVER change the selected bottom.
-{shoe_rule}
-{scarf_rule}
+{rules_text}
 - Only enhance the look.
 - Only use wardrobe items listed above.
 - Do NOT invent clothing the user doesn't own.

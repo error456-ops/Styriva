@@ -34,23 +34,31 @@ class StyleConsultation(models.Model):
     )
 
     # ==========================================================
-    # Tops
+    # Tops (optional)
     # ==========================================================
 
-    top_1 = models.ImageField(upload_to="tops/")
-    top_2 = models.ImageField(upload_to="tops/")
-    top_3 = models.ImageField(upload_to="tops/")
+    top_1 = models.ImageField(upload_to="tops/", blank=True, null=True)
+    top_2 = models.ImageField(upload_to="tops/", blank=True, null=True)
+    top_3 = models.ImageField(upload_to="tops/", blank=True, null=True)
 
     # ==========================================================
-    # Bottoms
+    # Bottoms (optional)
     # ==========================================================
 
-    bottom_1 = models.ImageField(upload_to="bottoms/")
-    bottom_2 = models.ImageField(upload_to="bottoms/")
-    bottom_3 = models.ImageField(upload_to="bottoms/")
+    bottom_1 = models.ImageField(upload_to="bottoms/", blank=True, null=True)
+    bottom_2 = models.ImageField(upload_to="bottoms/", blank=True, null=True)
+    bottom_3 = models.ImageField(upload_to="bottoms/", blank=True, null=True)
 
     # ==========================================================
-    # Shoes (NEW, optional)
+    # One-pieces: dress, long frock, gown (NEW, optional)
+    # ==========================================================
+
+    dress_1 = models.ImageField(upload_to="dresses/", blank=True, null=True)
+    dress_2 = models.ImageField(upload_to="dresses/", blank=True, null=True)
+    dress_3 = models.ImageField(upload_to="dresses/", blank=True, null=True)
+
+    # ==========================================================
+    # Shoes (optional)
     # ==========================================================
 
     shoe_1 = models.ImageField(upload_to="shoes/", blank=True, null=True)
@@ -58,7 +66,7 @@ class StyleConsultation(models.Model):
     shoe_3 = models.ImageField(upload_to="shoes/", blank=True, null=True)
 
     # ==========================================================
-    # Scarves
+    # Scarves (optional)
     # ==========================================================
 
     scarf_1 = models.ImageField(upload_to="scarves/", blank=True, null=True)
@@ -113,6 +121,13 @@ class GeneratedLook(models.Model):
     )
 
     selected_bottom = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    # NEW: the one-piece the AI picked (dress, long frock, gown)
+    selected_dress = models.CharField(
         max_length=255,
         blank=True,
         null=True

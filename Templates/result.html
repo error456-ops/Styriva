@@ -1,4 +1,5 @@
 {% load static %}
+{% load cloudinary_extras %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -52,7 +53,7 @@
         <div class="preview-card">
             <div class="preview-image">
                 {% if generated_look.generated_image %}
-<img src="{{ generated_look.generated_image.url }}" alt="Generated Look">
+<img src="{{ generated_look.generated_image.url|cl_opt:'f_auto,q_auto,w_900' }}" alt="Generated Look">
 {% else %}
                 <div class="placeholder">
                     <div class="placeholder-icon">✨</div>
@@ -68,7 +69,7 @@
 
             <div class="preview-footer">
                 <span class="preview-label">Virtual Try-On Render</span>
-                <a href="{{ generated_look.generated_image.url }}" download class="download-btn">
+                <a href="{{ generated_look.generated_image.url|cl_download }}" download class="download-btn">
     Download Portrait ↓
 </a>
             </div>

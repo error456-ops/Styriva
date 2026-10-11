@@ -1,4 +1,7 @@
-from django.core.files.base import File
+import os
+
+from django.conf import settings
+from django.core.files.base import File, ContentFile
 
 from jobs.constants import JobType
 
@@ -10,6 +13,47 @@ from selfmirror.models import (
 )
 
 from accounts.services import CreditManager
+
+
+# ==============================================================
+# Cloudinary helper
+#
+# Turns bytes, a local file path, or a Django File into something
+# Django can upload to Cloudinary through the storage backend.
+# ==============================================================
+
+def to_django_file(value, default_name="image.png"):
+
+    if isinstance(value, (bytes, bytearray)):
+
+        return ContentFile(
+            bytes(value),
+            name=default_name
+        )
+
+    if isinstance(value, File):
+
+        return value
+
+    if isinstance(value, str):
+
+        candidates = (
+            value,
+            os.path.join(settings.MEDIA_ROOT, value),
+        )
+
+        for candidate in candidates:
+
+            if os.path.isfile(candidate):
+
+                with open(candidate, "rb") as f:
+
+                    return ContentFile(
+                        f.read(),
+                        name=os.path.basename(candidate)
+                    )
+
+    return value
 
 
 class JobDispatcher:
@@ -118,6 +162,15 @@ class JobDispatcher:
                 "selected_bottom"
             ),
 
+            # NEW: one-piece (dress, long frock, gown)
+            selected_dress=styling_result.get(
+                "selected_dress"
+            ),
+
+            selected_shoe=styling_result.get(
+                "selected_shoe"
+            ),
+
             selected_scarf=styling_result.get(
                 "selected_scarf"
             ),
@@ -152,18 +205,15 @@ class JobDispatcher:
                 "render_prompt"
             ),
 
-            generated_image=generated_image,
+            # CLOUDINARY: make sure the image is uploadable
+            generated_image=to_django_file(
+                generated_image,
+                "look.png"
+            ),
         )
 
-        # ------------------------------------------------------
-        # Consume generation only after successful completion
-        # ------------------------------------------------------
-
-        if consultation.user:
-
-            CreditManager.consume_generation(
-                consultation.user
-            )
+        # NOTE: the credit is already spent in views.py when the
+        # job is created, so it is NOT charged again here.
 
         print(
             "Style Generation completed."
@@ -264,41 +314,16 @@ class JobDispatcher:
             ),
         )
 
-        evolved_image = result.get(
-            "generated_image"
+        # CLOUDINARY: make sure the image is uploadable
+        evolved.evolved_image = to_django_file(
+            result.get("generated_image"),
+            "evolved.png"
         )
-
-        if isinstance(
-            evolved_image,
-            File
-        ):
-
-            evolved.evolved_image.save(
-
-                evolved_image.name,
-
-                evolved_image,
-
-                save=False
-            )
-
-        else:
-
-            evolved.evolved_image = (
-                evolved_image
-            )
 
         evolved.save()
 
-        # ------------------------------------------------------
-        # Consume Style Evolution credit
-        # ------------------------------------------------------
-
-        if consultation.user:
-
-            CreditManager.consume_style_evolution(
-                consultation.user
-            )
+        # NOTE: the credit is already spent in views.py when the
+        # job is created, so it is NOT charged again here.
 
         print(
             "Style Evolution completed."

@@ -3,84 +3,111 @@ class OutfitCombination:
     def __init__(self, analysis_data):
         self.analysis_data = analysis_data
 
+    # ==========================================
+    # Collect whichever items were uploaded
+    # ==========================================
+
+    def _collect(self, prefix):
+
+        items = []
+
+        for i in range(1, 4):
+
+            item = self.analysis_data.get(
+                f"{prefix}_{i}_analysis"
+            )
+
+            if item:
+                items.append(item)
+
+        return items
+
     def generate(self):
 
         outfits = []
 
-        tops = [
-            self.analysis_data["top_1_analysis"],
-            self.analysis_data["top_2_analysis"],
-            self.analysis_data["top_3_analysis"],
-        ]
-
-        bottoms = [
-            self.analysis_data["bottom_1_analysis"],
-            self.analysis_data["bottom_2_analysis"],
-            self.analysis_data["bottom_3_analysis"],
-        ]
-
-        # ==========================================
-        # Optional Shoes (NEW)
-        # ==========================================
-
-        shoes = []
-
-        for key in (
-            "shoe_1_analysis",
-            "shoe_2_analysis",
-            "shoe_3_analysis",
-        ):
-
-            shoe = self.analysis_data.get(key)
-
-            if shoe:
-                shoes.append(shoe)
+        tops = self._collect("top")
+        bottoms = self._collect("bottom")
+        dresses = self._collect("dress")
+        shoes = self._collect("shoe")
+        scarves = self._collect("scarf")
 
         # If no shoes were uploaded, use a single "no shoe"
-        # option so the old behaviour still works.
+        # option (the shoes from the person's photo are kept).
         shoe_options = shoes if shoes else [None]
 
         # ==========================================
-        # Optional Scarves
+        # Base outfits (the main clothing part)
+        #
+        # - One-piece   -> dress only, no top/bottom
+        # - Top+Bottom  -> every top with every bottom
+        # - Only tops   -> top, bottom stays as in photo
+        # - Only bottoms-> bottom, top stays as in photo
         # ==========================================
 
-        scarves = []
+        bases = []
 
-        for key in (
-            "scarf_1_analysis",
-            "scarf_2_analysis",
-            "scarf_3_analysis",
-        ):
+        # One-piece outfits
+        for dress in dresses:
 
-            scarf = self.analysis_data.get(key)
+            bases.append({
+                "top": None,
+                "bottom": None,
+                "dress": dress,
+            })
 
-            if scarf:
-                scarves.append(scarf)
+        # Separates
+        if tops and bottoms:
 
-        # ==========================================
-        # Build combinations
-        # ==========================================
+            for top in tops:
+                for bottom in bottoms:
 
-        for top in tops:
+                    bases.append({
+                        "top": top,
+                        "bottom": bottom,
+                        "dress": None,
+                    })
+
+        elif tops:
+
+            for top in tops:
+
+                bases.append({
+                    "top": top,
+                    "bottom": None,
+                    "dress": None,
+                })
+
+        elif bottoms:
 
             for bottom in bottoms:
 
-                for shoe in shoe_options:
+                bases.append({
+                    "top": None,
+                    "bottom": bottom,
+                    "dress": None,
+                })
+
+        # ==========================================
+        # Add shoes and scarves to every base outfit
+        # ==========================================
+
+        for base in bases:
+
+            for shoe in shoe_options:
+
+                outfits.append({
+                    **base,
+                    "shoe": shoe,
+                    "scarf": None,
+                })
+
+                for scarf in scarves:
 
                     outfits.append({
-                        "top": top,
-                        "bottom": bottom,
+                        **base,
                         "shoe": shoe,
-                        "scarf": None,
+                        "scarf": scarf,
                     })
-
-                    for scarf in scarves:
-
-                        outfits.append({
-                            "top": top,
-                            "bottom": bottom,
-                            "shoe": shoe,
-                            "scarf": scarf,
-                        })
 
         return outfits

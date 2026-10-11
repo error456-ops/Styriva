@@ -67,7 +67,6 @@ def splash(request):
 # Generate Style Look
 # ==========================================================
 
-
 def generate_style_look(request):
 
     if request.method == "POST":
@@ -141,35 +140,25 @@ def generate_style_look(request):
         # ==================================================
         # STEP 1
         # Collect uploaded images
+        #
+        # Only the user's own photo is required.
+        # Tops, bottoms, one-pieces, shoes and scarves are
+        # all optional, but at least ONE garment (top,
+        # bottom or one-piece) is needed.
         # ==================================================
 
         required_files = {
-
             "user_model_photo": request.FILES.get(
                 "user_model_photo"
             ),
-
-            "top_1": request.FILES.get("top_1"),
-            "top_2": request.FILES.get("top_2"),
-            "top_3": request.FILES.get("top_3"),
-
-            "bottom_1": request.FILES.get("bottom_1"),
-            "bottom_2": request.FILES.get("bottom_2"),
-            "bottom_3": request.FILES.get("bottom_3"),
         }
 
-        optional_files = {
+        optional_files = {}
 
-            # Shoes (NEW)
-            "shoe_1": request.FILES.get("shoe_1"),
-            "shoe_2": request.FILES.get("shoe_2"),
-            "shoe_3": request.FILES.get("shoe_3"),
-
-            # Scarves
-            "scarf_1": request.FILES.get("scarf_1"),
-            "scarf_2": request.FILES.get("scarf_2"),
-            "scarf_3": request.FILES.get("scarf_3"),
-        }
+        for prefix in ("top", "bottom", "dress", "shoe", "scarf"):
+            for i in range(1, 4):
+                field = f"{prefix}_{i}"
+                optional_files[field] = request.FILES.get(field)
 
         uploaded_files = {
             **required_files,
@@ -178,31 +167,39 @@ def generate_style_look(request):
 
         # ==================================================
         # STEP 2
-        # Check required images only
+        # Check required image + at least one garment
         # ==================================================
 
-        missing_files = [
-            field_name
-            for field_name, uploaded_file
-            in required_files.items()
-            if uploaded_file is None
+        if required_files["user_model_photo"] is None:
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": "Please upload your photo.",
+                },
+                status=400,
+            )
+
+        garment_fields = [
+            f"{prefix}_{i}"
+            for prefix in ("top", "bottom", "dress")
+            for i in range(1, 4)
         ]
 
-        if missing_files:
+        has_garment = any(
+            uploaded_files[field] is not None
+            for field in garment_fields
+        )
 
-            readable_names = [
-                field_name.replace("_", " ")
-                for field_name in missing_files
-            ]
+        if not has_garment:
 
             return JsonResponse(
                 {
                     "success": False,
                     "message": (
-                        "Please upload all required images. "
-                        "Missing: "
-                        + ", ".join(readable_names)
-                    )
+                        "Please upload at least one top, "
+                        "bottom or one-piece."
+                    ),
                 },
                 status=400,
             )
@@ -280,22 +277,9 @@ def generate_style_look(request):
 
                 user_model_photo=uploaded_files["user_model_photo"],
 
-                top_1=uploaded_files["top_1"],
-                top_2=uploaded_files["top_2"],
-                top_3=uploaded_files["top_3"],
-
-                bottom_1=uploaded_files["bottom_1"],
-                bottom_2=uploaded_files["bottom_2"],
-                bottom_3=uploaded_files["bottom_3"],
-
-                # Shoes (NEW)
-                shoe_1=uploaded_files["shoe_1"],
-                shoe_2=uploaded_files["shoe_2"],
-                shoe_3=uploaded_files["shoe_3"],
-
-                scarf_1=uploaded_files["scarf_1"],
-                scarf_2=uploaded_files["scarf_2"],
-                scarf_3=uploaded_files["scarf_3"],
+                # tops, bottoms, one-pieces, shoes, scarves
+                # (any that were not uploaded are saved as empty)
+                **optional_files,
             )
 
         except Exception as error:

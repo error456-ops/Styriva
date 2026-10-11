@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load cloudinary_extras %}
 
 {% block title %}
 My Profile | STYRIVA
@@ -126,7 +127,7 @@ My Profile | STYRIVA
                 {% if look.generated_image %}
 
                     <img
-                        src="{{ look.generated_image.url }}"
+                        src="{{ look.generated_image.url|cl_opt:'f_auto,q_auto,w_500' }}"
                         alt="{{ look.title }}"
                         class="look-image"
                     >
