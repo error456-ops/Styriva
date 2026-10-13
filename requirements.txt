@@ -8,3 +8,4 @@ django-cloudinary-storage
 openai
 razorpay
 opencv-python-headless
+Pillow
