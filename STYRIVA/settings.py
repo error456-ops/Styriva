@@ -16,17 +16,27 @@ import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-60!0zx)t%+*i0r8_j8t(o#aepf!co+l(cgch1ammcza0ul432^'
+SECRET_KEY = env("SECRET_KEY")
+DEBUG = env.bool("DEBUG", default=False)
+
+
+
+'''SECRET_KEY = 'django-insecure-60!0zx)t%+*i0r8_j8t(o#aepf!co+l(cgch1ammcza0ul432^'''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-ALLOWED_HOSTS = []
+'''DEBUG = True
+env = environ.Env()'''
+'''environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+ALLOWED_HOSTS = []'''
+
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=[],
+)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -44,10 +54,9 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
 
 # Application definition
 
@@ -77,6 +86,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'STYRIVA.urls'
@@ -98,9 +108,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'STYRIVA.wsgi.application'
 
-env = environ.Env()
 
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+
 OPENAI_API_KEY = env('OPENAI_API_KEY')
 
 RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID')
@@ -110,7 +120,7 @@ RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET')
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
+'''DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'Styriva',
@@ -119,8 +129,13 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',
     }
+}'''
+# Database
+DATABASES = {
+    "default": env.db("DATABASE_URL"),
 }
 
+DATABASES["default"]["CONN_MAX_AGE"] = 600
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -156,11 +171,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+'''STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+'''
 
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_DIRS = (
+    [BASE_DIR / "static"]
+    if (BASE_DIR / "static").is_dir()
+    else []
+)
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

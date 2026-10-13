@@ -1,0 +1,10 @@
+Django==5.2.5
+gunicorn
+psycopg[binary]
+django-environ
+whitenoise
+cloudinary
+django-cloudinary-storage
+openai
+razorpay
+opencv-python-headless
