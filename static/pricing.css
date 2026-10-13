@@ -46,13 +46,8 @@ img{max-width:100%;display:block;}
 
 /* BACKGROUND EFFECTS */
 
-.noise{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    opacity:.04;
-    background-image:url("../images/gold-noise.png");
-    z-index:-3;
+.noise {
+    display: none;
 }
 
 .gradient-one{
