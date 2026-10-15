@@ -19,6 +19,7 @@ from django.urls import path, include
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +27,11 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
 
     path('', include('selfmirror.urls')),
+    
+    path("manifest.webmanifest", TemplateView.as_view(
+        
+        template_name="manifest.webmanifest",
+        content_type="application/manifest+json"), name="manifest"),
 ]
 
 # Serve uploaded media files during development
