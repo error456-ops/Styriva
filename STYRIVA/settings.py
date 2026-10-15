@@ -32,12 +32,28 @@ env = environ.Env()'''
 '''environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 ALLOWED_HOSTS = []'''
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS",
+    default=[
+        "styriva-production.up.railway.app",
+        "styriva.com",
+        "www.styriva.com",
+    ],
+)
+
 CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=[
+        "https://styriva-production.up.railway.app",
+        "https://styriva.com",
+        "https://www.styriva.com",
+    ],
+)
+'''CSRF_TRUSTED_ORIGINS = env.list(
     "CSRF_TRUSTED_ORIGINS",
     default=[],
 )
-
+'''
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -206,7 +222,7 @@ LOGGING = {
     },
 }
 
-CSRF_TRUSTED_ORIGINS = ["https://styriva-production.up.railway.app"]
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
