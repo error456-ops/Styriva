@@ -773,7 +773,41 @@ def style_evolution_status(
 # Static / Informational Pages
 # ==========================================================
 
+def sync_pending_payments(user):
+    client = razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+    )
+
+    pending = Payment.objects.filter(
+        user=user, status="created"
+    ).order_by("-pk")[:5]
+
+    for p in pending:
+        try:
+            result = client.order.payments(p.razorpay_order_id)
+        except Exception:
+            logger.exception("Payment sync failed for %s", p.razorpay_order_id)
+            continue
+
+        for item in result.get("items", []):
+            if item.get("status") == "captured" and item.get("amount") == p.amount:
+                with transaction.atomic():
+                    locked = Payment.objects.select_for_update().get(pk=p.pk)
+                    if locked.status != "paid":
+                        locked.razorpay_payment_id = item.get("id")
+                        locked.status = "paid"
+                        locked.paid_at = timezone.now()
+                        locked.save(
+                            update_fields=["razorpay_payment_id", "status", "paid_at"]
+                        )
+                        CreditManager.add_credits(user, locked.credits)
+                        logger.info("Payment sync credited order %s", p.razorpay_order_id)
+                break
+
+
 def premium_pricing(request):
+    if request.user.is_authenticated:
+        sync_pending_payments(request.user)
     return render(request, "pricing.html")
 
 
