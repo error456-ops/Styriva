@@ -129,7 +129,7 @@ class CreditManager:
         Adds purchased credits.
         """
 
-        profile = user.profile
+        profile = Profile.objects.select_for_update().get(user=user)
 
         profile.credits += amount
 
