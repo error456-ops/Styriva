@@ -110,4 +110,6 @@ path(
     name="verify_razorpay_payment",
 ),
 
+path("razorpay/webhook/", views.razorpay_webhook, name="razorpay_webhook"),
+
 ]

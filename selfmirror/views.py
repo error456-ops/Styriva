@@ -32,6 +32,13 @@ from accounts.models import Payment, UserUsage
 
 from .abuse_protection import is_rate_limited
 
+import json
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import logging
+logger = logging.getLogger(__name__)
+
 
 RAZORPAY_PLANS = {
     "starter": {
@@ -1029,7 +1036,66 @@ def verify_razorpay_payment(request):
             },
             status=500,
         )
+        
+        
+@csrf_exempt
+@require_POST
+def razorpay_webhook(request):
 
+    signature = request.headers.get("X-Razorpay-Signature", "")
+    body = request.body.decode("utf-8")
+
+    client = razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+    )
+
+    try:
+        client.utility.verify_webhook_signature(
+            body, signature, settings.RAZORPAY_WEBHOOK_SECRET
+        )
+    except Exception:
+        logger.warning("Razorpay webhook: invalid signature")
+        return HttpResponse(status=400)
+
+    event = json.loads(body)
+
+    if event.get("event") not in ("payment.captured", "order.paid"):
+        return HttpResponse(status=200)
+
+    entity = event["payload"]["payment"]["entity"]
+    order_id = entity.get("order_id")
+
+    with transaction.atomic():
+
+        payment = (
+            Payment.objects
+            .select_for_update()
+            .filter(razorpay_order_id=order_id)
+            .first()
+        )
+
+        if payment is None:
+            logger.warning("Razorpay webhook: order %s not found", order_id)
+            return HttpResponse(status=200)
+
+        if payment.status == "paid":
+            return HttpResponse(status=200)
+
+        if entity.get("amount") != payment.amount:
+            logger.warning("Razorpay webhook: amount mismatch for %s", order_id)
+            return HttpResponse(status=200)
+
+        payment.razorpay_payment_id = entity.get("id")
+        payment.status = "paid"
+        payment.paid_at = timezone.now()
+        payment.save(
+            update_fields=["razorpay_payment_id", "status", "paid_at"]
+        )
+
+        CreditManager.add_credits(payment.user, payment.credits)
+
+    logger.info("Razorpay webhook: credited order %s", order_id)
+    return HttpResponse(status=200)
 
 def privacy_policy(request):
     return render(request, "privacy.html")
