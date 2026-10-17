@@ -32,6 +32,10 @@ urlpatterns = [
         
         template_name="manifest.webmanifest",
         content_type="application/manifest+json"), name="manifest"),
+    
+    path("sw.js", TemplateView.as_view(
+    template_name="sw.js",
+    content_type="application/javascript"), name="sw"),
 ]
 
 # Serve uploaded media files during development
