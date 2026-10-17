@@ -1,41 +1,45 @@
-"""
-URL configuration for STYRIVA project.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
+from django.http import HttpResponse
+from django.shortcuts import redirect
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.templatetags.static import static as static_url
 from django.views.generic import TemplateView
 
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /admin/",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def favicon_redirect(request):
+    return redirect(static_url("favicon.ico"), permanent=True)
+
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    
+    path("admin/", admin.site.urls),
+
     path("accounts/", include("accounts.urls")),
 
-    path('', include('selfmirror.urls')),
-    
     path("manifest.webmanifest", TemplateView.as_view(
-        
         template_name="manifest.webmanifest",
         content_type="application/manifest+json"), name="manifest"),
-    
+
     path("sw.js", TemplateView.as_view(
-    template_name="sw.js",
-    content_type="application/javascript"), name="sw"),
+        template_name="sw.js",
+        content_type="application/javascript"), name="sw"),
+
+    path("robots.txt", robots_txt),
+    path("favicon.ico", favicon_redirect),
+
+    path("", include("selfmirror.urls")),
 ]
 
 # Serve uploaded media files during development

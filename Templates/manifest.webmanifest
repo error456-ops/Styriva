@@ -1,6 +1,6 @@
 {% load static %}{
-  "name": "SelfMirror",
-  "short_name": "SelfMirror",
+  "name": "Styriva",
+  "short_name": "Styriva",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
