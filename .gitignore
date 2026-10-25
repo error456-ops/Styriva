@@ -3,7 +3,7 @@ __pycache__/
 .venv/
 venv/
 .env
-.env.*
+.env.*S
 !.env.example
 staticfiles/
 media/
