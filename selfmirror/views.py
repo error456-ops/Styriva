@@ -74,6 +74,10 @@ def splash(request):
 # Generate Style Look
 # ==========================================================
 
+def choose_feature(request):
+    return render(request, "choose_feature.html")
+
+
 def generate_style_look(request):
 
     if request.method == "POST":

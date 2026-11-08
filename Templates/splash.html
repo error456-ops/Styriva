@@ -59,7 +59,8 @@
                 
                 // Step 2: Wait exactly 1 second (1000ms) for the fade-out to finish, then go!
                 setTimeout(() => {
-                    window.location.href = "{%url 'generate_style_look' %}";
+                    window.location.href = "{% url 'choose_feature' %}";
+                    
                 }, 1000); 
 
             }, 3000); // 3000ms total showcase time

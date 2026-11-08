@@ -273,3 +273,106 @@ class EvolvedLook(models.Model):
             f"{self.generated_look.title} "
             f"({self.style_preference})"
         )
+        
+
+# ==============================================================
+# Style My Piece
+# ==============================================================
+
+class PieceStyling(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="piece_stylings",
+        null=True,
+        blank=True,
+    )
+
+    garment_image = models.ImageField(
+        upload_to="piece_styling/garments/"
+    )
+
+    garment_type = models.CharField(
+        max_length=30,
+        choices=[
+            ("top", "Top"),
+            ("bottom", "Bottom"),
+            ("dress", "Dress"),
+            ("outerwear", "Outerwear"),
+            ("shoes", "Shoes"),
+            ("accessory", "Accessory"),
+            ("other", "Other"),
+        ],
+    )
+
+    occasion = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    style_preference = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    status = models.CharField(
+        max_length=20,
+        default="pending",
+        choices=[
+            ("pending", "Pending"),
+            ("processing", "Processing"),
+            ("completed", "Completed"),
+            ("failed", "Failed"),
+        ],
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"Piece Styling #{self.id}"
+
+
+# ==============================================================
+# Style My Piece Results
+# ==============================================================
+
+class PieceStylingResult(models.Model):
+
+    piece_styling = models.ForeignKey(
+        PieceStyling,
+        on_delete=models.CASCADE,
+        related_name="results",
+    )
+
+    title = models.CharField(
+        max_length=150
+    )
+
+    description = models.TextField()
+
+    render_prompt = models.TextField(
+        blank=True,
+    )
+
+    generated_image = models.ImageField(
+        upload_to="piece_styling/results/",
+        blank=True,
+        null=True,
+    )
+
+    order = models.PositiveIntegerField(
+        default=1
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.title

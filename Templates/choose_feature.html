@@ -1,0 +1,119 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Choose Your Style | STYRIVA</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #fbf9f6;
+            font-family: Georgia, serif;
+        }
+
+        .feature-card {
+            transition: transform 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 45px rgba(58, 53, 48, 0.10);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center px-5 py-12">
+
+    <main class="max-w-5xl w-full text-center">
+
+        <img
+            src="{% static 'logo.png' %}"
+            alt="Styriva"
+            class="w-20 h-20 object-contain mx-auto mb-5"
+        >
+
+        <p class="text-xs tracking-[0.4em] text-stone-400 uppercase mb-4">
+            Welcome to Styriva
+        </p>
+
+        <h1 class="text-4xl md:text-5xl text-[#3a3530] mb-4">
+            How would you like to style today?
+        </h1>
+
+        <p class="text-stone-500 text-sm md:text-base mb-12">
+            Your wardrobe. Your style. Your possibilities.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-7 text-left">
+
+            <!-- CREATE AN OUTFIT -->
+
+            <a href="{% url 'generate_style_look' %}"
+               class="feature-card bg-white rounded-2xl p-8 border border-stone-100 block">
+
+                <div class="h-48 rounded-xl bg-[#f1e9df] flex items-center justify-center mb-7">
+                    <span class="text-7xl">👗</span>
+                </div>
+
+                <p class="text-xs tracking-[0.3em] uppercase text-stone-400 mb-3">
+                    Your wardrobe, reimagined
+                </p>
+
+                <h2 class="text-2xl text-[#3a3530] mb-3">
+                    Create an Outfit
+                </h2>
+
+                <p class="text-sm leading-7 text-stone-500 mb-6">
+                    Upload your wardrobe pieces and let Styriva
+                    create beautiful outfit combinations for you.
+                </p>
+
+                <span class="text-sm tracking-wider text-[#8b6d52]">
+                    EXPLORE YOUR WARDROBE →
+                </span>
+
+            </a>
+
+
+            <!-- STYLE MY PIECE -->
+
+            <div class="feature-card bg-white rounded-2xl p-8 border border-stone-100">
+
+                <div class="h-48 rounded-xl bg-[#eae8e1] flex items-center justify-center mb-7">
+                    <span class="text-7xl">🧥</span>
+                </div>
+
+                <p class="text-xs tracking-[0.3em] uppercase text-stone-400 mb-3">
+                    One piece, many possibilities
+                </p>
+
+                <h2 class="text-2xl text-[#3a3530] mb-3">
+                    Style My Piece
+                </h2>
+
+                <p class="text-sm leading-7 text-stone-500 mb-6">
+                    Upload one clothing item and discover different
+                    ways to style that exact piece.
+                </p>
+
+                <span class="text-sm tracking-wider text-[#8b6d52]">
+                    COMING SOON
+                </span>
+
+            </div>
+
+        </div>
+
+        <p class="text-xs text-stone-400 mt-12 tracking-wider">
+            STYRIVA · YOUR INTELLIGENT WARDROBE
+        </p>
+
+    </main>
+
+</body>
+</html>

@@ -8,6 +8,11 @@ urlpatterns = [
         views.splash,
         name="splash"
     ),
+    path(
+    "choose/",
+    views.choose_feature,
+    name="choose_feature"
+),
 
     path(
         "generate/",
@@ -109,6 +114,8 @@ path(
     views.verify_razorpay_payment,
     name="verify_razorpay_payment",
 ),
+
+
 
 path("razorpay/webhook/", views.razorpay_webhook, name="razorpay_webhook"),
 
