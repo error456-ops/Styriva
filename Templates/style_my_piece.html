@@ -2,10 +2,13 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Style My Piece | STYRIVA</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -56,12 +59,16 @@
 
         </div>
 
+
         <div class="bg-white rounded-2xl p-6 md:p-9 shadow-sm">
 
             <form method="POST"
-                  enctype="multipart/form-data">
+                  enctype="multipart/form-data"
+                  id="pieceForm">
 
                 {% csrf_token %}
+
+                <!-- IMAGE UPLOAD -->
 
                 <label class="block text-sm text-[#3a3530] mb-3">
                     1. Upload your clothing piece
@@ -94,6 +101,8 @@
                 </label>
 
 
+                <!-- GARMENT TYPE -->
+
                 <div class="mt-7">
 
                     <label class="block text-sm text-[#3a3530] mb-3">
@@ -118,6 +127,8 @@
                 </div>
 
 
+                <!-- OCCASION -->
+
                 <div class="mt-7">
 
                     <label class="block text-sm text-[#3a3530] mb-3">
@@ -140,6 +151,8 @@
 
                 </div>
 
+
+                <!-- STYLE PREFERENCE -->
 
                 <div class="mt-7">
 
@@ -164,7 +177,17 @@
                 </div>
 
 
+                <!-- MESSAGE -->
+
+                <div id="responseMessage"
+                     class="hidden mt-6 p-4 rounded-lg text-sm text-center">
+                </div>
+
+
+                <!-- SUBMIT BUTTON -->
+
                 <button type="submit"
+                        id="submitButton"
                         class="w-full mt-9 py-4 rounded-lg bg-[#3a3530] text-white text-sm tracking-widest hover:bg-[#625448] transition">
 
                     STYLE MY PIECE →
@@ -175,6 +198,7 @@
 
         </div>
 
+
         <p class="text-center text-xs text-stone-400 mt-8">
             STYRIVA · YOUR INTELLIGENT WARDROBE
         </p>
@@ -183,6 +207,9 @@
 
 
     <script>
+
+        // IMAGE PREVIEW
+
         const input = document.getElementById("garmentImage");
         const preview = document.getElementById("preview");
 
@@ -191,11 +218,86 @@
             const file = this.files[0];
 
             if (file) {
+
                 preview.src = URL.createObjectURL(file);
                 preview.classList.remove("hidden");
+
             }
 
         });
+
+
+        // FORM SUBMISSION
+
+        const form = document.getElementById("pieceForm");
+        const button = document.getElementById("submitButton");
+        const message = document.getElementById("responseMessage");
+
+        form.addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+            button.disabled = true;
+            button.textContent = "SAVING YOUR PIECE...";
+
+            message.classList.add("hidden");
+
+            const formData = new FormData(form);
+
+            try {
+
+                const response = await fetch(window.location.href, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+
+                const data = await response.json();
+
+                message.classList.remove("hidden");
+
+                if (response.ok && data.success) {
+
+                    message.className =
+                        "mt-6 p-4 rounded-lg text-sm text-center bg-green-50 text-green-800";
+
+                    message.textContent =
+                        "Your clothing piece has been saved successfully! Your styling journey is coming next.";
+
+                    button.textContent = "PIECE SAVED ✓";
+
+                } else {
+
+                    message.className =
+                        "mt-6 p-4 rounded-lg text-sm text-center bg-red-50 text-red-700";
+
+                    message.textContent =
+                        data.message || "Something went wrong. Please try again.";
+
+                    button.disabled = false;
+                    button.textContent = "STYLE MY PIECE →";
+
+                }
+
+            } catch (error) {
+
+                message.classList.remove("hidden");
+
+                message.className =
+                    "mt-6 p-4 rounded-lg text-sm text-center bg-red-50 text-red-700";
+
+                message.textContent =
+                    "We couldn't connect to Styriva. Please try again.";
+
+                button.disabled = false;
+                button.textContent = "STYLE MY PIECE →";
+
+            }
+
+        });
+
     </script>
 
 </body>

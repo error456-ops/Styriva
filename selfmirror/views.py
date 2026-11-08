@@ -16,6 +16,7 @@ from .models import (
     StyleConsultation,
     GeneratedLook,
     EvolvedLook,
+    PieceStyling,
 )
 
 from jobs.queue import JobQueue
@@ -1134,6 +1135,89 @@ def razorpay_webhook(request):
 
     logger.info("Razorpay webhook: credited order %s", order_id)
     return HttpResponse(status=200)
+
+
+def style_my_piece(request):
+
+    if request.method == "POST":
+
+        # Get uploaded garment
+        garment_image = request.FILES.get("garment_image")
+        garment_type = request.POST.get("garment_type")
+
+        # Check required fields
+        if not garment_image or not garment_type:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": "Please upload an image and select a clothing type."
+                },
+                status=400
+            )
+
+        # Validate uploaded image
+        media_manager = MediaManager()
+
+        is_valid, message = media_manager.validate_upload(
+            garment_image
+        )
+
+        if not is_valid:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": message
+                },
+                status=400
+            )
+
+        try:
+
+            # Save garment and preferences
+            piece = PieceStyling.objects.create(
+
+                user=(
+                    request.user
+                    if request.user.is_authenticated
+                    else None
+                ),
+
+                garment_image=garment_image,
+
+                garment_type=garment_type,
+
+                occasion=request.POST.get("occasion", ""),
+
+                style_preference=request.POST.get(
+                    "style_preference",
+                    ""
+                ),
+            )
+
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": "Your clothing piece was uploaded successfully.",
+                    "piece_id": piece.id,
+                }
+            )
+
+        except Exception:
+            logger.exception("Style My Piece upload failed")
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": "We couldn't save your clothing image. Please try again."
+                },
+                status=500
+            )
+
+    return render(request, "style_my_piece.html")
+
+
+
+
 
 def privacy_policy(request):
     return render(request, "privacy.html")
