@@ -28,8 +28,8 @@ DEBUG = env.bool("DEBUG", default=False)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 '''DEBUG = True
-env = environ.Env()'''
-'''environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 ALLOWED_HOSTS = []'''
 
 ALLOWED_HOSTS = env.list(

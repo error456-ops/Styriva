@@ -1,0 +1,202 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style My Piece | STYRIVA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #fbf9f6;
+            font-family: Georgia, serif;
+        }
+
+        .upload-box {
+            border: 2px dashed #d6c8b8;
+            transition: 0.3s;
+        }
+
+        .upload-box:hover {
+            border-color: #8b6d52;
+            background: #faf7f2;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen px-5 py-10">
+
+    <main class="max-w-2xl mx-auto">
+
+        <a href="{% url 'choose_feature' %}"
+           class="text-sm text-stone-500">
+            ← Back
+        </a>
+
+        <div class="text-center mt-8 mb-10">
+
+            <img src="{% static 'logo.png' %}"
+                 class="w-16 h-16 object-contain mx-auto mb-4"
+                 alt="Styriva">
+
+            <p class="text-xs tracking-[0.35em] uppercase text-stone-400 mb-4">
+                One piece, endless possibilities
+            </p>
+
+            <h1 class="text-4xl text-[#3a3530] mb-4">
+                Style My Piece
+            </h1>
+
+            <p class="text-stone-500 text-sm leading-7">
+                Upload one favourite item from your wardrobe.
+                Let Styriva discover beautiful ways to style it.
+            </p>
+
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 md:p-9 shadow-sm">
+
+            <form method="POST"
+                  enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <label class="block text-sm text-[#3a3530] mb-3">
+                    1. Upload your clothing piece
+                </label>
+
+                <label class="upload-box rounded-xl min-h-56 flex flex-col items-center justify-center cursor-pointer p-6 text-center">
+
+                    <span class="text-5xl mb-4">👚</span>
+
+                    <span class="text-[#3a3530] text-base">
+                        Choose your clothing image
+                    </span>
+
+                    <span class="text-xs text-stone-400 mt-2">
+                        JPG, PNG or WEBP
+                    </span>
+
+                    <input
+                        type="file"
+                        name="garment_image"
+                        accept="image/*"
+                        required
+                        class="hidden"
+                        id="garmentImage"
+                    >
+
+                    <img id="preview"
+                         class="hidden max-h-56 mt-5 rounded-lg object-contain">
+
+                </label>
+
+
+                <div class="mt-7">
+
+                    <label class="block text-sm text-[#3a3530] mb-3">
+                        2. What type of item is it?
+                    </label>
+
+                    <select name="garment_type"
+                            required
+                            class="w-full p-4 rounded-lg border border-stone-200 bg-white text-sm">
+
+                        <option value="">Select clothing type</option>
+                        <option value="top">Top</option>
+                        <option value="bottom">Bottom</option>
+                        <option value="dress">Dress</option>
+                        <option value="outerwear">Outerwear</option>
+                        <option value="shoes">Shoes</option>
+                        <option value="accessory">Accessory</option>
+                        <option value="other">Other</option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="mt-7">
+
+                    <label class="block text-sm text-[#3a3530] mb-3">
+                        3. Where do you want to wear it?
+                    </label>
+
+                    <select name="occasion"
+                            class="w-full p-4 rounded-lg border border-stone-200 bg-white text-sm">
+
+                        <option value="">Choose an occasion</option>
+                        <option value="Casual">Casual</option>
+                        <option value="Office">Office</option>
+                        <option value="Party">Party</option>
+                        <option value="Date Night">Date Night</option>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Everyday">Everyday</option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="mt-7">
+
+                    <label class="block text-sm text-[#3a3530] mb-3">
+                        4. Choose your preferred style
+                    </label>
+
+                    <select name="style_preference"
+                            class="w-full p-4 rounded-lg border border-stone-200 bg-white text-sm">
+
+                        <option value="">Surprise me</option>
+                        <option value="Minimalist">Minimalist</option>
+                        <option value="Elegant">Elegant</option>
+                        <option value="Chic">Chic</option>
+                        <option value="Streetwear">Streetwear</option>
+                        <option value="Bohemian">Bohemian</option>
+                        <option value="Classic">Classic</option>
+                        <option value="Trendy">Trendy</option>
+
+                    </select>
+
+                </div>
+
+
+                <button type="submit"
+                        class="w-full mt-9 py-4 rounded-lg bg-[#3a3530] text-white text-sm tracking-widest hover:bg-[#625448] transition">
+
+                    STYLE MY PIECE →
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <p class="text-center text-xs text-stone-400 mt-8">
+            STYRIVA · YOUR INTELLIGENT WARDROBE
+        </p>
+
+    </main>
+
+
+    <script>
+        const input = document.getElementById("garmentImage");
+        const preview = document.getElementById("preview");
+
+        input.addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove("hidden");
+            }
+
+        });
+    </script>
+
+</body>
+</html>

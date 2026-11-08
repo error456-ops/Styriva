@@ -13,6 +13,11 @@ urlpatterns = [
     views.choose_feature,
     name="choose_feature"
 ),
+    path(
+    "style-my-piece/",
+    views.style_my_piece,
+    name="style_my_piece"
+),
 
     path(
         "generate/",
