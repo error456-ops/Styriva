@@ -2,6 +2,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +18,7 @@
         }
 
         .feature-card {
+            display: block;
             transition: transform 0.35s ease, box-shadow 0.35s ease;
         }
 
@@ -30,6 +32,8 @@
 <body class="min-h-screen flex items-center justify-center px-5 py-12">
 
     <main class="max-w-5xl w-full text-center">
+
+        <!-- LOGO -->
 
         <img
             src="{% static 'logo.png' %}"
@@ -49,12 +53,18 @@
             Your wardrobe. Your style. Your possibilities.
         </p>
 
-        <div class="grid md:grid-cols-2 gap-7 text-left">
 
-            <!-- CREATE AN OUTFIT -->
+        <!-- FEATURE CARDS -->
 
-            <a href="{% url 'generate_style_look' %}"
-               class="feature-card bg-white rounded-2xl p-8 border border-stone-100 block">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-7 text-left">
+
+
+            <!-- CARD 1: CREATE AN OUTFIT -->
+
+            <a
+                href="{% url 'generate_style_look' %}"
+                class="feature-card bg-white rounded-2xl p-8 border border-stone-100"
+            >
 
                 <div class="h-48 rounded-xl bg-[#f1e9df] flex items-center justify-center mb-7">
                     <span class="text-7xl">👗</span>
@@ -80,10 +90,12 @@
             </a>
 
 
-            <!-- STYLE MY PIECE -->
+            <!-- CARD 2: STYLE MY PIECE -->
 
-            <a href="{% url 'style_my_piece' %}"
-   class="feature-card bg-white rounded-2xl p-8 border border-stone-100 block"> </a>
+            <a
+                href="{% url 'style_my_piece' %}"
+                class="feature-card bg-white rounded-2xl p-8 border border-stone-100"
+            >
 
                 <div class="h-48 rounded-xl bg-[#eae8e1] flex items-center justify-center mb-7">
                     <span class="text-7xl">🧥</span>
@@ -106,9 +118,12 @@
                     DISCOVER YOUR STYLE →
                 </span>
 
-            </div>
+            </a>
 
         </div>
+
+
+        <!-- FOOTER -->
 
         <p class="text-xs text-stone-400 mt-12 tracking-wider">
             STYRIVA · YOUR INTELLIGENT WARDROBE
