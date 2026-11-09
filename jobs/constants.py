@@ -14,3 +14,4 @@ class JobType(models.TextChoices):
     STYLE_GENERATION = "STYLE_GENERATION", "Style Generation"
     STYLE_EVOLUTION = "STYLE_EVOLUTION", "Style Evolution"
     IMAGE_PROCESSING = "IMAGE_PROCESSING", "Image Processing"
+    PIECE_STYLING = "PIECE_STYLING", "Piece Styling"
