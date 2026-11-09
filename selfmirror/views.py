@@ -1138,15 +1138,15 @@ def razorpay_webhook(request):
     return HttpResponse(status=200)
 
 
+
+
 def style_my_piece(request):
 
     if request.method == "POST":
 
-        # Get uploaded garment
         garment_image = request.FILES.get("garment_image")
         garment_type = request.POST.get("garment_type")
 
-        # Check required fields
         if not garment_image or not garment_type:
             return JsonResponse(
                 {
@@ -1156,7 +1156,25 @@ def style_my_piece(request):
                 status=400
             )
 
-        # Validate uploaded image
+        allowed_types = [
+            "top",
+            "bottom",
+            "dress",
+            "outerwear",
+            "shoes",
+            "accessory",
+            "other",
+        ]
+
+        if garment_type not in allowed_types:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": "Please select a valid clothing type."
+                },
+                status=400
+            )
+
         media_manager = MediaManager()
 
         is_valid, message = media_manager.validate_upload(
@@ -1174,50 +1192,50 @@ def style_my_piece(request):
 
         try:
 
-            # Save garment and preferences
-            piece = PieceStyling.objects.create(
+            with transaction.atomic():
 
-                user=(
-                    request.user
-                    if request.user.is_authenticated
-                    else None
-                ),
+                piece = PieceStyling.objects.create(
+                    user=(
+                        request.user
+                        if request.user.is_authenticated
+                        else None
+                    ),
+                    garment_image=garment_image,
+                    garment_type=garment_type,
+                    occasion=request.POST.get("occasion", ""),
+                    style_preference=request.POST.get(
+                        "style_preference",
+                        ""
+                    ),
+                )
 
-                garment_image=garment_image,
-
-                garment_type=garment_type,
-
-                occasion=request.POST.get("occasion", ""),
-
-                style_preference=request.POST.get(
-                    "style_preference",
-                    ""
-                ),
-            )
+                job = JobQueue.create_piece_styling_job(piece)
 
             return JsonResponse(
                 {
                     "success": True,
-                    "message": "Your clothing piece was uploaded successfully.",
+                    "message": "Your clothing piece has been uploaded! AI styling is starting.",
+                    "status": "processing",
                     "piece_id": piece.id,
+                    "job_id": job.id,
                 }
             )
 
         except Exception:
-            logger.exception("Style My Piece upload failed")
+
+            logger.exception(
+                "Style My Piece upload or job creation failed"
+            )
 
             return JsonResponse(
                 {
                     "success": False,
-                    "message": "We couldn't save your clothing image. Please try again."
+                    "message": "We couldn't save your clothing image or start styling. Please try again."
                 },
                 status=500
             )
 
     return render(request, "style_my_piece.html")
-
-
-
 
 
 def privacy_policy(request):

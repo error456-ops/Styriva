@@ -22,7 +22,7 @@ from accounts.services import CreditManager
 
 
 # ==============================================================
-# Cloudinary helper
+# Cloudinary-compatible file helper
 # ==============================================================
 
 def to_django_file(value, default_name="image.png"):
@@ -92,7 +92,7 @@ class JobDispatcher:
 
     # ==========================================================
     # Style Generation - EXISTING PIPELINE
-    # ==========================================================
+    # ==============================================================
 
     @staticmethod
     def handle_style_generation(job):
@@ -182,7 +182,7 @@ class JobDispatcher:
 
     # ==========================================================
     # Style Evolution - EXISTING PIPELINE
-    # ==========================================================
+    # ==============================================================
 
     @staticmethod
     def handle_style_evolution(job):
@@ -265,7 +265,7 @@ class JobDispatcher:
         )
 
     # ==========================================================
-    # STYLE MY PIECE - NEW INDEPENDENT PIPELINE
+    # STYLE MY PIECE - INDEPENDENT PIPELINE
     # ==============================================================
 
     @staticmethod
@@ -279,8 +279,19 @@ class JobDispatcher:
                 "Piece Styling job has no PieceStyling record."
             )
 
+        # Avoid generating duplicate looks for completed jobs
+        if (
+            piece.status == "completed"
+            and piece.results.count() == 6
+        ):
+
+            return list(piece.results.all())
+
         piece.status = "processing"
-        piece.save(update_fields=["status"])
+
+        piece.save(
+            update_fields=["status"]
+        )
 
         try:
 
@@ -289,22 +300,45 @@ class JobDispatcher:
 
             results = engine.run()
 
+            # Validate the six generated looks
             if not results or len(results) != 6:
 
                 raise RuntimeError(
                     "Piece Styling must generate six looks."
                 )
 
-            # Save the six generated looks
+            # Validate all results before saving anything
             for index, result in enumerate(results, start=1):
 
-                generated_image = result.get("generated_image")
-
-                if not generated_image:
+                if not result.get("generated_image"):
 
                     raise RuntimeError(
                         f"Look {index} has no generated image."
                     )
+
+                if (
+                    not result.get("title")
+                    or not result.get("description")
+                ):
+
+                    raise RuntimeError(
+                        f"Look {index} is missing its title "
+                        "or description."
+                    )
+
+            # Remove incomplete results from a previous attempt
+            for old_result in piece.results.all():
+
+                if old_result.generated_image:
+
+                    old_result.generated_image.delete(
+                        save=False
+                    )
+
+                old_result.delete()
+
+            # Save the six new results
+            for index, result in enumerate(results, start=1):
 
                 PieceStylingResult.objects.create(
 
@@ -320,7 +354,7 @@ class JobDispatcher:
                     ),
 
                     generated_image=to_django_file(
-                        generated_image,
+                        result["generated_image"],
                         f"piece_look_{index}.png"
                     ),
 
@@ -328,7 +362,10 @@ class JobDispatcher:
                 )
 
             piece.status = "completed"
-            piece.save(update_fields=["status"])
+
+            piece.save(
+                update_fields=["status"]
+            )
 
             print("Style My Piece completed.")
             print("Piece Styling ID:", piece.id)
@@ -338,6 +375,9 @@ class JobDispatcher:
         except Exception:
 
             piece.status = "failed"
-            piece.save(update_fields=["status"])
+
+            piece.save(
+                update_fields=["status"]
+            )
 
             raise
