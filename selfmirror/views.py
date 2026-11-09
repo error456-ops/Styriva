@@ -80,6 +80,7 @@ def choose_feature(request):
 
 
 def generate_style_look(request):
+    
 
     if request.method == "POST":
 
