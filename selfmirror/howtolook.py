@@ -435,7 +435,7 @@ Do not crop:
 
                     response = self.client.images.edit(
 
-                        model="gpt-image-1",
+                        model="gpt-image-2.5-sunburst",
 
                         image=image_files,
 
