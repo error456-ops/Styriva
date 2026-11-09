@@ -1254,5 +1254,3 @@ def cookies_view(request):
 def disclaimer_view(request):
     return render(request, "disclaimer.html")
 
-def style_my_piece(request):
-    return render(request, "style_my_piece.html")
