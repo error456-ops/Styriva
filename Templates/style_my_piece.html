@@ -325,6 +325,48 @@
         STYRIVA · YOUR INTELLIGENT WARDROBE
     </p>
 
+
+    <!-- SIGNUP MODAL -->
+
+    <div id="signupModal"
+         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-5">
+
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+
+            <img src="{% static 'logo.png' %}"
+                 class="w-14 h-14 object-contain mx-auto mb-5"
+                 alt="Styriva">
+
+            <p class="text-xs tracking-widest uppercase text-[#8b6d52] mb-3">
+                YOUR FIRST LOOK IS READY
+            </p>
+
+            <h2 class="text-3xl text-[#3a3530] mb-4">
+                Your style journey starts here.
+            </h2>
+
+            <p class="text-sm text-stone-500 leading-7 mb-7">
+                Create your free Styriva account to save your looks,
+                continue styling your piece and access your personal collection.
+            </p>
+
+            <a href="{% url 'signup' %}"
+               class="block w-full py-4 rounded-lg bg-[#3a3530] text-white text-sm tracking-widest hover:bg-[#625448]">
+                CREATE MY ACCOUNT →
+            </a>
+
+            <p class="text-sm text-stone-500 mt-6">
+                Already have an account?
+            </p>
+
+            <a href="{% url 'login' %}"
+               class="inline-block mt-2 text-[#8b6d52] underline text-sm">
+                Log in here
+            </a>
+
+        </div>
+    </div>
+
 </main>
 
 
@@ -354,6 +396,20 @@
 
     const nextLookButton = document.getElementById("nextLookButton");
     const nextLookHint = document.getElementById("nextLookHint");
+
+
+    // =====================================================
+    // GUEST SIGNUP MODAL
+    // =====================================================
+
+    const userIsAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
+    const signupModal = document.getElementById("signupModal");
+
+    function showSignupModal() {
+        if (!userIsAuthenticated && signupModal) {
+            signupModal.classList.remove("hidden");
+        }
+    }
 
 
     // =====================================================
@@ -671,6 +727,20 @@
 
             generationError.classList.add("hidden");
 
+
+            // REQUIRE SIGNUP AFTER THE FIRST SUCCESSFUL LOOK
+
+            if (!userIsAuthenticated && count >= 1) {
+
+                disableNextLookButton();
+
+                showSignupModal();
+
+                return;
+
+            }
+
+
             if (data.can_generate_more && count < 6) {
 
                 // Re-enable the button after EVERY completed look.
@@ -914,6 +984,7 @@
     const resumePieceId = pageParams.get("piece_id");
 
     if (resumePieceId && /^\d+$/.test(resumePieceId)) {
+
         currentPieceId = resumePieceId;
 
         uploadSection.classList.add("hidden");
@@ -923,11 +994,13 @@
         startPolling();
 
         // Remove the query parameter without reloading the page.
+
         window.history.replaceState(
             {},
             document.title,
             window.location.pathname
         );
+
     }
 
 </script>
