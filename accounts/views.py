@@ -185,3 +185,7 @@ def profile(request):
         "profile.html",
         context,
     )
+    
+def logout_view(request):
+    logout(request)
+    return redirect("login")
