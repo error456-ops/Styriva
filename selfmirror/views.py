@@ -1140,9 +1140,55 @@ def razorpay_webhook(request):
 
 
 
+
+# ==========================================================
+# STYLE MY PIECE - PROGRESSIVE GENERATION
+# ==========================================================
+
+def get_piece_for_request(request, piece_id):
+    """
+    Return a PieceStyling record only if it belongs
+    to the authenticated user or the guest session.
+    """
+
+    piece = get_object_or_404(
+        PieceStyling,
+        pk=piece_id,
+    )
+
+    if request.user.is_authenticated:
+        if piece.user_id != request.user.id:
+            return None
+
+    else:
+        allowed_ids = request.session.get(
+            "style_my_piece_ids",
+            [],
+        )
+
+        if piece.user_id is not None or piece.id not in allowed_ids:
+            return None
+
+    return piece
+
+
+# ==========================================================
+# UPLOAD CLOTHING AND START FIRST LOOK
+# ==========================================================
+
 def style_my_piece(request):
 
     if request.method == "POST":
+
+        if is_rate_limited(request):
+            return JsonResponse(
+                {
+                    "success": False,
+                    "rate_limited": True,
+                    "message": "Too many requests. Please wait and try again.",
+                },
+                status=429,
+            )
 
         garment_image = request.FILES.get("garment_image")
         garment_type = request.POST.get("garment_type")
@@ -1151,9 +1197,9 @@ def style_my_piece(request):
             return JsonResponse(
                 {
                     "success": False,
-                    "message": "Please upload an image and select a clothing type."
+                    "message": "Please upload an image and select a clothing type.",
                 },
-                status=400
+                status=400,
             )
 
         allowed_types = [
@@ -1170,9 +1216,9 @@ def style_my_piece(request):
             return JsonResponse(
                 {
                     "success": False,
-                    "message": "Please select a valid clothing type."
+                    "message": "Please select a valid clothing type.",
                 },
-                status=400
+                status=400,
             )
 
         media_manager = MediaManager()
@@ -1185,9 +1231,9 @@ def style_my_piece(request):
             return JsonResponse(
                 {
                     "success": False,
-                    "message": message
+                    "message": message,
                 },
-                status=400
+                status=400,
             )
 
         try:
@@ -1205,19 +1251,34 @@ def style_my_piece(request):
                     occasion=request.POST.get("occasion", ""),
                     style_preference=request.POST.get(
                         "style_preference",
-                        ""
+                        "",
                     ),
                 )
 
+                # Automatically queue the first look.
                 job = JobQueue.create_piece_styling_job(piece)
+
+            # Allow the guest session to access its own piece.
+            if not request.user.is_authenticated:
+
+                allowed_ids = request.session.get(
+                    "style_my_piece_ids",
+                    [],
+                )
+
+                allowed_ids.append(piece.id)
+
+                request.session["style_my_piece_ids"] = allowed_ids
+                request.session.modified = True
 
             return JsonResponse(
                 {
                     "success": True,
-                    "message": "Your clothing piece has been uploaded! AI styling is starting.",
+                    "message": "Your clothing piece has been uploaded. Your first look is starting!",
                     "status": "processing",
                     "piece_id": piece.id,
                     "job_id": job.id,
+                    "next_look_number": 1,
                 }
             )
 
@@ -1230,12 +1291,249 @@ def style_my_piece(request):
             return JsonResponse(
                 {
                     "success": False,
-                    "message": "We couldn't save your clothing image or start styling. Please try again."
+                    "message": "We couldn't save your clothing image or start styling. Please try again.",
                 },
-                status=500
+                status=500,
             )
 
-    return render(request, "style_my_piece.html")
+    return render(
+        request,
+        "style_my_piece.html",
+    )
+
+
+# ==========================================================
+# CHECK STYLE MY PIECE GENERATION STATUS
+# ==========================================================
+
+def piece_styling_status(request, piece_id):
+
+    piece = get_piece_for_request(request, piece_id)
+
+    if piece is None:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Styling session not found.",
+            },
+            status=404,
+        )
+
+    results = piece.results.order_by("order")
+
+    result_data = []
+
+    for result in results:
+
+        image_url = None
+
+        if result.generated_image:
+            image_url = result.generated_image.url
+
+        result_data.append(
+            {
+                "id": result.id,
+                "title": result.title,
+                "description": result.description,
+                "image_url": image_url,
+                "order": result.order,
+            }
+        )
+
+    latest_job = (
+        Job.objects
+        .filter(
+            piece_styling=piece,
+            job_type=JobType.PIECE_STYLING,
+        )
+        .order_by("-created_at")
+        .first()
+    )
+
+    active_job = (
+        Job.objects
+        .filter(
+            piece_styling=piece,
+            job_type=JobType.PIECE_STYLING,
+            job_status__in=[
+                JobStatus.PENDING,
+                JobStatus.RUNNING,
+            ],
+        )
+        .exists()
+    )
+
+    if active_job:
+        status = "processing"
+
+    elif latest_job and latest_job.job_status == JobStatus.FAILED:
+        status = "failed"
+
+    elif results.exists():
+        status = "completed"
+
+    else:
+        status = piece.status
+
+    next_number = piece.next_look_number
+
+    return JsonResponse(
+        {
+            "success": True,
+            "piece_id": piece.id,
+            "status": status,
+            "completed": status == "completed",
+            "processing": active_job,
+            "results": result_data,
+            "look_count": len(result_data),
+            "next_look_number": next_number,
+            "remaining_looks": max(
+                0,
+                6 - len(result_data),
+            ),
+            "can_generate_more": (
+                not active_job
+                and next_number <= 6
+            ),
+            "message": (
+                latest_job.error_message
+                if status == "failed" and latest_job
+                else ""
+            ),
+        }
+    )
+
+
+# ==========================================================
+# GENERATE ONE MORE LOOK
+# ==========================================================
+
+@require_POST
+def generate_next_piece_look(request, piece_id):
+
+    if is_rate_limited(request):
+        return JsonResponse(
+            {
+                "success": False,
+                "rate_limited": True,
+                "message": "Too many requests. Please wait and try again.",
+            },
+            status=429,
+        )
+
+    piece = get_piece_for_request(request, piece_id)
+
+    if piece is None:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Styling session not found.",
+            },
+            status=404,
+        )
+
+    try:
+
+        expected_number = int(
+            request.POST.get("expected_look_number", "")
+        )
+
+        with transaction.atomic():
+
+            locked_piece = (
+                PieceStyling.objects
+                .select_for_update()
+                .get(pk=piece.id)
+            )
+
+            # Prevent an old or duplicate button request
+            # from generating the next look twice.
+            if expected_number != locked_piece.next_look_number:
+
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "status": locked_piece.status,
+                        "message": "This look has already been requested or generated. Please refresh the results.",
+                        "next_look_number": locked_piece.next_look_number,
+                    },
+                    status=409,
+                )
+
+            if locked_piece.next_look_number > 6:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": "All six looks have been generated.",
+                    },
+                    status=400,
+                )
+
+            existing_job = Job.objects.filter(
+                piece_styling=locked_piece,
+                job_type=JobType.PIECE_STYLING,
+                job_status__in=[
+                    JobStatus.PENDING,
+                    JobStatus.RUNNING,
+                ],
+            ).first()
+
+            if existing_job:
+
+                return JsonResponse(
+                    {
+                        "success": True,
+                        "status": "processing",
+                        "job_id": existing_job.id,
+                        "look_number": expected_number,
+                        "message": "Your look is already being generated.",
+                    }
+                )
+
+            # Create exactly one new generation job.
+            job = JobQueue.create_piece_styling_job(
+                locked_piece
+            )
+
+            locked_piece.status = "processing"
+
+            locked_piece.save(
+                update_fields=["status"]
+            )
+
+        return JsonResponse(
+            {
+                "success": True,
+                "status": "processing",
+                "job_id": job.id,
+                "look_number": expected_number,
+                "message": "Your next look is being generated!",
+            }
+        )
+
+    except ValueError:
+
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "A valid expected look number is required.",
+            },
+            status=400,
+        )
+
+    except Exception:
+
+        logger.exception(
+            "Next Style My Piece look generation failed"
+        )
+
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "We couldn't start your next look. Please try again.",
+            },
+            status=500,
+        )
 
 
 def privacy_policy(request):

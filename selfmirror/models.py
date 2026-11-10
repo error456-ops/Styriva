@@ -326,6 +326,14 @@ class PieceStyling(models.Model):
             ("failed", "Failed"),
         ],
     )
+    garment_analysis = models.JSONField(
+    default=dict,
+    blank=True,
+)
+
+    next_look_number = models.PositiveIntegerField(
+    default=1,
+)
 
     created_at = models.DateTimeField(
         auto_now_add=True

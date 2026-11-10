@@ -1,3 +1,6 @@
+
+from django.db import transaction
+
 from jobs.models import Job
 from jobs.constants import JobType, JobStatus
 from selfmirror.models import StyleConsultation, PieceStyling
@@ -66,28 +69,41 @@ class JobQueue:
             payload=payload or {},
         )
 
-    # NEW: Style My Piece
+    # ==========================================================
+    # STYLE MY PIECE - ONE LOOK PER JOB
+    # ==========================================================
+
     @staticmethod
     def create_piece_styling_job(
         piece_styling: PieceStyling,
     ):
 
-        existing_job = Job.objects.filter(
-            piece_styling=piece_styling,
-            job_type=JobType.PIECE_STYLING,
-            job_status__in=[
-                JobStatus.PENDING,
-                JobStatus.RUNNING,
-            ],
-        ).first()
+        with transaction.atomic():
 
-        if existing_job:
-            return existing_job
+            # Lock this clothing piece so simultaneous requests
+            # cannot create duplicate jobs for the same piece.
+            locked_piece = (
+                PieceStyling.objects
+                .select_for_update()
+                .get(pk=piece_styling.pk)
+            )
 
-        return Job.objects.create(
-            piece_styling=piece_styling,
-            job_type=JobType.PIECE_STYLING,
-            payload={
-                "number_of_looks": 6,
-            },
-        )
+            # Reuse an existing pending or running job.
+            existing_job = Job.objects.filter(
+                piece_styling=locked_piece,
+                job_type=JobType.PIECE_STYLING,
+                job_status__in=[
+                    JobStatus.PENDING,
+                    JobStatus.RUNNING,
+                ],
+            ).first()
+
+            if existing_job:
+                return existing_job
+
+            # The engine generates exactly one look per job.
+            return Job.objects.create(
+                piece_styling=locked_piece,
+                job_type=JobType.PIECE_STYLING,
+                payload={},
+            )

@@ -12,19 +12,11 @@ from .image_utils import local_path
 
 class PieceStylingEngine:
     """
-    Independent AI pipeline for Style My Piece.
+    Independent, on-demand AI pipeline for Style My Piece.
 
-    Input:
-        One uploaded garment.
-
-    Output:
-        Six different styling concepts and six generated images.
-
-    Does not require:
-        - User selfie
-        - Wardrobe uploads
-        - StyleConsultation
-        - Existing StyleEngine
+    Generates exactly ONE look per run().
+    Reuses saved garment analysis.
+    Supports a maximum of six looks.
     """
 
     NUMBER_OF_LOOKS = 6
@@ -75,7 +67,6 @@ class PieceStylingEngine:
     ]
 
     def __init__(self, piece_styling_id):
-
         from .models import PieceStyling
 
         self.piece = PieceStyling.objects.get(
@@ -107,19 +98,24 @@ class PieceStylingEngine:
             Path(temp_directory.name) / "garment.png"
         )
 
-        with Image.open(original_path) as image:
+        try:
+            with Image.open(original_path) as image:
 
-            image = image.convert("RGB")
+                image = image.convert("RGB")
 
-            image.save(
-                png_path,
-                format="PNG"
-            )
+                image.save(
+                    png_path,
+                    format="PNG"
+                )
+
+        except Exception:
+            temp_directory.cleanup()
+            raise
 
         return temp_directory, str(png_path)
 
     # ==========================================================
-    # ANALYZE THE UPLOADED GARMENT
+    # ANALYZE GARMENT
     # ==========================================================
 
     def analyze_garment(self, image_path):
@@ -201,7 +197,6 @@ Return valid JSON:
             )
 
         try:
-
             result = json.loads(raw_result)
 
         except json.JSONDecodeError as error:
@@ -216,6 +211,40 @@ Return valid JSON:
             )
 
         return result
+
+    # ==========================================================
+    # REUSE SAVED GARMENT ANALYSIS
+    # ==========================================================
+
+    def get_garment_analysis(self, image_path):
+
+        analysis = self.piece.garment_analysis
+
+        if isinstance(analysis, dict) and analysis:
+
+            print(
+                "Using cached garment analysis.",
+                flush=True
+            )
+
+            return analysis
+
+        print(
+            "Analyzing uploaded garment for the first time.",
+            flush=True
+        )
+
+        analysis = self.analyze_garment(
+            image_path
+        )
+
+        self.piece.garment_analysis = analysis
+
+        self.piece.save(
+            update_fields=["garment_analysis"]
+        )
+
+        return analysis
 
     # ==========================================================
     # BUILD IMAGE GENERATION PROMPT
@@ -352,86 +381,89 @@ The result should look like a real fashion campaign.
         return image_bytes
 
     # ==========================================================
-    # MAIN PIPELINE
+    # GENERATE EXACTLY ONE LOOK PER JOB
     # ==========================================================
 
     def run(self):
 
-        print("===== STYLE MY PIECE STARTED =====")
+        print(
+            "===== STYLE MY PIECE: ONE LOOK STARTED =====",
+            flush=True
+        )
 
         temp_directory = None
 
         try:
 
-            # STEP 1: Prepare uploaded garment
+            # Get the next requested look.
+            look_number = self.piece.next_look_number
+
+            if (
+                look_number < 1
+                or look_number > self.NUMBER_OF_LOOKS
+            ):
+
+                raise ValueError(
+                    "All six Style My Piece looks have already "
+                    "been generated."
+                )
+
+            style = self.STYLE_PRESETS[
+                look_number - 1
+            ]
+
+            # STEP 1: Prepare garment image.
 
             temp_directory, image_path = (
                 self.prepare_image()
             )
 
-            # STEP 2: Understand the garment
+            # STEP 2: Reuse or create garment analysis.
 
-            garment_analysis = self.analyze_garment(
-                image_path
+            garment_analysis = (
+                self.get_garment_analysis(
+                    image_path
+                )
+            )
+
+            # STEP 3: Build the selected style prompt.
+
+            print(
+                f"Generating look {look_number}/6: "
+                f"{style['title']}",
+                flush=True
+            )
+
+            prompt = self.build_prompt(
+                garment_analysis,
+                style
+            )
+
+            # STEP 4: Generate ONE image.
+
+            generated_image = self.generate_image(
+                image_path,
+                prompt,
+                look_number
             )
 
             print(
-                "GARMENT ANALYSIS:",
-                garment_analysis
+                f"Look {look_number} generated successfully.",
+                flush=True
             )
 
-            # STEP 3: Generate six different looks
+            # IMPORTANT:
+            # The dispatcher must save the result first.
+            # It should increment next_look_number only
+            # after the database save succeeds.
 
-            results = []
-
-            for index, style in enumerate(
-                self.STYLE_PRESETS,
-                start=1
-            ):
-
-                print(
-                    f"Generating look {index}/6:",
-                    style["title"]
-                )
-
-                prompt = self.build_prompt(
-                    garment_analysis,
-                    style
-                )
-
-                generated_image = self.generate_image(
-                    image_path,
-                    prompt,
-                    index
-                )
-
-                results.append(
-                    {
-                        "title": style["title"],
-
-                        "description": style["description"],
-
-                        "render_prompt": prompt,
-
-                        "generated_image": generated_image,
-                    }
-                )
-
-                print(
-                    f"Look {index} generated successfully."
-                )
-
-            if len(results) != self.NUMBER_OF_LOOKS:
-
-                raise RuntimeError(
-                    "The engine did not generate all six looks."
-                )
-
-            print(
-                "===== STYLE MY PIECE COMPLETED ====="
-            )
-
-            return results
+            return {
+                "look_number": look_number,
+                "title": style["title"],
+                "description": style["description"],
+                "render_prompt": prompt,
+                "generated_image": generated_image,
+            }
 
         finally:
 

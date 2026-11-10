@@ -1,8 +1,8 @@
-
 import os
 
 from django.conf import settings
 from django.core.files.base import File, ContentFile
+from django.db import transaction
 
 from jobs.constants import JobType
 
@@ -63,7 +63,7 @@ class JobDispatcher:
 
     # ==========================================================
     # Job Router
-    # ==========================================================
+    # ==============================================================
 
     @staticmethod
     def execute(job):
@@ -265,7 +265,7 @@ class JobDispatcher:
         )
 
     # ==========================================================
-    # STYLE MY PIECE - INDEPENDENT PIPELINE
+    # STYLE MY PIECE - ONE LOOK PER JOB
     # ==============================================================
 
     @staticmethod
@@ -279,70 +279,74 @@ class JobDispatcher:
                 "Piece Styling job has no PieceStyling record."
             )
 
-        # Avoid generating duplicate looks for completed jobs
-        if (
-            piece.status == "completed"
-            and piece.results.count() == 6
-        ):
-
-            return list(piece.results.all())
-
         piece.status = "processing"
-
-        piece.save(
-            update_fields=["status"]
-        )
+        piece.save(update_fields=["status"])
 
         try:
 
-            # Run the independent Style My Piece engine
+            # Refresh from database in case an earlier job
+            # has already advanced the next look number.
+            piece.refresh_from_db()
+
+            look_number = piece.next_look_number
+
+            if look_number > PieceStylingEngine.NUMBER_OF_LOOKS:
+
+                piece.status = "completed"
+                piece.save(update_fields=["status"])
+
+                return {
+                    "piece_styling_id": piece.id,
+                    "status": "completed",
+                    "message": "All six looks have already been generated.",
+                    "look_number": None,
+                }
+
+            # Generate exactly one look.
             engine = PieceStylingEngine(piece.id)
+            result = engine.run()
 
-            results = engine.run()
-
-            # Validate the six generated looks
-            if not results or len(results) != 6:
+            if not result or not result.get("generated_image"):
 
                 raise RuntimeError(
-                    "Piece Styling must generate six looks."
+                    "Piece Styling did not return a generated image."
                 )
 
-            # Validate all results before saving anything
-            for index, result in enumerate(results, start=1):
+            if not result.get("title") or not result.get("description"):
 
-                if not result.get("generated_image"):
+                raise RuntimeError(
+                    "Piece Styling result is missing its title or description."
+                )
+
+            returned_look_number = result.get("look_number")
+
+            if returned_look_number != look_number:
+
+                raise RuntimeError(
+                    "The generated look number does not match "
+                    "the next expected look number."
+                )
+
+            # Save the result and advance the counter together.
+            # If the database save fails, the counter is not advanced.
+            with transaction.atomic():
+
+                locked_piece = (
+                    PieceStyling.objects
+                    .select_for_update()
+                    .get(pk=piece.pk)
+                )
+
+                if locked_piece.next_look_number != look_number:
 
                     raise RuntimeError(
-                        f"Look {index} has no generated image."
+                        "Another Style My Piece job changed the "
+                        "next look number. This result was not saved."
                     )
-
-                if (
-                    not result.get("title")
-                    or not result.get("description")
-                ):
-
-                    raise RuntimeError(
-                        f"Look {index} is missing its title "
-                        "or description."
-                    )
-
-            # Remove incomplete results from a previous attempt
-            for old_result in piece.results.all():
-
-                if old_result.generated_image:
-
-                    old_result.generated_image.delete(
-                        save=False
-                    )
-
-                old_result.delete()
-
-            # Save the six new results
-            for index, result in enumerate(results, start=1):
 
                 PieceStylingResult.objects.create(
 
-                    piece_styling=piece,
+                    piece_styling=locked_piece,
 
                     title=result["title"],
 
@@ -355,22 +359,43 @@ class JobDispatcher:
 
                     generated_image=to_django_file(
                         result["generated_image"],
-                        f"piece_look_{index}.png"
+                        f"piece_look_{look_number}.png"
                     ),
 
-                    order=index,
+                    order=look_number,
                 )
 
-            piece.status = "completed"
+                locked_piece.next_look_number = look_number + 1
+                locked_piece.status = "completed"
 
-            piece.save(
-                update_fields=["status"]
+                locked_piece.save(
+                    update_fields=[
+                        "next_look_number",
+                        "status",
+                    ]
+                )
+
+            print(
+                f"Style My Piece look {look_number} completed."
+            )
+            print("Piece Styling ID:", piece.id)
+            print(
+                f"Looks generated: {piece.results.count()}/"
+                f"{PieceStylingEngine.NUMBER_OF_LOOKS}"
             )
 
-            print("Style My Piece completed.")
-            print("Piece Styling ID:", piece.id)
-
-            return results
+            return {
+                "piece_styling_id": piece.id,
+                "status": "completed",
+                "look_number": look_number,
+                "title": result["title"],
+                "description": result["description"],
+                "remaining_looks": max(
+                    0,
+                    PieceStylingEngine.NUMBER_OF_LOOKS
+                    - look_number
+                ),
+            }
 
         except Exception:
 

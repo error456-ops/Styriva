@@ -124,4 +124,15 @@ path(
 
 path("razorpay/webhook/", views.razorpay_webhook, name="razorpay_webhook"),
 
+path(
+    "style-my-piece/<int:piece_id>/status/",
+    views.piece_styling_status,
+    name="piece_styling_status",
+),
+path(
+    "style-my-piece/<int:piece_id>/next/",
+    views.generate_next_piece_look,
+    name="generate_next_piece_look",
+),
+
 ]

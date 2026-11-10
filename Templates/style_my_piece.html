@@ -37,9 +37,7 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         .pulse-dot {
@@ -55,7 +53,6 @@
                 opacity: 0.3;
                 transform: scale(0.8);
             }
-
             50% {
                 opacity: 1;
                 transform: scale(1.2);
@@ -66,178 +63,208 @@
 
 <body class="min-h-screen px-5 py-10">
 
-    <main class="max-w-2xl mx-auto">
+<main class="max-w-2xl mx-auto">
 
-        <a href="{% url 'choose_feature' %}"
-           class="text-sm text-stone-500">
-            ← Back
-        </a>
+    <a href="{% url 'choose_feature' %}"
+       class="text-sm text-stone-500">
+        ← Back
+    </a>
 
-        <div class="text-center mt-8 mb-10">
+    <div class="text-center mt-8 mb-10">
 
-            <img src="{% static 'logo.png' %}"
-                 class="w-16 h-16 object-contain mx-auto mb-4"
-                 alt="Styriva">
+        <img src="{% static 'logo.png' %}"
+             class="w-16 h-16 object-contain mx-auto mb-4"
+             alt="Styriva">
 
-            <p class="text-xs tracking-[0.35em] uppercase text-stone-400 mb-4">
-                One piece, endless possibilities
-            </p>
+        <p class="text-xs tracking-[0.35em] uppercase text-stone-400 mb-4">
+            One piece, endless possibilities
+        </p>
 
-            <h1 class="text-4xl text-[#3a3530] mb-4">
-                Style My Piece
-            </h1>
+        <h1 class="text-4xl text-[#3a3530] mb-4">
+            Style My Piece
+        </h1>
 
-            <p class="text-stone-500 text-sm leading-7">
-                Upload one favourite item from your wardrobe.
-                Let Styriva discover beautiful ways to style it.
-            </p>
+        <p class="text-stone-500 text-sm leading-7">
+            Upload one favourite item from your wardrobe.
+            Let Styriva discover beautiful ways to style it.
+        </p>
 
-        </div>
+    </div>
 
 
-        <!-- UPLOAD FORM -->
+    <!-- UPLOAD FORM -->
 
-        <div id="uploadSection"
-             class="bg-white rounded-2xl p-6 md:p-9 shadow-sm">
+    <div id="uploadSection"
+         class="bg-white rounded-2xl p-6 md:p-9 shadow-sm">
 
-            <form method="POST"
-                  enctype="multipart/form-data"
-                  id="pieceForm">
+        <form method="POST"
+              enctype="multipart/form-data"
+              id="pieceForm">
 
-                {% csrf_token %}
+            {% csrf_token %}
 
-                <!-- IMAGE UPLOAD -->
+            <label class="block text-sm text-[#3a3530] mb-3">
+                1. Upload your clothing piece
+            </label>
+
+            <label class="upload-box rounded-xl min-h-56 flex flex-col items-center justify-center cursor-pointer p-6 text-center">
+
+                <span class="text-5xl mb-4">👚</span>
+
+                <span class="text-[#3a3530] text-base">
+                    Choose your clothing image
+                </span>
+
+                <span class="text-xs text-stone-400 mt-2">
+                    JPG, PNG or WEBP
+                </span>
+
+                <input
+                    type="file"
+                    name="garment_image"
+                    accept="image/*"
+                    required
+                    class="hidden"
+                    id="garmentImage"
+                >
+
+                <img id="preview"
+                     class="hidden max-h-56 mt-5 rounded-lg object-contain"
+                     alt="Clothing preview">
+
+            </label>
+
+
+            <!-- GARMENT TYPE -->
+
+            <div class="mt-7">
 
                 <label class="block text-sm text-[#3a3530] mb-3">
-                    1. Upload your clothing piece
+                    2. What type of item is it?
                 </label>
 
-                <label class="upload-box rounded-xl min-h-56 flex flex-col items-center justify-center cursor-pointer p-6 text-center">
-
-                    <span class="text-5xl mb-4">👚</span>
-
-                    <span class="text-[#3a3530] text-base">
-                        Choose your clothing image
-                    </span>
-
-                    <span class="text-xs text-stone-400 mt-2">
-                        JPG, PNG or WEBP
-                    </span>
-
-                    <input
-                        type="file"
-                        name="garment_image"
-                        accept="image/*"
+                <select name="garment_type"
                         required
-                        class="hidden"
-                        id="garmentImage"
-                    >
+                        class="w-full p-4 rounded-lg border border-stone-200 bg-white text-sm">
 
-                    <img id="preview"
-                         class="hidden max-h-56 mt-5 rounded-lg object-contain">
+                    <option value="">Select clothing type</option>
+                    <option value="top">Top</option>
+                    <option value="bottom">Bottom</option>
+                    <option value="dress">Dress</option>
+                    <option value="outerwear">Outerwear</option>
+                    <option value="shoes">Shoes</option>
+                    <option value="accessory">Accessory</option>
+                    <option value="other">Other</option>
 
+                </select>
+
+            </div>
+
+
+            <!-- OCCASION -->
+
+            <div class="mt-7">
+
+                <label class="block text-sm text-[#3a3530] mb-3">
+                    3. Where do you want to wear it?
                 </label>
 
+                <select name="occasion"
+                        class="w-full p-4 rounded-lg border border-stone-200 bg-white text-sm">
 
-                <!-- GARMENT TYPE -->
+                    <option value="">Choose an occasion</option>
+                    <option value="Casual">Casual</option>
+                    <option value="Office">Office</option>
+                    <option value="Party">Party</option>
+                    <option value="Date Night">Date Night</option>
+                    <option value="Wedding">Wedding</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Everyday">Everyday</option>
 
-                <div class="mt-7">
+                </select>
 
-                    <label class="block text-sm text-[#3a3530] mb-3">
-                        2. What type of item is it?
-                    </label>
-
-                    <select name="garment_type"
-                            required
-                            class="w-full p-4 rounded-lg border border-stone-200 bg-white text-sm">
-
-                        <option value="">Select clothing type</option>
-                        <option value="top">Top</option>
-                        <option value="bottom">Bottom</option>
-                        <option value="dress">Dress</option>
-                        <option value="outerwear">Outerwear</option>
-                        <option value="shoes">Shoes</option>
-                        <option value="accessory">Accessory</option>
-                        <option value="other">Other</option>
-
-                    </select>
-
-                </div>
+            </div>
 
 
-                <!-- OCCASION -->
+            <!-- STYLE PREFERENCE -->
 
-                <div class="mt-7">
+            <div class="mt-7">
 
-                    <label class="block text-sm text-[#3a3530] mb-3">
-                        3. Where do you want to wear it?
-                    </label>
+                <label class="block text-sm text-[#3a3530] mb-3">
+                    4. Choose your preferred style
+                </label>
 
-                    <select name="occasion"
-                            class="w-full p-4 rounded-lg border border-stone-200 bg-white text-sm">
+                <select name="style_preference"
+                        class="w-full p-4 rounded-lg border border-stone-200 bg-white text-sm">
 
-                        <option value="">Choose an occasion</option>
-                        <option value="Casual">Casual</option>
-                        <option value="Office">Office</option>
-                        <option value="Party">Party</option>
-                        <option value="Date Night">Date Night</option>
-                        <option value="Wedding">Wedding</option>
-                        <option value="Travel">Travel</option>
-                        <option value="Everyday">Everyday</option>
+                    <option value="">Surprise me</option>
+                    <option value="Minimalist">Minimalist</option>
+                    <option value="Elegant">Elegant</option>
+                    <option value="Chic">Chic</option>
+                    <option value="Streetwear">Streetwear</option>
+                    <option value="Bohemian">Bohemian</option>
+                    <option value="Classic">Classic</option>
+                    <option value="Trendy">Trendy</option>
 
-                    </select>
+                </select>
 
-                </div>
-
-
-                <!-- STYLE PREFERENCE -->
-
-                <div class="mt-7">
-
-                    <label class="block text-sm text-[#3a3530] mb-3">
-                        4. Choose your preferred style
-                    </label>
-
-                    <select name="style_preference"
-                            class="w-full p-4 rounded-lg border border-stone-200 bg-white text-sm">
-
-                        <option value="">Surprise me</option>
-                        <option value="Minimalist">Minimalist</option>
-                        <option value="Elegant">Elegant</option>
-                        <option value="Chic">Chic</option>
-                        <option value="Streetwear">Streetwear</option>
-                        <option value="Bohemian">Bohemian</option>
-                        <option value="Classic">Classic</option>
-                        <option value="Trendy">Trendy</option>
-
-                    </select>
-
-                </div>
+            </div>
 
 
-                <!-- ERROR MESSAGE -->
-
-                <div id="responseMessage"
-                     class="hidden mt-6 p-4 rounded-lg text-sm text-center">
-                </div>
+            <div id="responseMessage"
+                 class="hidden mt-6 p-4 rounded-lg text-sm text-center">
+            </div>
 
 
-                <!-- SUBMIT BUTTON -->
+            <button type="submit"
+                    id="submitButton"
+                    class="w-full mt-9 py-4 rounded-lg bg-[#3a3530] text-white text-sm tracking-widest hover:bg-[#625448] transition">
 
-                <button type="submit"
-                        id="submitButton"
-                        class="w-full mt-9 py-4 rounded-lg bg-[#3a3530] text-white text-sm tracking-widest hover:bg-[#625448] transition">
+                STYLE MY PIECE →
 
-                    STYLE MY PIECE →
+            </button>
 
-                </button>
+        </form>
 
-            </form>
+    </div>
+
+
+    <!-- RESULTS SECTION -->
+
+    <div id="resultsSection"
+         class="hidden mt-8">
+
+        <div class="text-center mb-7">
+
+            <p class="text-xs tracking-[0.3em] uppercase text-stone-400 mb-3">
+                STYRIVA AI STYLIST
+            </p>
+
+            <h2 class="text-3xl text-[#3a3530] mb-3">
+                Your Style Collection
+            </h2>
+
+            <p class="text-sm text-stone-500">
+                Discover six different ways to style your favourite piece,
+                one look at a time.
+            </p>
+
+            <p id="lookCounter"
+               class="text-sm text-[#8b6d52] mt-4">
+                0 of 6 looks created
+            </p>
 
         </div>
 
 
-        <!-- AI LOADING SECTION -->
+        <!-- GENERATED LOOKS -->
+
+        <div id="resultsGrid"
+             class="space-y-6">
+        </div>
+
+
+        <!-- LOADING SECTION -->
 
         <div id="loadingSection"
              class="hidden bg-white rounded-2xl p-8 md:p-12 shadow-sm text-center mt-6">
@@ -250,21 +277,18 @@
                 STYRIVA AI STYLIST
             </p>
 
-            <h2 class="text-3xl text-[#3a3530] mb-4">
-                Your styling journey has begun!
+            <h2 class="text-2xl text-[#3a3530] mb-4">
+                Creating your next look
             </h2>
 
             <p class="text-sm text-stone-500 leading-7 mb-7">
-                We're preparing six different ways to style
-                your favourite clothing piece.
+                Your AI stylist is putting together a new outfit combination.
             </p>
 
             <div class="flex justify-center items-center gap-3 mb-5">
-
                 <span class="pulse-dot"></span>
                 <span class="pulse-dot" style="animation-delay: 0.2s;"></span>
                 <span class="pulse-dot" style="animation-delay: 0.4s;"></span>
-
             </div>
 
             <p id="loadingMessage"
@@ -272,131 +296,583 @@
                 Your AI stylist is getting started...
             </p>
 
-            <div class="mt-8 bg-stone-100 rounded-full h-1.5 overflow-hidden">
-
-                <div class="bg-[#8b6d52] h-full w-1/3 rounded-full"
-                     style="animation: loadingBar 2s ease-in-out infinite alternate;">
-                </div>
-
-            </div>
-
-            <style>
-                @keyframes loadingBar {
-                    from { width: 15%; }
-                    to { width: 85%; }
-                }
-            </style>
-
             <p class="text-xs text-stone-400 mt-6">
-                Please keep this page open while we prepare your looks.
+                Please keep this page open while your look is being created.
             </p>
 
         </div>
 
 
-        <p class="text-center text-xs text-stone-400 mt-8">
-            STYRIVA · YOUR INTELLIGENT WARDROBE
-        </p>
+        <!-- ERROR MESSAGE -->
 
-    </main>
+        <div id="generationError"
+             class="hidden mt-6 p-4 rounded-lg text-sm text-center bg-red-50 text-red-700">
+        </div>
 
 
-    <script>
+        <!-- NEXT LOOK BUTTON -->
 
-        // IMAGE PREVIEW
+        <div class="mt-8">
 
-        const input = document.getElementById("garmentImage");
-        const preview = document.getElementById("preview");
+            <button id="nextLookButton"
+                    type="button"
+                    class="hidden w-full py-4 rounded-lg bg-[#3a3530] text-white text-sm tracking-widest hover:bg-[#625448] transition disabled:opacity-50 disabled:cursor-not-allowed">
 
-        input.addEventListener("change", function () {
+                GENERATE ANOTHER LOOK →
 
-            const file = this.files[0];
+            </button>
 
-            if (file) {
+            <p id="nextLookHint"
+               class="hidden text-center text-xs text-stone-400 mt-4">
+                Each click creates one new look.
+            </p>
 
-                preview.src = URL.createObjectURL(file);
-                preview.classList.remove("hidden");
+        </div>
 
-            }
+    </div>
+
+
+    <p class="text-center text-xs text-stone-400 mt-8">
+        STYRIVA · YOUR INTELLIGENT WARDROBE
+    </p>
+
+</main>
+
+
+<script>
+
+    // =====================================================
+    // ELEMENTS
+    // =====================================================
+
+    const input = document.getElementById("garmentImage");
+    const preview = document.getElementById("preview");
+
+    const form = document.getElementById("pieceForm");
+    const submitButton = document.getElementById("submitButton");
+    const responseMessage = document.getElementById("responseMessage");
+
+    const uploadSection = document.getElementById("uploadSection");
+    const resultsSection = document.getElementById("resultsSection");
+
+    const resultsGrid = document.getElementById("resultsGrid");
+    const lookCounter = document.getElementById("lookCounter");
+
+    const loadingSection = document.getElementById("loadingSection");
+    const loadingMessage = document.getElementById("loadingMessage");
+
+    const generationError = document.getElementById("generationError");
+
+    const nextLookButton = document.getElementById("nextLookButton");
+    const nextLookHint = document.getElementById("nextLookHint");
+
+
+    // =====================================================
+    // ENDPOINT URLS
+    // =====================================================
+
+    const statusUrlTemplate =
+        "{% url 'piece_styling_status' 0 %}";
+
+    const nextUrlTemplate =
+        "{% url 'generate_next_piece_look' 0 %}";
+
+
+    function getPieceUrl(template, pieceId) {
+        return template.replace("/0/", `/${pieceId}/`);
+    }
+
+
+    // =====================================================
+    // STATE
+    // =====================================================
+
+    let currentPieceId = null;
+    let currentNextLookNumber = 1;
+
+    let isGenerating = false;
+    let pollingTimer = null;
+
+
+    // =====================================================
+    // IMAGE PREVIEW
+    // =====================================================
+
+    input.addEventListener("change", function () {
+
+        const file = this.files[0];
+
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove("hidden");
+        }
+
+    });
+
+
+    // =====================================================
+    // SAFE TEXT DISPLAY
+    // =====================================================
+
+    function escapeHtml(value) {
+
+        return String(value ?? "").replace(/[&<>"']/g, function (char) {
+
+            const entities = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            };
+
+            return entities[char];
 
         });
 
+    }
 
-        // FORM SUBMISSION
 
-        const form = document.getElementById("pieceForm");
-        const button = document.getElementById("submitButton");
-        const message = document.getElementById("responseMessage");
+    // =====================================================
+    // DISPLAY GENERATED LOOKS
+    // =====================================================
 
-        const uploadSection = document.getElementById("uploadSection");
-        const loadingSection = document.getElementById("loadingSection");
-        const loadingMessage = document.getElementById("loadingMessage");
+    function displayResults(results) {
 
-        form.addEventListener("submit", async function (event) {
+        resultsGrid.innerHTML = "";
 
-            event.preventDefault();
+        results.forEach(function (result) {
 
-            button.disabled = true;
-            button.textContent = "UPLOADING YOUR PIECE...";
+            const card = document.createElement("div");
 
-            message.classList.add("hidden");
+            card.className =
+                "bg-white rounded-2xl shadow-sm overflow-hidden";
 
-            const formData = new FormData(form);
+            const image = result.image_url
+                ? `
+                    <img
+                        src="${escapeHtml(result.image_url)}"
+                        alt="${escapeHtml(result.title)}"
+                        class="w-full object-contain bg-stone-50"
+                        loading="lazy"
+                    >
+                `
+                : "";
 
-            try {
+            card.innerHTML = `
 
-                const response = await fetch(window.location.href, {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    }
-                });
+                ${image}
 
-                const data = await response.json();
+                <div class="p-6">
 
-                if (response.ok && data.success) {
+                    <p class="text-xs tracking-widest uppercase text-[#8b6d52] mb-3">
+                        LOOK ${escapeHtml(result.order)}
+                    </p>
 
-                    // Show AI styling screen
-                    uploadSection.classList.add("hidden");
-                    loadingSection.classList.remove("hidden");
+                    <h3 class="text-2xl text-[#3a3530] mb-3">
+                        ${escapeHtml(result.title)}
+                    </h3>
 
-                    loadingMessage.textContent =
-                        "Your clothing piece is saved. Your AI styling job is queued!";
+                    <p class="text-sm text-stone-500 leading-7">
+                        ${escapeHtml(result.description)}
+                    </p>
 
-                } else {
+                </div>
 
-                    message.classList.remove("hidden");
+            `;
 
-                    message.className =
-                        "mt-6 p-4 rounded-lg text-sm text-center bg-red-50 text-red-700";
+            resultsGrid.appendChild(card);
 
-                    message.textContent =
-                        data.message || "Something went wrong. Please try again.";
+        });
 
-                    button.disabled = false;
-                    button.textContent = "STYLE MY PIECE →";
+    }
+
+
+    // =====================================================
+    // LOADING DISPLAY
+    // =====================================================
+
+    function showLoading(message) {
+
+        isGenerating = true;
+
+        loadingSection.classList.remove("hidden");
+
+        loadingMessage.textContent =
+            message || "Your AI stylist is getting started...";
+
+        nextLookButton.classList.add("hidden");
+        nextLookHint.classList.add("hidden");
+
+        generationError.classList.add("hidden");
+
+    }
+
+
+    function hideLoading() {
+
+        loadingSection.classList.add("hidden");
+
+        isGenerating = false;
+
+    }
+
+
+    // =====================================================
+    // SHOW ERROR
+    // =====================================================
+
+    function showError(message) {
+
+        generationError.textContent =
+            message || "Something went wrong. Please try again.";
+
+        generationError.classList.remove("hidden");
+
+    }
+
+
+    // =====================================================
+    // POLL GENERATION STATUS
+    // =====================================================
+
+    async function checkGenerationStatus() {
+
+        if (!currentPieceId) {
+            return;
+        }
+
+        try {
+
+            const statusUrl = getPieceUrl(
+                statusUrlTemplate,
+                currentPieceId
+            );
+
+            const response = await fetch(statusUrl, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message || "Could not check generation status."
+                );
+
+            }
+
+
+            // Display every look returned by the server.
+
+            displayResults(data.results || []);
+
+
+            const count = data.look_count || 0;
+
+            lookCounter.textContent =
+                `${count} of 6 looks created`;
+
+
+            currentNextLookNumber =
+                data.next_look_number || 1;
+
+
+            // -------------------------------------------------
+            // STILL GENERATING
+            // -------------------------------------------------
+
+            if (data.processing || data.status === "pending" ||
+                data.status === "processing") {
+
+                showLoading(
+                    count === 0
+                        ? "Creating your first look..."
+                        : "Creating your next look..."
+                );
+
+                pollingTimer = setTimeout(
+                    checkGenerationStatus,
+                    3000
+                );
+
+                return;
+
+            }
+
+
+            // -------------------------------------------------
+            // GENERATION FAILED
+            // -------------------------------------------------
+
+            if (data.status === "failed") {
+
+                hideLoading();
+
+                showError(
+                    data.message ||
+                    "Your look could not be generated. You can try again."
+                );
+
+                if (data.can_generate_more) {
+
+                    nextLookButton.textContent =
+                        `RETRY LOOK ${currentNextLookNumber} →`;
+
+                    nextLookButton.classList.remove("hidden");
+                    nextLookHint.classList.remove("hidden");
 
                 }
 
-            } catch (error) {
-
-                message.classList.remove("hidden");
-
-                message.className =
-                    "mt-6 p-4 rounded-lg text-sm text-center bg-red-50 text-red-700";
-
-                message.textContent =
-                    "We couldn't connect to Styriva. Please try again.";
-
-                button.disabled = false;
-                button.textContent = "STYLE MY PIECE →";
+                return;
 
             }
 
-        });
 
-    </script>
+            // -------------------------------------------------
+            // GENERATION COMPLETED
+            // -------------------------------------------------
+
+            hideLoading();
+
+            generationError.classList.add("hidden");
+
+            if (data.can_generate_more) {
+
+                nextLookButton.textContent =
+                    "GENERATE ANOTHER LOOK →";
+
+                nextLookButton.classList.remove("hidden");
+                nextLookHint.classList.remove("hidden");
+
+            } else {
+
+                nextLookButton.classList.add("hidden");
+                nextLookHint.classList.add("hidden");
+
+                lookCounter.textContent =
+                    "All six looks have been created!";
+
+            }
+
+
+        } catch (error) {
+
+            console.error("Status check error:", error);
+
+            loadingMessage.textContent =
+                "Reconnecting to your AI stylist...";
+
+            pollingTimer = setTimeout(
+                checkGenerationStatus,
+                5000
+            );
+
+        }
+
+    }
+
+
+    // =====================================================
+    // START POLLING
+    // =====================================================
+
+    function startPolling() {
+
+        if (pollingTimer) {
+            clearTimeout(pollingTimer);
+        }
+
+        checkGenerationStatus();
+
+    }
+
+
+    // =====================================================
+    // UPLOAD CLOTHING AND START FIRST LOOK
+    // =====================================================
+
+    form.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        if (isGenerating) {
+            return;
+        }
+
+        submitButton.disabled = true;
+
+        submitButton.textContent =
+            "UPLOADING YOUR PIECE...";
+
+        responseMessage.classList.add("hidden");
+
+        const formData = new FormData(form);
+
+        try {
+
+            const response = await fetch(window.location.href, {
+
+                method: "POST",
+
+                body: formData,
+
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message || "Something went wrong."
+                );
+
+            }
+
+
+            // Save the uploaded piece ID.
+
+            currentPieceId = data.piece_id;
+
+            currentNextLookNumber = 1;
+
+
+            // Switch from upload form to results screen.
+
+            uploadSection.classList.add("hidden");
+
+            resultsSection.classList.remove("hidden");
+
+            showLoading("Creating your first look...");
+
+
+            // Start checking the first generation job.
+
+            startPolling();
+
+
+        } catch (error) {
+
+            responseMessage.classList.remove("hidden");
+
+            responseMessage.className =
+                "mt-6 p-4 rounded-lg text-sm text-center bg-red-50 text-red-700";
+
+            responseMessage.textContent =
+                error.message || "We couldn't connect to Styriva. Please try again.";
+
+            submitButton.disabled = false;
+
+            submitButton.textContent =
+                "STYLE MY PIECE →";
+
+        }
+
+    });
+
+
+    // =====================================================
+    // GENERATE EXACTLY ONE NEXT LOOK
+    // =====================================================
+
+    nextLookButton.addEventListener("click", async function () {
+
+        if (!currentPieceId || isGenerating) {
+            return;
+        }
+
+        nextLookButton.disabled = true;
+
+        nextLookButton.textContent =
+            "STARTING YOUR NEXT LOOK...";
+
+
+        try {
+
+            const nextUrl = getPieceUrl(
+                nextUrlTemplate,
+                currentPieceId
+            );
+
+
+            const csrfToken = form.querySelector(
+                '[name="csrfmiddlewaretoken"]'
+            ).value;
+
+
+            const formData = new URLSearchParams();
+
+            formData.append(
+                "expected_look_number",
+                currentNextLookNumber
+            );
+
+
+            const response = await fetch(nextUrl, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+
+                body: formData.toString()
+
+            });
+
+
+            const data = await response.json();
+
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message || "Could not start your next look."
+                );
+
+            }
+
+
+            // One click = one generation job.
+
+            showLoading(
+                `Creating look ${currentNextLookNumber}...`
+            );
+
+
+            // Start polling for this one new look.
+
+            startPolling();
+
+
+        } catch (error) {
+
+            showError(
+                error.message || "We couldn't start your next look."
+            );
+
+            nextLookButton.disabled = false;
+
+            nextLookButton.textContent =
+                `RETRY LOOK ${currentNextLookNumber} →`;
+
+            nextLookButton.classList.remove("hidden");
+
+        }
+
+    });
+
+</script>
 
 </body>
 </html>
