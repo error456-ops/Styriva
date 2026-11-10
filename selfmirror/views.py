@@ -1,418 +1,296 @@
-from django.shortcuts import (
-    render,
-    redirect,
-    get_object_or_404,
-)
-from django.http import JsonResponse
-from django.conf import settings
-from django.urls import reverse
-from django.utils import timezone
-from django.db import transaction
-from django.contrib.auth.decorators import login_required
+import json
+import logging
 
 import razorpay
 
-from .models import (
-    StyleConsultation,
-    GeneratedLook,
-    EvolvedLook,
-    PieceStyling,
-)
-
-from jobs.queue import JobQueue
-from jobs.models import Job
-from jobs.constants import (
-    JobStatus,
-    JobType,
-)
-
-from media_manager.manager import MediaManager
-
-from accounts.services import CreditManager
-from accounts.models import Payment, UserUsage
-
-from .abuse_protection import is_rate_limited
-
-import json
-from django.http import HttpResponse
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-import logging
+
+from accounts.models import Payment
+from accounts.services import CreditManager
+from jobs.constants import JobStatus, JobType
+from jobs.models import Job
+from jobs.queue import JobQueue
+from media_manager.manager import MediaManager
+
+from .abuse_protection import is_rate_limited
+from .models import (
+    EvolvedLook,
+    GeneratedLook,
+    PieceStyling,
+    StyleConsultation,
+)
+
 logger = logging.getLogger(__name__)
 
 
+# ==========================================================
+# Constants
+# ==========================================================
+
 RAZORPAY_PLANS = {
-    "starter": {
-        "name": "Starter",
-        "amount": 19900,
-        "credits": 20,
-    },
-    "premium": {
-        "name": "Premium",
-        "amount": 39900,
-        "credits": 50,
-    },
-    "creator": {
-        "name": "Creator",
-        "amount": 69900,
-        "credits": 100,
-    },
+    "starter": {"name": "Starter", "amount": 19900, "credits": 20},
+    "premium": {"name": "Premium", "amount": 39900, "credits": 50},
+    "creator": {"name": "Creator", "amount": 69900, "credits": 100},
 }
 
+# Style My Piece: the first batch of looks is free (guests included).
+# Every further batch of FREE_PIECE_LOOKS looks costs one credit
+# and requires an account.
+FREE_PIECE_LOOKS = 6
+
+
 # ==========================================================
-# Splash
+# Helpers
+# ==========================================================
+
+def rate_limited_response():
+    return JsonResponse(
+        {
+            "success": False,
+            "rate_limited": True,
+            "message": "Too many requests. Please wait a moment and try again.",
+        },
+        status=429,
+    )
+
+
+def razorpay_client():
+    return razorpay.Client(
+        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
+    )
+
+
+# ==========================================================
+# Splash / Feature chooser
 # ==========================================================
 
 def splash(request):
+    return render(request, "splash.html")
 
-    return render(
-        request,
-        "splash.html"
-    )
+
+def choose_feature(request):
+    return render(request, "choose_feature.html")
 
 
 # ==========================================================
 # Generate Style Look
 # ==========================================================
 
-def choose_feature(request):
-    return render(request, "choose_feature.html")
-
-
 def generate_style_look(request):
-    
 
-    if request.method == "POST":
+    if request.method != "POST":
+        return render(request, "generate_style_look.html")
 
-        # ==================================================
-        # ABUSE PROTECTION
-        # ==================================================
+    # ------------------------------------------------------
+    # Abuse protection
+    # ------------------------------------------------------
+    if is_rate_limited(request):
+        return rate_limited_response()
 
-        if is_rate_limited(request):
+    # ------------------------------------------------------
+    # Complimentary guest session check
+    # ------------------------------------------------------
+    if not request.user.is_authenticated:
 
+        if request.session.get("free_generation_used", False):
             return JsonResponse(
                 {
                     "success": False,
-                    "rate_limited": True,
+                    "requires_signup": True,
+                    "redirect_url": reverse("signup"),
                     "message": (
-                        "Too many requests. "
-                        "Please wait a moment and try again."
+                        "Your complimentary styling session "
+                        "has been completed."
                     ),
                 },
-                status=429,
+                status=403,
             )
 
-        # ==================================================
-        # Complimentary Guest Session Check
-        # ==================================================
+    # ------------------------------------------------------
+    # Authenticated user credit check
+    # ------------------------------------------------------
+    else:
 
-        if not request.user.is_authenticated:
-
-            free_generation_used = request.session.get(
-                "free_generation_used",
-                False
-            )
-
-            if free_generation_used:
-
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "requires_signup": True,
-                        "redirect_url": reverse("signup"),
-                        "message": (
-                            "Your complimentary styling session "
-                            "has been completed."
-                        ),
-                    },
-                    status=403,
-                )
-
-        # ==================================================
-        # Authenticated User Credit Check
-        # ==================================================
-
-        if request.user.is_authenticated:
-
-            if not CreditManager.can_generate(
-                request.user
-            ):
-
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "requires_upgrade": True,
-                        "message": (
-                            "You've used your free styling session "
-                            "and have no credits remaining."
-                        ),
-                    },
-                    status=403,
-                )
-
-        # ==================================================
-        # STEP 1
-        # Collect uploaded images
-        #
-        # Only the user's own photo is required.
-        # Tops, bottoms, one-pieces, shoes and scarves are
-        # all optional, but at least ONE garment (top,
-        # bottom or one-piece) is needed.
-        # ==================================================
-
-        required_files = {
-            "user_model_photo": request.FILES.get(
-                "user_model_photo"
-            ),
-        }
-
-        optional_files = {}
-
-        for prefix in ("top", "bottom", "dress", "shoe", "scarf"):
-            for i in range(1, 4):
-                field = f"{prefix}_{i}"
-                optional_files[field] = request.FILES.get(field)
-
-        uploaded_files = {
-            **required_files,
-            **optional_files,
-        }
-
-        # ==================================================
-        # STEP 2
-        # Check required image + at least one garment
-        # ==================================================
-
-        if required_files["user_model_photo"] is None:
-
+        if not CreditManager.can_generate(request.user):
             return JsonResponse(
                 {
                     "success": False,
-                    "message": "Please upload your photo.",
+                    "requires_upgrade": True,
+                    "message": (
+                        "You've used your free styling session "
+                        "and have no credits remaining."
+                    ),
                 },
-                status=400,
+                status=403,
             )
 
-        garment_fields = [
-            f"{prefix}_{i}"
-            for prefix in ("top", "bottom", "dress")
-            for i in range(1, 4)
-        ]
+    # ------------------------------------------------------
+    # STEP 1: Collect uploaded images
+    #
+    # Only the user's own photo is required. Tops, bottoms,
+    # one-pieces, shoes and scarves are optional, but at least
+    # ONE garment (top, bottom or one-piece) is needed.
+    # ------------------------------------------------------
+    user_model_photo = request.FILES.get("user_model_photo")
 
-        has_garment = any(
-            uploaded_files[field] is not None
-            for field in garment_fields
+    optional_files = {}
+
+    for prefix in ("top", "bottom", "dress", "shoe", "scarf"):
+        for i in range(1, 4):
+            field = f"{prefix}_{i}"
+            optional_files[field] = request.FILES.get(field)
+
+    uploaded_files = {
+        "user_model_photo": user_model_photo,
+        **optional_files,
+    }
+
+    # ------------------------------------------------------
+    # STEP 2: Required photo + at least one garment
+    # ------------------------------------------------------
+    if user_model_photo is None:
+        return JsonResponse(
+            {"success": False, "message": "Please upload your photo."},
+            status=400,
         )
 
-        if not has_garment:
+    garment_fields = [
+        f"{prefix}_{i}"
+        for prefix in ("top", "bottom", "dress")
+        for i in range(1, 4)
+    ]
 
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": (
-                        "Please upload at least one top, "
-                        "bottom or one-piece."
-                    ),
-                },
-                status=400,
-            )
-
-        # ==================================================
-        # STEP 3
-        # Validate uploaded images
-        # ==================================================
-
-        media_manager = MediaManager()
-
-        for field_name, uploaded_file in uploaded_files.items():
-
-            if uploaded_file is None:
-                continue
-
-            try:
-
-                is_valid, message = (
-                    media_manager.validate_upload(
-                        uploaded_file
-                    )
-                )
-
-            except Exception as error:
-
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "message": (
-                            "We could not validate "
-                            f"{field_name.replace('_', ' ')}. "
-                            f"Error: {str(error)}"
-                        )
-                    },
-                    status=400,
-                )
-
-            if not is_valid:
-
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "message": (
-                            f"Invalid "
-                            f"{field_name.replace('_', ' ')}: "
-                            f"{message}"
-                        )
-                    },
-                    status=400,
-                )
-
-        # ==================================================
-        # STEP 4
-        # Create Style Consultation
-        # ==================================================
-
-        try:
-
-            consultation = StyleConsultation.objects.create(
-
-                user=(
-                    request.user
-                    if request.user.is_authenticated
-                    else None
-                ),
-
-                gender=request.POST.get("gender"),
-
-                occasion=request.POST.get("occasion"),
-
-                vibe=request.POST.get("vibe"),
-
-                weather=request.POST.get("weather"),
-
-                user_model_photo=uploaded_files["user_model_photo"],
-
-                # tops, bottoms, one-pieces, shoes, scarves
-                # (any that were not uploaded are saved as empty)
-                **optional_files,
-            )
-
-        except Exception as error:
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": (
-                        "We could not create your "
-                        "style consultation. "
-                        f"Error: {str(error)}"
-                    )
-                },
-                status=500,
-            )
-
-        # ==================================================
-        # STEP 5
-        # Create background generation job
-        # ==================================================
-
-        try:
-
-            JobQueue.create_style_generation_job(
-                consultation
-            )
-
-            # ==============================================
-            # SPEND CREDIT / MARK COMPLIMENTARY SESSION USED
-            # ==============================================
-
-            if request.user.is_authenticated:
-
-                CreditManager.consume_generation(
-                    request.user
-                )
-
-        except Exception as error:
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": (
-                        "Your images were uploaded, "
-                        "but we could not start "
-                        "style generation. "
-                        f"Error: {str(error)}"
-                    )
-                },
-                status=500,
-            )
-
-        # ==================================================
-        # STEP 6
-        # Redirect to loading/result page
-        # ==================================================
-
+    if not any(optional_files[field] is not None for field in garment_fields):
         return JsonResponse(
             {
-                "success": True,
-                "redirect_url": reverse(
-                    "result_view",
-                    kwargs={
-                        "consultation_id": consultation.id
-                    }
-                )
-            }
+                "success": False,
+                "message": "Please upload at least one top, bottom or one-piece.",
+            },
+            status=400,
         )
 
-    return render(
-        request,
-        "generate_style_look.html"
+    # ------------------------------------------------------
+    # STEP 3: Validate uploaded images
+    # ------------------------------------------------------
+    media_manager = MediaManager()
+
+    for field_name, uploaded_file in uploaded_files.items():
+
+        if uploaded_file is None:
+            continue
+
+        label = field_name.replace("_", " ")
+
+        try:
+            is_valid, message = media_manager.validate_upload(uploaded_file)
+
+        except Exception:
+            logger.exception("Upload validation failed for %s", field_name)
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": f"We could not validate {label}.",
+                },
+                status=400,
+            )
+
+        if not is_valid:
+            return JsonResponse(
+                {"success": False, "message": f"Invalid {label}: {message}"},
+                status=400,
+            )
+
+    # ------------------------------------------------------
+    # STEP 4: Create style consultation
+    # ------------------------------------------------------
+    try:
+        consultation = StyleConsultation.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            gender=request.POST.get("gender"),
+            occasion=request.POST.get("occasion"),
+            vibe=request.POST.get("vibe"),
+            weather=request.POST.get("weather"),
+            user_model_photo=user_model_photo,
+            # Any garment that was not uploaded is saved as empty.
+            **optional_files,
+        )
+
+    except Exception:
+        logger.exception("Style consultation creation failed")
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "We could not create your style consultation.",
+            },
+            status=500,
+        )
+
+    # ------------------------------------------------------
+    # STEP 5: Create background generation job + spend credit
+    # ------------------------------------------------------
+    try:
+        JobQueue.create_style_generation_job(consultation)
+
+        if request.user.is_authenticated:
+            CreditManager.consume_generation(request.user)
+
+    except Exception:
+        logger.exception("Style generation job creation failed")
+        return JsonResponse(
+            {
+                "success": False,
+                "message": (
+                    "Your images were uploaded, but we could not "
+                    "start style generation."
+                ),
+            },
+            status=500,
+        )
+
+    # ------------------------------------------------------
+    # STEP 6: Redirect to loading / result page
+    # ------------------------------------------------------
+    return JsonResponse(
+        {
+            "success": True,
+            "redirect_url": reverse(
+                "result_view",
+                kwargs={"consultation_id": consultation.id},
+            ),
+        }
     )
 
 
 # ==========================================================
 # Result View
 # ==========================================================
-def result_view(
-    request,
-    consultation_id
-):
 
-    consultation = get_object_or_404(
-        StyleConsultation,
-        id=consultation_id
-    )
+def result_view(request, consultation_id):
+
+    consultation = get_object_or_404(StyleConsultation, id=consultation_id)
 
     generated_look = (
         GeneratedLook.objects
-        .filter(
-            consultation=consultation
-        )
-        .order_by(
-            "-created_at"
-        )
+        .filter(consultation=consultation)
+        .order_by("-created_at")
         .first()
     )
 
-    # ======================================================
-    # Guest has successfully completed their complimentary
-    # styling session
-    # ======================================================
+    if generated_look is None:
+        return render(request, "loading.html", {"consultation": consultation})
 
-    if (
-        generated_look is not None
-        and not request.user.is_authenticated
-    ):
+    # Guest has successfully completed their complimentary session.
+    if not request.user.is_authenticated:
         request.session["free_generation_used"] = True
         request.session.modified = True
-
-    if not generated_look:
-
-        return render(
-            request,
-            "loading.html",
-            {
-                "consultation": consultation,
-            }
-        )
 
     return render(
         request,
@@ -420,7 +298,7 @@ def result_view(
         {
             "consultation": consultation,
             "generated_look": generated_look,
-        }
+        },
     )
 
 
@@ -431,45 +309,20 @@ def result_view(
 def generate_style_evolution(request):
 
     if request.method != "POST":
-
         return JsonResponse(
-            {
-                "success": False,
-                "message": "POST request required."
-            },
-            status=405
+            {"success": False, "message": "POST request required."},
+            status=405,
         )
-
-    # ==================================================
-    # ABUSE PROTECTION
-    # ==================================================
 
     if is_rate_limited(request):
+        return rate_limited_response()
 
-        return JsonResponse(
-            {
-                "success": False,
-                "rate_limited": True,
-                "message": (
-                    "Too many requests. "
-                    "Please wait a moment and try again."
-                ),
-            },
-            status=429,
-        )
-
-    # ==================================================
-    # Complimentary Guest Session Check
-    # ==================================================
-
+    # ------------------------------------------------------
+    # Complimentary guest session / credit check
+    # ------------------------------------------------------
     if not request.user.is_authenticated:
 
-        free_evolution_used = request.session.get(
-            "free_evolution_used",
-            False
-        )
-
-        if free_evolution_used:
+        if request.session.get("free_evolution_used", False):
             return JsonResponse(
                 {
                     "success": False,
@@ -501,34 +354,16 @@ def generate_style_evolution(request):
     consultation = None
 
     try:
-
-        consultation_id = request.POST.get(
-            "consultation_id"
-        )
-
-        style_preference = request.POST.get(
-            "style_preference",
-            "minimal"
-        )
-
-        extras = request.POST.getlist(
-            "extras[]"
-        )
-
         consultation = get_object_or_404(
             StyleConsultation,
-            id=consultation_id
+            id=request.POST.get("consultation_id"),
         )
 
-        consultation.style_evolution_status = (
-            "processing"
-        )
+        style_preference = request.POST.get("style_preference", "minimal")
+        extras = request.POST.getlist("extras[]")
 
-        consultation.save(
-            update_fields=[
-                "style_evolution_status"
-            ]
-        )
+        consultation.style_evolution_status = "processing"
+        consultation.save(update_fields=["style_evolution_status"])
 
         JobQueue.create_style_evolution_job(
             consultation=consultation,
@@ -536,48 +371,26 @@ def generate_style_evolution(request):
             extras=extras,
         )
 
-        # ==================================================
-        # MARK COMPLIMENTARY SESSION USED / SPEND CREDIT
-        # ==================================================
-
+        # Mark complimentary session used / spend credit.
         if not request.user.is_authenticated:
-
             request.session["free_evolution_used"] = True
             request.session.modified = True
-
         else:
-            CreditManager.consume_style_evolution(
-                request.user
-            )
+            CreditManager.consume_style_evolution(request.user)
 
-        return JsonResponse(
-            {
-                "success": True,
-                "status": "processing",
-            }
-        )
+        return JsonResponse({"success": True, "status": "processing"})
 
     except Exception as error:
 
+        logger.exception("Style evolution failed to start")
+
         if consultation is not None:
-
-            consultation.style_evolution_status = (
-                "failed"
-            )
-
-            consultation.save(
-                update_fields=[
-                    "style_evolution_status"
-                ]
-            )
+            consultation.style_evolution_status = "failed"
+            consultation.save(update_fields=["style_evolution_status"])
 
         return JsonResponse(
-            {
-                "success": False,
-                "status": "failed",
-                "message": str(error),
-            },
-            status=500
+            {"success": False, "status": "failed", "message": str(error)},
+            status=500,
         )
 
 
@@ -585,33 +398,19 @@ def generate_style_evolution(request):
 # Generation Status
 # ==========================================================
 
-def generation_status(
-    request,
-    consultation_id
-):
+def generation_status(request, consultation_id):
 
-    consultation = get_object_or_404(
-        StyleConsultation,
-        id=consultation_id
-    )
+    consultation = get_object_or_404(StyleConsultation, id=consultation_id)
 
     generated_look = (
         GeneratedLook.objects
-        .filter(
-            consultation=consultation
-        )
-        .order_by(
-            "-created_at"
-        )
+        .filter(consultation=consultation)
+        .order_by("-created_at")
         .first()
     )
 
     if generated_look is not None:
-
-        return JsonResponse({
-            "completed": True,
-            "status": "completed",
-        })
+        return JsonResponse({"completed": True, "status": "completed"})
 
     job = (
         Job.objects
@@ -619,89 +418,65 @@ def generation_status(
             consultation=consultation,
             job_type=JobType.STYLE_GENERATION,
         )
-        .order_by(
-            "-created_at"
-        )
+        .order_by("-created_at")
         .first()
     )
 
     if job is None:
-
-        return JsonResponse({
-            "completed": False,
-            "status": "pending",
-        })
+        return JsonResponse({"completed": False, "status": "pending"})
 
     if job.job_status == JobStatus.FAILED:
-
-        return JsonResponse({
-            "completed": False,
-            "status": "failed",
-            "message": (
-                job.error_message
-                or
-                "Style generation failed."
-            ),
-        })
+        return JsonResponse(
+            {
+                "completed": False,
+                "status": "failed",
+                "message": job.error_message or "Style generation failed.",
+            }
+        )
 
     if job.job_status == JobStatus.COMPLETED:
-
-        return JsonResponse({
-            "completed": False,
-            "status": "failed",
-            "message": (
-                "Style generation finished, "
-                "but no generated look was found."
-            ),
-        })
+        return JsonResponse(
+            {
+                "completed": False,
+                "status": "failed",
+                "message": (
+                    "Style generation finished, "
+                    "but no generated look was found."
+                ),
+            }
+        )
 
     if job.job_status == JobStatus.RUNNING:
+        return JsonResponse({"completed": False, "status": "processing"})
 
-        return JsonResponse({
-            "completed": False,
-            "status": "processing",
-        })
-
-    return JsonResponse({
-        "completed": False,
-        "status": "pending",
-    })
+    return JsonResponse({"completed": False, "status": "pending"})
 
 
 # ==========================================================
 # Style Evolution Status
 # ==========================================================
 
-def style_evolution_status(
-    request,
-    consultation_id
-):
+def style_evolution_status(request, consultation_id):
 
-    consultation = get_object_or_404(
-        StyleConsultation,
-        id=consultation_id
-    )
+    consultation = get_object_or_404(StyleConsultation, id=consultation_id)
 
     evolved = (
         EvolvedLook.objects
-        .filter(
-            generated_look__consultation=consultation
-        )
-        .order_by(
-            "-created_at"
-        )
+        .filter(generated_look__consultation=consultation)
+        .order_by("-created_at")
         .first()
     )
 
     if evolved is not None:
-
-        return JsonResponse({
-            "completed": True,
-            "status": "completed",
-            "generated_image": evolved.evolved_image.url,
-            "reasoning": evolved.reasoning,
-            "added_items": evolved.added_items,
-        })
+        return JsonResponse(
+            {
+                "completed": True,
+                "status": "completed",
+                "generated_image": evolved.evolved_image.url,
+                "reasoning": evolved.reasoning,
+                "added_items": evolved.added_items,
+            }
+        )
 
     job = (
         Job.objects
@@ -709,80 +484,64 @@ def style_evolution_status(
             consultation=consultation,
             job_type=JobType.STYLE_EVOLUTION,
         )
-        .order_by(
-            "-created_at"
-        )
+        .order_by("-created_at")
         .first()
     )
 
-    if (
-        consultation.style_evolution_status
-        == "failed"
-    ):
-
-        return JsonResponse({
-            "completed": False,
-            "status": "failed",
-            "message": (
-                job.error_message
-                if job
-                and job.error_message
-                else
-                "Style evolution failed."
-            ),
-        })
+    if consultation.style_evolution_status == "failed":
+        return JsonResponse(
+            {
+                "completed": False,
+                "status": "failed",
+                "message": (
+                    job.error_message
+                    if job and job.error_message
+                    else "Style evolution failed."
+                ),
+            }
+        )
 
     if job is None:
-
-        return JsonResponse({
-            "completed": False,
-            "status": "pending",
-        })
+        return JsonResponse({"completed": False, "status": "pending"})
 
     if job.job_status == JobStatus.FAILED:
-
-        return JsonResponse({
-            "completed": False,
-            "status": "failed",
-            "message": (
-                job.error_message
-                or
-                "Style evolution failed."
-            ),
-        })
+        return JsonResponse(
+            {
+                "completed": False,
+                "status": "failed",
+                "message": job.error_message or "Style evolution failed.",
+            }
+        )
 
     if job.job_status == JobStatus.COMPLETED:
-
-        return JsonResponse({
-            "completed": False,
-            "status": "failed",
-            "message": (
-                "Style evolution finished, "
-                "but no evolved look was found."
-            ),
-        })
+        return JsonResponse(
+            {
+                "completed": False,
+                "status": "failed",
+                "message": (
+                    "Style evolution finished, "
+                    "but no evolved look was found."
+                ),
+            }
+        )
 
     if job.job_status == JobStatus.RUNNING:
+        return JsonResponse({"completed": False, "status": "processing"})
 
-        return JsonResponse({
-            "completed": False,
-            "status": "processing",
-        })
-
-    return JsonResponse({
-        "completed": False,
-        "status": "pending",
-    })
+    return JsonResponse({"completed": False, "status": "pending"})
 
 
 # ==========================================================
-# Static / Informational Pages
+# Payments (Razorpay)
 # ==========================================================
 
 def sync_pending_payments(user):
-    client = razorpay.Client(
-        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
-    )
+    """
+    Safety net: credit any recent 'created' payments that Razorpay
+    has actually captured (e.g. the browser closed before verify).
+    """
+
+    client = razorpay_client()
 
     pending = Payment.objects.filter(
         user=user, status="created"
@@ -804,10 +563,17 @@ def sync_pending_payments(user):
                         locked.status = "paid"
                         locked.paid_at = timezone.now()
                         locked.save(
-                            update_fields=["razorpay_payment_id", "status", "paid_at"]
+                            update_fields=[
+                                "razorpay_payment_id",
+                                "status",
+                                "paid_at",
+                            ]
                         )
                         CreditManager.add_credits(user, locked.credits)
-                        logger.info("Payment sync credited order %s", p.razorpay_order_id)
+                        logger.info(
+                            "Payment sync credited order %s",
+                            p.razorpay_order_id,
+                        )
                 break
 
 
@@ -822,34 +588,21 @@ def create_razorpay_order(request):
 
     if request.method != "POST":
         return JsonResponse(
-            {
-                "success": False,
-                "message": "POST request required.",
-            },
+            {"success": False, "message": "POST request required."},
             status=405,
         )
 
     plan_key = request.POST.get("plan")
-
     plan = RAZORPAY_PLANS.get(plan_key)
 
     if not plan:
         return JsonResponse(
-            {
-                "success": False,
-                "message": "Invalid plan selected.",
-            },
+            {"success": False, "message": "Invalid plan selected."},
             status=400,
         )
 
     try:
-
-        client = razorpay.Client(
-            auth=(
-                settings.RAZORPAY_KEY_ID,
-                settings.RAZORPAY_KEY_SECRET,
-            )
-        )
+        client = razorpay_client()
 
         razorpay_order = client.order.create(
             {
@@ -862,7 +615,7 @@ def create_razorpay_order(request):
             }
         )
 
-        payment = Payment.objects.create(
+        Payment.objects.create(
             user=request.user,
             plan=plan_key,
             amount=plan["amount"],
@@ -884,12 +637,9 @@ def create_razorpay_order(request):
         )
 
     except Exception as error:
-
+        logger.exception("Razorpay order creation failed")
         return JsonResponse(
-            {
-                "success": False,
-                "message": str(error),
-            },
+            {"success": False, "message": str(error)},
             status=500,
         )
 
@@ -900,48 +650,22 @@ def verify_razorpay_payment(request):
 
     if request.method != "POST":
         return JsonResponse(
-            {
-                "success": False,
-                "message": "POST request required.",
-            },
+            {"success": False, "message": "POST request required."},
             status=405,
         )
 
-    razorpay_order_id = request.POST.get(
-        "razorpay_order_id"
-    )
+    razorpay_order_id = request.POST.get("razorpay_order_id")
+    razorpay_payment_id = request.POST.get("razorpay_payment_id")
+    razorpay_signature = request.POST.get("razorpay_signature")
 
-    razorpay_payment_id = request.POST.get(
-        "razorpay_payment_id"
-    )
-
-    razorpay_signature = request.POST.get(
-        "razorpay_signature"
-    )
-
-    if not all(
-        [
-            razorpay_order_id,
-            razorpay_payment_id,
-            razorpay_signature,
-        ]
-    ):
+    if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature]):
         return JsonResponse(
-            {
-                "success": False,
-                "message": "Missing payment information.",
-            },
+            {"success": False, "message": "Missing payment information."},
             status=400,
         )
 
     try:
-
-        client = razorpay.Client(
-            auth=(
-                settings.RAZORPAY_KEY_ID,
-                settings.RAZORPAY_KEY_SECRET,
-            )
-        )
+        client = razorpay_client()
 
         payment = (
             Payment.objects
@@ -954,7 +678,6 @@ def verify_razorpay_payment(request):
 
         # Prevent duplicate crediting
         if payment.status == "paid":
-
             return JsonResponse(
                 {
                     "success": True,
@@ -973,33 +696,19 @@ def verify_razorpay_payment(request):
         )
 
         # Fetch payment from Razorpay
-        razorpay_payment = client.payment.fetch(
-            razorpay_payment_id
-        )
+        razorpay_payment = client.payment.fetch(razorpay_payment_id)
 
-        # Make sure payment belongs to this order
-        if (
-            razorpay_payment.get("order_id")
-            != razorpay_order_id
-        ):
+        # Payment must belong to this order
+        if razorpay_payment.get("order_id") != razorpay_order_id:
             return JsonResponse(
-                {
-                    "success": False,
-                    "message": "Payment/order mismatch.",
-                },
+                {"success": False, "message": "Payment/order mismatch."},
                 status=400,
             )
 
-        # Make sure amount matches our database
-        if (
-            razorpay_payment.get("amount")
-            != payment.amount
-        ):
+        # Amount must match our database
+        if razorpay_payment.get("amount") != payment.amount:
             return JsonResponse(
-                {
-                    "success": False,
-                    "message": "Payment amount mismatch.",
-                },
+                {"success": False, "message": "Payment amount mismatch."},
                 status=400,
             )
 
@@ -1008,19 +717,15 @@ def verify_razorpay_payment(request):
             return JsonResponse(
                 {
                     "success": False,
-                    "message": (
-                        "Payment has not been captured yet."
-                    ),
+                    "message": "Payment has not been captured yet.",
                 },
                 status=400,
             )
 
-        # Mark payment as paid
         payment.razorpay_payment_id = razorpay_payment_id
         payment.razorpay_signature = razorpay_signature
         payment.status = "paid"
         payment.paid_at = timezone.now()
-
         payment.save(
             update_fields=[
                 "razorpay_payment_id",
@@ -1030,54 +735,36 @@ def verify_razorpay_payment(request):
             ]
         )
 
-        # Add purchased credits
-        CreditManager.add_credits(
-            request.user,
-            payment.credits,
-        )
+        CreditManager.add_credits(request.user, payment.credits)
 
         return JsonResponse(
             {
                 "success": True,
-                "message": (
-                    f"{payment.credits} credits "
-                    "added successfully."
-                ),
+                "message": f"{payment.credits} credits added successfully.",
                 "credits": request.user.profile.credits,
             }
         )
 
     except Payment.DoesNotExist:
-
         return JsonResponse(
-            {
-                "success": False,
-                "message": "Payment order not found.",
-            },
+            {"success": False, "message": "Payment order not found."},
             status=404,
         )
 
     except razorpay.errors.SignatureVerificationError:
-
         return JsonResponse(
-            {
-                "success": False,
-                "message": "Invalid payment signature.",
-            },
+            {"success": False, "message": "Invalid payment signature."},
             status=400,
         )
 
     except Exception as error:
-
+        logger.exception("Razorpay payment verification failed")
         return JsonResponse(
-            {
-                "success": False,
-                "message": str(error),
-            },
+            {"success": False, "message": str(error)},
             status=500,
         )
-        
-        
+
+
 @csrf_exempt
 @require_POST
 def razorpay_webhook(request):
@@ -1085,9 +772,7 @@ def razorpay_webhook(request):
     signature = request.headers.get("X-Razorpay-Signature", "")
     body = request.body.decode("utf-8")
 
-    client = razorpay.Client(
-        auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
-    )
+    client = razorpay_client()
 
     try:
         client.utility.verify_webhook_signature(
@@ -1128,17 +813,12 @@ def razorpay_webhook(request):
         payment.razorpay_payment_id = entity.get("id")
         payment.status = "paid"
         payment.paid_at = timezone.now()
-        payment.save(
-            update_fields=["razorpay_payment_id", "status", "paid_at"]
-        )
+        payment.save(update_fields=["razorpay_payment_id", "status", "paid_at"])
 
         CreditManager.add_credits(payment.user, payment.credits)
 
     logger.info("Razorpay webhook: credited order %s", order_id)
     return HttpResponse(status=200)
-
-
-
 
 
 # ==========================================================
@@ -1147,24 +827,18 @@ def razorpay_webhook(request):
 
 def get_piece_for_request(request, piece_id):
     """
-    Return a PieceStyling record only if it belongs
-    to the authenticated user or the guest session.
+    Return a PieceStyling record only if it belongs to the
+    authenticated user or the guest session.
     """
 
-    piece = get_object_or_404(
-        PieceStyling,
-        pk=piece_id,
-    )
+    piece = get_object_or_404(PieceStyling, pk=piece_id)
 
     if request.user.is_authenticated:
         if piece.user_id != request.user.id:
             return None
 
     else:
-        allowed_ids = request.session.get(
-            "style_my_piece_ids",
-            [],
-        )
+        allowed_ids = request.session.get("style_my_piece_ids", [])
 
         if piece.user_id is not None or piece.id not in allowed_ids:
             return None
@@ -1172,139 +846,116 @@ def get_piece_for_request(request, piece_id):
     return piece
 
 
-# ==========================================================
-# UPLOAD CLOTHING AND START FIRST LOOK
-# ==========================================================
+# ----------------------------------------------------------
+# Upload clothing and start first look
+# ----------------------------------------------------------
 
 def style_my_piece(request):
 
-    if request.method == "POST":
+    if request.method != "POST":
+        return render(request, "style_my_piece.html")
 
-        if is_rate_limited(request):
-            return JsonResponse(
-                {
-                    "success": False,
-                    "rate_limited": True,
-                    "message": "Too many requests. Please wait and try again.",
-                },
-                status=429,
-            )
+    if is_rate_limited(request):
+        return rate_limited_response()
 
-        garment_image = request.FILES.get("garment_image")
-        garment_type = request.POST.get("garment_type")
+    garment_image = request.FILES.get("garment_image")
+    garment_type = request.POST.get("garment_type")
 
-        if not garment_image or not garment_type:
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": "Please upload an image and select a clothing type.",
-                },
-                status=400,
-            )
-
-        allowed_types = [
-            "top",
-            "bottom",
-            "dress",
-            "outerwear",
-            "shoes",
-            "accessory",
-            "other",
-        ]
-
-        if garment_type not in allowed_types:
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": "Please select a valid clothing type.",
-                },
-                status=400,
-            )
-
-        media_manager = MediaManager()
-
-        is_valid, message = media_manager.validate_upload(
-            garment_image
+    if not garment_image or not garment_type:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Please upload an image and select a clothing type.",
+            },
+            status=400,
         )
 
-        if not is_valid:
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": message,
+    allowed_types = [
+        "top",
+        "bottom",
+        "dress",
+        "outerwear",
+        "shoes",
+        "accessory",
+        "other",
+    ]
+
+    if garment_type not in allowed_types:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Please select a valid clothing type.",
+            },
+            status=400,
+        )
+
+    is_valid, message = MediaManager().validate_upload(garment_image)
+
+    if not is_valid:
+        return JsonResponse(
+            {"success": False, "message": message},
+            status=400,
+        )
+
+    try:
+        with transaction.atomic():
+
+            piece = PieceStyling.objects.create(
+                user=request.user if request.user.is_authenticated else None,
+                garment_image=garment_image,
+                garment_type=garment_type,
+                occasion=request.POST.get("occasion", ""),
+                style_preference=request.POST.get("style_preference", ""),
+            )
+
+            # Automatically queue the first look (free batch 0).
+            job = JobQueue.create_piece_styling_job(
+                piece,
+                payload={
+                    "look_number": 1,
+                    "batch_number": 0,
                 },
-                status=400,
             )
 
-        try:
+        # Allow the guest session to access its own piece.
+        if not request.user.is_authenticated:
+            allowed_ids = request.session.get("style_my_piece_ids", [])
+            allowed_ids.append(piece.id)
+            request.session["style_my_piece_ids"] = allowed_ids
+            request.session.modified = True
 
-            with transaction.atomic():
+        return JsonResponse(
+            {
+                "success": True,
+                "message": (
+                    "Your clothing piece has been uploaded. "
+                    "Your first look is starting!"
+                ),
+                "status": "processing",
+                "piece_id": piece.id,
+                "job_id": job.id,
+                "next_look_number": 1,
+            }
+        )
 
-                piece = PieceStyling.objects.create(
-                    user=(
-                        request.user
-                        if request.user.is_authenticated
-                        else None
-                    ),
-                    garment_image=garment_image,
-                    garment_type=garment_type,
-                    occasion=request.POST.get("occasion", ""),
-                    style_preference=request.POST.get(
-                        "style_preference",
-                        "",
-                    ),
-                )
-
-                # Automatically queue the first look.
-                job = JobQueue.create_piece_styling_job(piece)
-
-            # Allow the guest session to access its own piece.
-            if not request.user.is_authenticated:
-
-                allowed_ids = request.session.get(
-                    "style_my_piece_ids",
-                    [],
-                )
-
-                allowed_ids.append(piece.id)
-
-                request.session["style_my_piece_ids"] = allowed_ids
-                request.session.modified = True
-
-            return JsonResponse(
-                {
-                    "success": True,
-                    "message": "Your clothing piece has been uploaded. Your first look is starting!",
-                    "status": "processing",
-                    "piece_id": piece.id,
-                    "job_id": job.id,
-                    "next_look_number": 1,
-                }
-            )
-
-        except Exception:
-
-            logger.exception(
-                "Style My Piece upload or job creation failed"
-            )
-
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": "We couldn't save your clothing image or start styling. Please try again.",
-                },
-                status=500,
-            )
-
-    return render(
-        request,
-        "style_my_piece.html",
-    )
+    except Exception:
+        logger.exception("Style My Piece upload or job creation failed")
+        return JsonResponse(
+            {
+                "success": False,
+                "message": (
+                    "We couldn't save your clothing image or start "
+                    "styling. Please try again."
+                ),
+            },
+            status=500,
+        )
 
 
-# ==========================================================
-# CHECK STYLE MY PIECE GENERATION STATUS
-# ==========================================================
+# ----------------------------------------------------------
+# Check Style My Piece generation status
+# ----------------------------------------------------------
+
 
 def piece_styling_status(request, piece_id):
 
@@ -1312,70 +963,64 @@ def piece_styling_status(request, piece_id):
 
     if piece is None:
         return JsonResponse(
-            {
-                "success": False,
-                "message": "Styling session not found.",
-            },
+            {"success": False, "message": "Styling session not found."},
             status=404,
         )
 
     results = piece.results.order_by("order")
 
-    result_data = []
+    result_data = [
+        {
+            "id": result.id,
+            "title": result.title,
+            "description": result.description,
+            "image_url": (
+                result.generated_image.url
+                if result.generated_image else None
+            ),
+            "order": result.order,
+        }
+        for result in results
+    ]
 
-    for result in results:
-
-        image_url = None
-
-        if result.generated_image:
-            image_url = result.generated_image.url
-
-        result_data.append(
-            {
-                "id": result.id,
-                "title": result.title,
-                "description": result.description,
-                "image_url": image_url,
-                "order": result.order,
-            }
-        )
-
-    latest_job = (
-        Job.objects
-        .filter(
-            piece_styling=piece,
-            job_type=JobType.PIECE_STYLING,
-        )
-        .order_by("-created_at")
-        .first()
+    piece_jobs = Job.objects.filter(
+        piece_styling=piece,
+        job_type=JobType.PIECE_STYLING,
     )
 
-    active_job = (
-        Job.objects
-        .filter(
-            piece_styling=piece,
-            job_type=JobType.PIECE_STYLING,
-            job_status__in=[
-                JobStatus.PENDING,
-                JobStatus.RUNNING,
-            ],
-        )
-        .exists()
-    )
+    latest_job = piece_jobs.order_by("-created_at").first()
+
+    active_job = piece_jobs.filter(
+        job_status__in=[
+            JobStatus.PENDING,
+            JobStatus.RUNNING,
+        ],
+    ).exists()
 
     if active_job:
         status = "processing"
-
     elif latest_job and latest_job.job_status == JobStatus.FAILED:
         status = "failed"
-
-    elif results.exists():
+    elif result_data:
         status = "completed"
-
     else:
         status = piece.status
 
     next_number = piece.next_look_number
+
+    if request.user.is_authenticated:
+        credits_remaining = request.user.profile.credits
+    else:
+        credits_remaining = 0
+
+    next_requires_signup = (
+        next_number > FREE_PIECE_LOOKS
+        and not request.user.is_authenticated
+    )
+
+    next_requires_credit = (
+        next_number > FREE_PIECE_LOOKS
+    )
 
     return JsonResponse(
         {
@@ -1387,14 +1032,21 @@ def piece_styling_status(request, piece_id):
             "results": result_data,
             "look_count": len(result_data),
             "next_look_number": next_number,
+
+            # Number of free looks still available.
             "remaining_looks": max(
                 0,
-                6 - len(result_data),
+                FREE_PIECE_LOOKS - len(result_data),
             ),
-            "can_generate_more": (
-                not active_job
-                and next_number <= 6
+
+            "next_requires_credit": next_requires_credit,
+            "next_requires_signup": next_requires_signup,
+            "credits_remaining": credits_remaining,
+            "credits_required": (
+                1 if next_requires_credit else 0
             ),
+            "can_generate_more": not active_job,
+
             "message": (
                 latest_job.error_message
                 if status == "failed" and latest_job
@@ -1404,22 +1056,11 @@ def piece_styling_status(request, piece_id):
     )
 
 
-# ==========================================================
-# GENERATE ONE MORE LOOK
-# ==========================================================
-
 @require_POST
 def generate_next_piece_look(request, piece_id):
 
     if is_rate_limited(request):
-        return JsonResponse(
-            {
-                "success": False,
-                "rate_limited": True,
-                "message": "Too many requests. Please wait and try again.",
-            },
-            status=429,
-        )
+        return rate_limited_response()
 
     piece = get_piece_for_request(request, piece_id)
 
@@ -1433,10 +1074,12 @@ def generate_next_piece_look(request, piece_id):
         )
 
     try:
-
         expected_number = int(
             request.POST.get("expected_look_number", "")
         )
+
+        if expected_number < 1:
+            raise ValueError
 
         with transaction.atomic():
 
@@ -1446,30 +1089,39 @@ def generate_next_piece_look(request, piece_id):
                 .get(pk=piece.id)
             )
 
-            # Prevent an old or duplicate button request
-            # from generating the next look twice.
+            # Prevent duplicate or outdated requests.
             if expected_number != locked_piece.next_look_number:
-
                 return JsonResponse(
                     {
                         "success": False,
                         "status": locked_piece.status,
-                        "message": "This look has already been requested or generated. Please refresh the results.",
+                        "message": "Please refresh your results.",
                         "next_look_number": locked_piece.next_look_number,
                     },
                     status=409,
                 )
 
-            if locked_piece.next_look_number > 6:
+            # First six looks are free for everyone.
+            # Look seven onward requires an account.
+            if (
+                expected_number > FREE_PIECE_LOOKS
+                and not request.user.is_authenticated
+            ):
                 return JsonResponse(
                     {
                         "success": False,
-                        "message": "All six looks have been generated.",
+                        "requires_signup": True,
+                        "redirect_url": reverse("signup"),
+                        "message": (
+                            "Create an account to generate "
+                            "more looks."
+                        ),
                     },
-                    status=400,
+                    status=403,
                 )
 
-            existing_job = Job.objects.filter(
+            # Make sure no other look is currently processing.
+            existing_active_job = Job.objects.filter(
                 piece_styling=locked_piece,
                 job_type=JobType.PIECE_STYLING,
                 job_status__in=[
@@ -1478,25 +1130,91 @@ def generate_next_piece_look(request, piece_id):
                 ],
             ).first()
 
-            if existing_job:
-
+            if existing_active_job:
                 return JsonResponse(
                     {
                         "success": True,
                         "status": "processing",
-                        "job_id": existing_job.id,
+                        "job_id": existing_active_job.id,
                         "look_number": expected_number,
-                        "message": "Your look is already being generated.",
+                        "message": (
+                            "Your look is already being generated."
+                        ),
                     }
                 )
 
-            # Create exactly one new generation job.
+            # Every look after the first six costs one credit.
+            if expected_number > FREE_PIECE_LOOKS:
+
+                # Extra ownership protection.
+                if locked_piece.user_id != request.user.id:
+                    return JsonResponse(
+                        {
+                            "success": False,
+                            "message": "Account mismatch.",
+                        },
+                        status=403,
+                    )
+
+                # Check whether this exact look was already paid for.
+                # This prevents charging twice when a failed job
+                # is retried.
+                already_charged = Job.objects.filter(
+                    piece_styling=locked_piece,
+                    job_type=JobType.PIECE_STYLING,
+                    payload__look_number=expected_number,
+                    payload__credit_charged=True,
+                ).exists()
+
+                if not already_charged:
+
+                    credit_result = (
+                        CreditManager.consume_piece_generation(
+                            request.user
+                        )
+                    )
+
+                    if credit_result is None:
+                        return JsonResponse(
+                            {
+                                "success": False,
+                                "requires_upgrade": True,
+                                "credits_required": 1,
+                                "credits_remaining": (
+                                    request.user.profile.credits
+                                ),
+                                "message": (
+                                    "You need one credit to "
+                                    "generate this look."
+                                ),
+                            },
+                            status=403,
+                        )
+
+                else:
+                    credit_result = request.user.profile.credits
+
+            else:
+                credit_result = (
+                    request.user.profile.credits
+                    if request.user.is_authenticated
+                    else 0
+                )
+
+            # Queue exactly one look.
+            # The transaction also rolls back the credit deduction
+            # if job creation fails.
             job = JobQueue.create_piece_styling_job(
-                locked_piece
+                locked_piece,
+                payload={
+                    "look_number": expected_number,
+                    "credit_charged": (
+                        expected_number > FREE_PIECE_LOOKS
+                    ),
+                },
             )
 
             locked_piece.status = "processing"
-
             locked_piece.save(
                 update_fields=["status"]
             )
@@ -1507,22 +1225,21 @@ def generate_next_piece_look(request, piece_id):
                 "status": "processing",
                 "job_id": job.id,
                 "look_number": expected_number,
+                "credits_remaining": credit_result,
                 "message": "Your next look is being generated!",
             }
         )
 
     except ValueError:
-
         return JsonResponse(
             {
                 "success": False,
-                "message": "A valid expected look number is required.",
+                "message": "A valid look number is required.",
             },
             status=400,
         )
 
     except Exception:
-
         logger.exception(
             "Next Style My Piece look generation failed"
         )
@@ -1530,11 +1247,17 @@ def generate_next_piece_look(request, piece_id):
         return JsonResponse(
             {
                 "success": False,
-                "message": "We couldn't start your next look. Please try again.",
+                "message": (
+                    "We couldn't start your next look. "
+                    "Please try again."
+                ),
             },
             status=500,
         )
 
+# ==========================================================
+# Static / Informational Pages
+# ==========================================================
 
 def privacy_policy(request):
     return render(request, "privacy.html")
@@ -1570,4 +1293,3 @@ def cookies_view(request):
 
 def disclaimer_view(request):
     return render(request, "disclaimer.html")
-

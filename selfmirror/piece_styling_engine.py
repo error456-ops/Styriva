@@ -16,7 +16,7 @@ class PieceStylingEngine:
 
     Generates exactly ONE look per run().
     Reuses saved garment analysis.
-    Supports a maximum of six looks.
+    Supports exactly six free looks.
     """
 
     NUMBER_OF_LOOKS = 6
@@ -67,6 +67,7 @@ class PieceStylingEngine:
     ]
 
     def __init__(self, piece_styling_id):
+
         from .models import PieceStyling
 
         self.piece = PieceStyling.objects.get(
@@ -86,6 +87,7 @@ class PieceStylingEngine:
         )
 
         if not original_path or not Path(original_path).is_file():
+
             raise FileNotFoundError(
                 "Could not access the uploaded garment image."
             )
@@ -99,6 +101,7 @@ class PieceStylingEngine:
         )
 
         try:
+
             with Image.open(original_path) as image:
 
                 image = image.convert("RGB")
@@ -109,6 +112,7 @@ class PieceStylingEngine:
                 )
 
         except Exception:
+
             temp_directory.cleanup()
             raise
 
@@ -192,11 +196,13 @@ Return valid JSON:
         )
 
         if not raw_result:
+
             raise RuntimeError(
                 "Garment analysis returned an empty response."
             )
 
         try:
+
             result = json.loads(raw_result)
 
         except json.JSONDecodeError as error:
@@ -206,6 +212,7 @@ Return valid JSON:
             ) from error
 
         if not isinstance(result, dict):
+
             raise RuntimeError(
                 "Garment analysis must return JSON."
             )
@@ -270,10 +277,12 @@ Return valid JSON:
 Create a premium, realistic fashion editorial photograph.
 
 THE REFERENCE IMAGE:
+
 The uploaded image contains the exact garment that must
 be worn by the fashion model.
 
 GARMENT ANALYSIS:
+
 {json.dumps(garment_analysis, ensure_ascii=False)}
 
 ABSOLUTE GARMENT PRESERVATION RULES:
@@ -308,6 +317,12 @@ For example:
 - A dress should remain the main one-piece garment.
 - Outerwear should be visibly worn over a suitable outfit.
 - Shoes and accessories should complement the garment.
+
+IMPORTANT:
+
+Create an outfit that clearly follows the selected styling
+concept. Do not simply reuse the same outfit combination
+for every look.
 
 MODEL AND PHOTOGRAPHY:
 
@@ -404,8 +419,8 @@ The result should look like a real fashion campaign.
             ):
 
                 raise ValueError(
-                    "All six Style My Piece looks have already "
-                    "been generated."
+                    f"All {self.NUMBER_OF_LOOKS} Style My Piece looks "
+                    "have already been generated."
                 )
 
             style = self.STYLE_PRESETS[
@@ -429,7 +444,7 @@ The result should look like a real fashion campaign.
             # STEP 3: Build the selected style prompt.
 
             print(
-                f"Generating look {look_number}/6: "
+                f"Generating look {look_number}/{self.NUMBER_OF_LOOKS}: "
                 f"{style['title']}",
                 flush=True
             )
@@ -452,7 +467,6 @@ The result should look like a real fashion campaign.
                 flush=True
             )
 
-            # IMPORTANT:
             # The dispatcher must save the result first.
             # It should increment next_look_number only
             # after the database save succeeds.

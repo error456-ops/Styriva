@@ -62,6 +62,21 @@
 
 <main class="max-w-2xl mx-auto">
 
+    {% if request.user.is_authenticated %}
+    <div class="flex justify-start mb-4">
+        <div class="w-11 h-11 rounded-full bg-white border border-stone-200 shadow-sm flex items-center justify-center text-[#8b6d52]"
+             title="Your Styriva account" aria-label="Your Styriva account">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M5 21v-2a7 7 0 0 1 14 0v2"></path>
+            </svg>
+        </div>
+    </div>
+    {% endif %}
+
     <a href="{% url 'choose_feature' %}"
        class="text-sm text-stone-500">
         ← Back
@@ -235,13 +250,13 @@
             </h2>
 
             <p class="text-sm text-stone-500">
-                Discover six different ways to style your favourite piece,
+                Discover different ways to style your favourite piece,
                 one look at a time.
             </p>
 
             <p id="lookCounter"
                class="text-sm text-[#8b6d52] mt-4">
-                0 of 6 looks created
+                0 looks created
             </p>
 
         </div>
@@ -298,6 +313,31 @@
         </div>
 
 
+        <!-- PAYMENT WALL: SHOWN AFTER LOOK SIX -->
+
+        <div id="paymentWall"
+             class="hidden mt-8 bg-white rounded-2xl p-8 text-center shadow-sm border border-stone-200">
+
+            <p class="text-xs tracking-[0.3em] uppercase text-[#8b6d52] mb-3">
+                YOUR SIX FREE LOOKS ARE READY
+            </p>
+
+            <h2 class="text-2xl text-[#3a3530] mb-4">
+                Ready for more styling inspiration?
+            </h2>
+
+            <p class="text-sm text-stone-500 leading-7 mb-7">
+                You have completed all six complimentary looks for this piece.
+                Choose a Styriva plan to continue creating more looks.
+            </p>
+
+            <a href="{% url 'premium' %}"
+               class="block w-full py-4 rounded-lg bg-[#3a3530] text-white text-sm tracking-widest hover:bg-[#625448] transition">
+                EXPLORE STYRIVA PLANS →
+            </a>
+        </div>
+
+
         <!-- NEXT LOOK BUTTON -->
 
         <div class="mt-8">
@@ -346,8 +386,8 @@
             </h2>
 
             <p class="text-sm text-stone-500 leading-7 mb-7">
-                Create your free Styriva account to save your looks,
-                continue styling your piece and access your personal collection.
+                Create your free Styriva account to save your first look.
+                Then generate five more looks for this piece at no charge.
             </p>
 
             <a href="{% url 'signup' %}"
@@ -404,10 +444,25 @@
 
     const userIsAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
     const signupModal = document.getElementById("signupModal");
+    const paymentWall = document.getElementById("paymentWall");
 
     function showSignupModal() {
         if (!userIsAuthenticated && signupModal) {
             signupModal.classList.remove("hidden");
+        }
+    }
+
+    function hideSignupModal() {
+        if (signupModal) {
+            signupModal.classList.add("hidden");
+        }
+    }
+
+    function showPaymentWall() {
+        disableNextLookButton();
+
+        if (paymentWall) {
+            paymentWall.classList.remove("hidden");
         }
     }
 
@@ -421,6 +476,9 @@
 
     const nextUrlTemplate =
         "{% url 'generate_next_piece_look' 0 %}";
+
+    const pricingUrl =
+        "{% url 'premium' %}";
 
     function getPieceUrl(template, pieceId) {
         return template.replace("/0/", `/${pieceId}/`);
@@ -552,6 +610,10 @@
 
         generationError.classList.add("hidden");
 
+        if (paymentWall) {
+            paymentWall.classList.add("hidden");
+        }
+
     }
 
 
@@ -649,7 +711,7 @@
             const count = Number(data.look_count || 0);
 
             lookCounter.textContent =
-                `${count} of 6 looks created`;
+                `${count} look${count === 1 ? "" : "s"} created`;
 
             currentNextLookNumber =
                 Number(data.next_look_number || 1);
@@ -697,7 +759,15 @@
                     "Your look could not be generated. You can try again."
                 );
 
-                if (data.can_generate_more && count < 6) {
+                // A guest can retry only the first look.
+                // After look one succeeds, signup is required.
+
+                if (!userIsAuthenticated && count >= 1) {
+
+                    disableNextLookButton();
+                    showSignupModal();
+
+                } else if (data.can_generate_more && count < 6) {
 
                     nextLookButton.disabled = false;
 
@@ -705,8 +775,11 @@
                         `RETRY LOOK ${currentNextLookNumber} →`;
 
                     nextLookButton.classList.remove("hidden");
-
                     nextLookHint.classList.remove("hidden");
+
+                } else if (count >= 6) {
+
+                    showPaymentWall();
 
                 } else {
 
@@ -715,7 +788,6 @@
                 }
 
                 return;
-
             }
 
 
@@ -727,32 +799,39 @@
 
             generationError.classList.add("hidden");
 
-
-            // REQUIRE SIGNUP AFTER THE FIRST SUCCESSFUL LOOK
+            // Guest sees look one, then must create an account.
 
             if (!userIsAuthenticated && count >= 1) {
 
                 disableNextLookButton();
-
                 showSignupModal();
 
                 return;
-
             }
 
 
-            if (data.can_generate_more && count < 6) {
+            // Exactly six looks are free after account creation.
 
-                // Re-enable the button after EVERY completed look.
+            if (count >= 6) {
+
+                showPaymentWall();
+
+                return;
+            }
+
+
+            // Looks 2-6 are generated one at a time for free.
+
+            if (data.can_generate_more) {
 
                 enableNextLookButton();
+
+                nextLookButton.textContent =
+                    `GENERATE LOOK ${currentNextLookNumber} →`;
 
             } else {
 
                 disableNextLookButton();
-
-                lookCounter.textContent =
-                    "All six looks have been created!";
 
             }
 
@@ -885,8 +964,7 @@
         if (
             !currentPieceId ||
             isGenerating ||
-            nextLookButton.disabled ||
-            currentNextLookNumber > 6
+            nextLookButton.disabled
         ) {
             return;
         }
@@ -932,6 +1010,28 @@
 
             const data = await response.json();
 
+
+            // The backend requires signup before look two.
+
+            if (data.requires_signup) {
+
+                disableNextLookButton();
+                showSignupModal();
+
+                return;
+            }
+
+
+            // After look six, show the existing pricing/payment page.
+
+            if (data.requires_upgrade || data.payment_required) {
+
+                showPaymentWall();
+
+                return;
+            }
+
+
             if (!response.ok || !data.success) {
 
                 throw new Error(
@@ -941,7 +1041,7 @@
             }
 
 
-            // One click = one generation job.
+            // One click creates exactly one additional look.
 
             showLoading(
                 `Creating look ${currentNextLookNumber}...`
@@ -977,7 +1077,7 @@
 
 
     // =====================================================
-    // RESTORE A GUEST STYLE MY PIECE SESSION AFTER SIGNUP/LOGIN
+    // RESTORE STYLE MY PIECE SESSION AFTER SIGNUP/LOGIN
     // =====================================================
 
     const pageParams = new URLSearchParams(window.location.search);
@@ -987,10 +1087,13 @@
 
         currentPieceId = resumePieceId;
 
+        hideSignupModal();
+
         uploadSection.classList.add("hidden");
         resultsSection.classList.remove("hidden");
 
         showLoading("Restoring your style collection...");
+
         startPolling();
 
         // Remove the query parameter without reloading the page.

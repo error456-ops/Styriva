@@ -1,3 +1,4 @@
+
 from django.db import transaction
 
 from .models import Profile, UserUsage
@@ -9,18 +10,15 @@ class CreditManager:
     @transaction.atomic
     def can_generate(user):
         """
-        Returns True if the authenticated user
-        can generate a style.
+        Checks whether the user can generate a style.
         """
 
         usage = user.usage
         profile = user.profile
 
-        # Free signup generation
         if not usage.signup_free_used:
             return True
 
-        # Purchased credits
         if profile.credits > 0:
             return True
 
@@ -30,7 +28,7 @@ class CreditManager:
     @transaction.atomic
     def consume_generation(user):
         """
-        Consumes one successful generation.
+        Consumes one normal style generation.
 
         Priority:
         1. Free signup generation
@@ -40,7 +38,6 @@ class CreditManager:
         usage = user.usage
         profile = user.profile
 
-        # Free signup generation
         if not usage.signup_free_used:
 
             usage.signup_free_used = True
@@ -55,23 +52,18 @@ class CreditManager:
 
             return "signup"
 
-        # Purchased credit
         if profile.credits > 0:
 
             profile.credits -= 1
 
             profile.save(
-                update_fields=[
-                    "credits",
-                ]
+                update_fields=["credits"]
             )
 
             usage.total_generations += 1
 
             usage.save(
-                update_fields=[
-                    "total_generations",
-                ]
+                update_fields=["total_generations"]
             )
 
             return "credit"
@@ -82,8 +74,8 @@ class CreditManager:
     @transaction.atomic
     def can_evolve(user):
         """
-        Returns True if the user has credits
-        available for Style Evolution.
+        Checks whether the user has credits
+        for Style Evolution.
         """
 
         profile = user.profile
@@ -94,8 +86,7 @@ class CreditManager:
     @transaction.atomic
     def consume_style_evolution(user):
         """
-        Consumes one credit for a successful
-        Style Evolution.
+        Consumes one credit for Style Evolution.
         """
 
         profile = user.profile
@@ -107,20 +98,62 @@ class CreditManager:
         profile.credits -= 1
 
         profile.save(
-            update_fields=[
-                "credits",
-            ]
+            update_fields=["credits"]
         )
 
         usage.total_style_evolutions += 1
 
         usage.save(
-            update_fields=[
-                "total_style_evolutions",
-            ]
+            update_fields=["total_style_evolutions"]
         )
 
         return "credit"
+
+    @staticmethod
+    @transaction.atomic
+    def consume_piece_generation(user):
+        """
+        Consumes exactly ONE credit for ONE
+        additional Style My Piece look.
+
+        Does not consume the signup free generation.
+
+        Returns:
+            Remaining credits if successful.
+            None if the user has no credits.
+        """
+
+        if not user or not user.is_authenticated:
+            return None
+
+        profile = (
+            Profile.objects
+            .select_for_update()
+            .get(user=user)
+        )
+
+        if profile.credits <= 0:
+            return None
+
+        profile.credits -= 1
+
+        profile.save(
+            update_fields=["credits"]
+        )
+
+        usage = (
+            UserUsage.objects
+            .select_for_update()
+            .get(user=user)
+        )
+
+        usage.total_generations += 1
+
+        usage.save(
+            update_fields=["total_generations"]
+        )
+
+        return profile.credits
 
     @staticmethod
     @transaction.atomic
@@ -129,14 +162,16 @@ class CreditManager:
         Adds purchased credits.
         """
 
-        profile = Profile.objects.select_for_update().get(user=user)
+        profile = (
+            Profile.objects
+            .select_for_update()
+            .get(user=user)
+        )
 
         profile.credits += amount
 
         profile.save(
-            update_fields=[
-                "credits",
-            ]
+            update_fields=["credits"]
         )
 
         return profile.credits

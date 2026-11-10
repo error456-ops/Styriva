@@ -76,12 +76,12 @@ class JobQueue:
     @staticmethod
     def create_piece_styling_job(
         piece_styling: PieceStyling,
+        payload=None,
     ):
 
         with transaction.atomic():
 
-            # Lock this clothing piece so simultaneous requests
-            # cannot create duplicate jobs for the same piece.
+            # Lock the clothing piece.
             locked_piece = (
                 PieceStyling.objects
                 .select_for_update()
@@ -101,9 +101,9 @@ class JobQueue:
             if existing_job:
                 return existing_job
 
-            # The engine generates exactly one look per job.
+            # Create exactly one look per job.
             return Job.objects.create(
                 piece_styling=locked_piece,
                 job_type=JobType.PIECE_STYLING,
-                payload={},
+                payload=payload or {},
             )
