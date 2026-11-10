@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -674,7 +673,6 @@
 
             if (data.can_generate_more && count < 6) {
 
-                // THIS IS THE IMPORTANT FIX.
                 // Re-enable the button after EVERY completed look.
 
                 enableNextLookButton();
@@ -906,6 +904,31 @@
         }
 
     });
+
+
+    // =====================================================
+    // RESTORE A GUEST STYLE MY PIECE SESSION AFTER SIGNUP/LOGIN
+    // =====================================================
+
+    const pageParams = new URLSearchParams(window.location.search);
+    const resumePieceId = pageParams.get("piece_id");
+
+    if (resumePieceId && /^\d+$/.test(resumePieceId)) {
+        currentPieceId = resumePieceId;
+
+        uploadSection.classList.add("hidden");
+        resultsSection.classList.remove("hidden");
+
+        showLoading("Restoring your style collection...");
+        startPolling();
+
+        // Remove the query parameter without reloading the page.
+        window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+        );
+    }
 
 </script>
 

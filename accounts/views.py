@@ -15,7 +15,66 @@ from selfmirror.models import (
     StyleConsultation,
     GeneratedLook,
     EvolvedLook,
+    PieceStyling,
+    
+    
 )
+
+from django.urls import reverse
+
+from selfmirror.models import PieceStyling
+
+
+def transfer_guest_piece_stylings(request, user):
+    """
+    Transfer only guest styling sessions recorded
+    in this browser session to the newly authenticated user.
+    """
+
+    guest_ids = request.session.get("style_my_piece_ids", [])
+
+    valid_ids = []
+
+    for piece_id in guest_ids:
+        try:
+            valid_ids.append(int(piece_id))
+        except (TypeError, ValueError):
+            continue
+
+    if not valid_ids:
+        return None
+
+    guest_pieces = PieceStyling.objects.filter(
+        pk__in=valid_ids,
+        user__isnull=True,
+    )
+
+    transferable_ids = list(
+        guest_pieces.values_list("pk", flat=True)
+    )
+
+    if not transferable_ids:
+        return None
+
+    guest_pieces.update(user=user)
+
+    latest_piece_id = next(
+        (
+            piece_id
+            for piece_id in reversed(valid_ids)
+            if piece_id in transferable_ids
+        ),
+        None,
+    )
+
+    request.session.pop("style_my_piece_ids", None)
+
+    if latest_piece_id:
+        request.session["style_my_piece_resume_id"] = latest_piece_id
+
+    return latest_piece_id
+
+
 
 def signup_view(request):
     if request.user.is_authenticated:
@@ -29,10 +88,20 @@ def signup_view(request):
 
             login(request, user)
 
+            piece_id = transfer_guest_piece_stylings(
+                request,
+                user,
+            )
+
             messages.success(
                 request,
                 "Your account has been created successfully.",
             )
+
+            if piece_id:
+                return redirect(
+                    f"{reverse('style_my_piece')}?piece_id={piece_id}"
+                )
 
             return redirect("generate_style_look")
 
@@ -42,9 +111,7 @@ def signup_view(request):
     return render(
         request,
         "signup.html",
-        {
-            "form": form,
-        },
+        {"form": form},
     )
 
 
@@ -53,20 +120,27 @@ def login_view(request):
         return redirect("home")
 
     if request.method == "POST":
-        form = LoginForm(
-            request,
-            data=request.POST,
-        )
+        form = LoginForm(request, data=request.POST)
 
         if form.is_valid():
             user = form.get_user()
 
             login(request, user)
 
+            piece_id = transfer_guest_piece_stylings(
+                request,
+                user,
+            )
+
             messages.success(
                 request,
                 "Welcome back!",
             )
+
+            if piece_id:
+                return redirect(
+                    f"{reverse('style_my_piece')}?piece_id={piece_id}"
+                )
 
             return redirect("generate_style_look")
 
@@ -76,23 +150,8 @@ def login_view(request):
     return render(
         request,
         "login.html",
-        {
-            "form": form,
-        },
+        {"form": form},
     )
-
-
-@login_required
-def logout_view(request):
-    logout(request)
-
-    messages.success(
-        request,
-        "You have been logged out successfully.",
-    )
-
-    return redirect("login")
-
 
 @login_required
 def profile(request):
