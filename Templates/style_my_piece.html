@@ -6,9 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Style My Piece | STYRIVA</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -135,8 +133,6 @@
             </label>
 
 
-            <!-- GARMENT TYPE -->
-
             <div class="mt-7">
 
                 <label class="block text-sm text-[#3a3530] mb-3">
@@ -161,8 +157,6 @@
             </div>
 
 
-            <!-- OCCASION -->
-
             <div class="mt-7">
 
                 <label class="block text-sm text-[#3a3530] mb-3">
@@ -185,8 +179,6 @@
 
             </div>
 
-
-            <!-- STYLE PREFERENCE -->
 
             <div class="mt-7">
 
@@ -231,8 +223,7 @@
 
     <!-- RESULTS SECTION -->
 
-    <div id="resultsSection"
-         class="hidden mt-8">
+    <div id="resultsSection" class="hidden mt-8">
 
         <div class="text-center mb-7">
 
@@ -259,9 +250,7 @@
 
         <!-- GENERATED LOOKS -->
 
-        <div id="resultsGrid"
-             class="space-y-6">
-        </div>
+        <div id="resultsGrid" class="space-y-6"></div>
 
 
         <!-- LOADING SECTION -->
@@ -316,6 +305,7 @@
 
             <button id="nextLookButton"
                     type="button"
+                    disabled
                     class="hidden w-full py-4 rounded-lg bg-[#3a3530] text-white text-sm tracking-widest hover:bg-[#625448] transition disabled:opacity-50 disabled:cursor-not-allowed">
 
                 GENERATE ANOTHER LOOK →
@@ -376,7 +366,6 @@
 
     const nextUrlTemplate =
         "{% url 'generate_next_piece_look' 0 %}";
-
 
     function getPieceUrl(template, pieceId) {
         return template.replace("/0/", `/${pieceId}/`);
@@ -501,7 +490,9 @@
         loadingMessage.textContent =
             message || "Your AI stylist is getting started...";
 
+        nextLookButton.disabled = true;
         nextLookButton.classList.add("hidden");
+
         nextLookHint.classList.add("hidden");
 
         generationError.classList.add("hidden");
@@ -528,6 +519,35 @@
             message || "Something went wrong. Please try again.";
 
         generationError.classList.remove("hidden");
+
+    }
+
+
+    // =====================================================
+    // CONTROL NEXT LOOK BUTTON
+    // =====================================================
+
+    function enableNextLookButton() {
+
+        nextLookButton.disabled = false;
+
+        nextLookButton.textContent =
+            "GENERATE ANOTHER LOOK →";
+
+        nextLookButton.classList.remove("hidden");
+
+        nextLookHint.classList.remove("hidden");
+
+    }
+
+
+    function disableNextLookButton() {
+
+        nextLookButton.disabled = true;
+
+        nextLookButton.classList.add("hidden");
+
+        nextLookHint.classList.add("hidden");
 
     }
 
@@ -567,27 +587,31 @@
             }
 
 
-            // Display every look returned by the server.
+            // Display all generated looks.
 
             displayResults(data.results || []);
 
-
-            const count = data.look_count || 0;
+            const count = Number(data.look_count || 0);
 
             lookCounter.textContent =
                 `${count} of 6 looks created`;
 
-
             currentNextLookNumber =
-                data.next_look_number || 1;
+                Number(data.next_look_number || 1);
+
+            const status = String(data.status || "").toLowerCase();
 
 
             // -------------------------------------------------
             // STILL GENERATING
             // -------------------------------------------------
 
-            if (data.processing || data.status === "pending" ||
-                data.status === "processing") {
+            if (
+                data.processing ||
+                status === "pending" ||
+                status === "processing" ||
+                status === "running"
+            ) {
 
                 showLoading(
                     count === 0
@@ -609,7 +633,7 @@
             // GENERATION FAILED
             // -------------------------------------------------
 
-            if (data.status === "failed") {
+            if (status === "failed") {
 
                 hideLoading();
 
@@ -618,13 +642,20 @@
                     "Your look could not be generated. You can try again."
                 );
 
-                if (data.can_generate_more) {
+                if (data.can_generate_more && count < 6) {
+
+                    nextLookButton.disabled = false;
 
                     nextLookButton.textContent =
                         `RETRY LOOK ${currentNextLookNumber} →`;
 
                     nextLookButton.classList.remove("hidden");
+
                     nextLookHint.classList.remove("hidden");
+
+                } else {
+
+                    disableNextLookButton();
 
                 }
 
@@ -641,24 +672,21 @@
 
             generationError.classList.add("hidden");
 
-            if (data.can_generate_more) {
+            if (data.can_generate_more && count < 6) {
 
-                nextLookButton.textContent =
-                    "GENERATE ANOTHER LOOK →";
+                // THIS IS THE IMPORTANT FIX.
+                // Re-enable the button after EVERY completed look.
 
-                nextLookButton.classList.remove("hidden");
-                nextLookHint.classList.remove("hidden");
+                enableNextLookButton();
 
             } else {
 
-                nextLookButton.classList.add("hidden");
-                nextLookHint.classList.add("hidden");
+                disableNextLookButton();
 
                 lookCounter.textContent =
                     "All six looks have been created!";
 
             }
-
 
         } catch (error) {
 
@@ -738,14 +766,14 @@
             }
 
 
-            // Save the uploaded piece ID.
+            // Save uploaded piece ID.
 
             currentPieceId = data.piece_id;
 
             currentNextLookNumber = 1;
 
 
-            // Switch from upload form to results screen.
+            // Switch to results screen.
 
             uploadSection.classList.add("hidden");
 
@@ -754,7 +782,7 @@
             showLoading("Creating your first look...");
 
 
-            // Start checking the first generation job.
+            // Start first generation status check.
 
             startPolling();
 
@@ -767,7 +795,8 @@
                 "mt-6 p-4 rounded-lg text-sm text-center bg-red-50 text-red-700";
 
             responseMessage.textContent =
-                error.message || "We couldn't connect to Styriva. Please try again.";
+                error.message ||
+                "We couldn't connect to Styriva. Please try again.";
 
             submitButton.disabled = false;
 
@@ -785,15 +814,21 @@
 
     nextLookButton.addEventListener("click", async function () {
 
-        if (!currentPieceId || isGenerating) {
+        if (
+            !currentPieceId ||
+            isGenerating ||
+            nextLookButton.disabled ||
+            currentNextLookNumber > 6
+        ) {
             return;
         }
+
+        // Prevent double clicks.
 
         nextLookButton.disabled = true;
 
         nextLookButton.textContent =
             "STARTING YOUR NEXT LOOK...";
-
 
         try {
 
@@ -802,11 +837,9 @@
                 currentPieceId
             );
 
-
             const csrfToken = form.querySelector(
                 '[name="csrfmiddlewaretoken"]'
             ).value;
-
 
             const formData = new URLSearchParams();
 
@@ -814,7 +847,6 @@
                 "expected_look_number",
                 currentNextLookNumber
             );
-
 
             const response = await fetch(nextUrl, {
 
@@ -830,9 +862,7 @@
 
             });
 
-
             const data = await response.json();
-
 
             if (!response.ok || !data.success) {
 
@@ -858,8 +888,11 @@
         } catch (error) {
 
             showError(
-                error.message || "We couldn't start your next look."
+                error.message ||
+                "We couldn't start your next look."
             );
+
+            // Allow another attempt.
 
             nextLookButton.disabled = false;
 
@@ -867,6 +900,8 @@
                 `RETRY LOOK ${currentNextLookNumber} →`;
 
             nextLookButton.classList.remove("hidden");
+
+            nextLookHint.classList.remove("hidden");
 
         }
 
