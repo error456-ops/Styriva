@@ -12,57 +12,47 @@ from .image_utils import local_path
 
 class PieceStylingEngine:
     """
-    Independent, on-demand AI pipeline for Style My Piece.
+    Independent AI pipeline for Style My Piece.
 
+    The user uploads ONE fashion item.
+    AI creates six different ways to style that exact item.
+
+    This engine does NOT handle Outfit Combination.
     Generates exactly ONE look per run().
-    Reuses saved garment analysis.
-    Supports exactly six free looks.
     """
 
     NUMBER_OF_LOOKS = 6
 
     STYLE_PRESETS = [
         {
-            "title": "Everyday Chic",
-            "description": (
-                "A polished everyday outfit with comfortable "
-                "pieces and effortless styling."
-            ),
+            "title": "Everyday Casual",
+            "strategy": "casual",
+            "description": "Relaxed, practical everyday styling."
         },
         {
-            "title": "Office Elegance",
-            "description": (
-                "A sophisticated professional outfit with "
-                "refined tailoring and elegant accessories."
-            ),
+            "title": "Elegant Chic",
+            "strategy": "elegant",
+            "description": "Sophisticated, polished styling."
         },
         {
-            "title": "Casual Cool",
-            "description": (
-                "A relaxed modern outfit with contemporary "
-                "casual styling."
-            ),
+            "title": "Layered Look",
+            "strategy": "layered",
+            "description": "Creative layering and visibly different proportions."
         },
         {
-            "title": "Minimal Luxury",
-            "description": (
-                "A clean, expensive-looking outfit with "
-                "minimal accessories and elegant proportions."
-            ),
+            "title": "Minimal Style",
+            "strategy": "minimal",
+            "description": "Clean, understated styling."
         },
         {
-            "title": "Statement Style",
-            "description": (
-                "A fashionable statement outfit with "
-                "interesting layers and distinctive accessories."
-            ),
+            "title": "Street Style",
+            "strategy": "street",
+            "description": "Contemporary, fashion-forward styling."
         },
         {
-            "title": "Evening Glam",
-            "description": (
-                "A sophisticated evening outfit with "
-                "elevated styling and beautiful accessories."
-            ),
+            "title": "Statement Look",
+            "strategy": "statement",
+            "description": "Bold and distinctive styling."
         },
     ]
 
@@ -119,7 +109,7 @@ class PieceStylingEngine:
         return temp_directory, str(png_path)
 
     # ==========================================================
-    # ANALYZE GARMENT
+    # ANALYZE UPLOADED ITEM
     # ==========================================================
 
     def analyze_garment(self, image_path):
@@ -141,22 +131,27 @@ class PieceStylingEngine:
                     "content": [
                         {
                             "type": "text",
+
                             "text": """
-Analyze the uploaded clothing item.
+Analyze the uploaded fashion item.
+
+Identify the actual item visible in the image.
 
 Describe only visible details:
-- Garment type
+
+- Garment or item type
 - Main color
 - Pattern
 - Fabric appearance
 - Cut and silhouette
-- Neckline or collar
-- Sleeves or length
+- Neckline or collar, if applicable
+- Sleeves or length, if applicable
 - Distinctive details
 
 Do not invent details that cannot be seen.
 
 Return valid JSON:
+
 {
     "garment_type": "",
     "color": "",
@@ -169,6 +164,7 @@ Return valid JSON:
                         },
                         {
                             "type": "image_url",
+
                             "image_url": {
                                 "url": (
                                     "data:image/png;base64,"
@@ -254,14 +250,383 @@ Return valid JSON:
         return analysis
 
     # ==========================================================
+    # IDENTIFY UPLOADED ITEM CATEGORY
+    # ==========================================================
+
+    def get_garment_category(self, garment_analysis):
+
+        garment_type = str(
+            garment_analysis.get("garment_type", "")
+        ).lower().replace("-", " ").strip()
+
+        if any(word in garment_type for word in [
+            "dress", "gown", "jumpsuit", "romper"
+        ]):
+            return "dress"
+
+        if any(word in garment_type for word in [
+            "scarf", "shawl", "stole"
+        ]):
+            return "scarf"
+
+        if any(word in garment_type for word in [
+            "shoe", "sneaker", "boot", "heel",
+            "sandal", "footwear"
+        ]):
+            return "shoes"
+
+        if any(word in garment_type for word in [
+            "handbag", "bag", "purse"
+        ]):
+            return "bag"
+
+        if any(word in garment_type for word in [
+            "jacket", "coat", "blazer",
+            "cardigan", "vest", "outerwear"
+        ]):
+            return "outerwear"
+
+        if any(word in garment_type for word in [
+            "trouser", "pants", "jeans",
+            "skirt", "shorts", "leggings"
+        ]):
+            return "bottom"
+
+        if any(word in garment_type for word in [
+            "top", "shirt", "blouse", "t-shirt",
+            "tee", "sweater", "sweatshirt",
+            "crop top", "tank top"
+        ]):
+            return "top"
+
+        return "other"
+
+    # ==========================================================
+    # GARMENT-SPECIFIC STYLING STRATEGIES
+    # ==========================================================
+
+    def get_styling_instruction(self, category, strategy):
+
+        styling_rules = {
+
+            "dress": {
+
+                "casual": """
+Keep the exact uploaded dress unchanged.
+
+Style it as a relaxed daytime look.
+Use comfortable sneakers or casual flats.
+Add a denim jacket or lightweight casual layer.
+Use simple everyday accessories.
+The result should feel effortless and wearable.
+""",
+
+                "elegant": """
+Keep the exact uploaded dress unchanged.
+
+Create a sophisticated polished appearance.
+Use elegant heels or refined footwear.
+Add delicate jewelry and a structured handbag.
+If suitable, add a tailored blazer.
+Make the result look appropriate for an elegant occasion.
+""",
+
+                "layered": """
+Keep the exact uploaded dress unchanged.
+
+Make layering the main transformation.
+Add a visibly different cardigan, blazer,
+cropped jacket or suitable outer layer.
+Show the added layer clearly.
+Do not hide or replace the dress.
+Create interesting fashion proportions.
+""",
+
+                "minimal": """
+Keep the exact uploaded dress unchanged.
+
+Create a clean, understated appearance.
+Use simple footwear, minimal jewelry
+and very few accessories.
+Focus on elegant proportions and simplicity.
+Do not add unnecessary layers.
+""",
+
+                "street": """
+Keep the exact uploaded dress unchanged.
+
+Create a contemporary street-style appearance.
+Use fashionable sneakers or boots.
+Add an oversized jacket or modern casual layer.
+Use contemporary accessories.
+The styling should look youthful and fashion-forward.
+""",
+
+                "statement": """
+Keep the exact uploaded dress unchanged.
+
+Create a bold fashion-editorial appearance.
+Use distinctive footwear, noticeable jewelry
+and carefully selected statement accessories.
+Make the styling visually striking.
+Do not change the original dress.
+"""
+            },
+
+            "top": {
+
+                "casual": """
+Keep the exact uploaded top unchanged.
+Pair it with relaxed jeans or casual trousers.
+Use sneakers or comfortable flats.
+Create a practical everyday appearance.
+""",
+
+                "elegant": """
+Keep the exact uploaded top unchanged.
+Pair it with tailored trousers or a refined skirt.
+Use elegant footwear and delicate jewelry.
+Create a polished sophisticated appearance.
+""",
+
+                "layered": """
+Keep the exact uploaded top unchanged.
+Add a visibly different blazer, cardigan
+or jacket as the main transformation.
+Show the layering clearly.
+""",
+
+                "minimal": """
+Keep the exact uploaded top unchanged.
+Pair it with clean, simple neutral bottoms.
+Use understated footwear and minimal accessories.
+Focus on balanced proportions.
+""",
+
+                "street": """
+Keep the exact uploaded top unchanged.
+Pair it with contemporary wide-leg trousers
+or relaxed streetwear bottoms.
+Use sneakers and an oversized outer layer.
+""",
+
+                "statement": """
+Keep the exact uploaded top unchanged.
+Pair it with a distinctive skirt or trousers.
+Use bold but coordinated footwear and accessories.
+Create a striking fashion appearance.
+"""
+            },
+
+            "bottom": {
+
+                "casual": """
+Keep the exact uploaded bottom unchanged.
+Pair it with a relaxed everyday top.
+Use casual sneakers or flats.
+Create a comfortable daytime appearance.
+""",
+
+                "elegant": """
+Keep the exact uploaded bottom unchanged.
+Pair it with a refined blouse or fitted top.
+Use elegant footwear and sophisticated accessories.
+""",
+
+                "layered": """
+Keep the exact uploaded bottom unchanged.
+Pair it with a suitable top and a visibly worn
+blazer, cardigan or jacket.
+Make the layering clear.
+""",
+
+                "minimal": """
+Keep the exact uploaded bottom unchanged.
+Pair it with a simple, clean top.
+Use minimal accessories and understated footwear.
+""",
+
+                "street": """
+Keep the exact uploaded bottom unchanged.
+Pair it with a contemporary top or oversized shirt.
+Use sneakers and modern streetwear styling.
+""",
+
+                "statement": """
+Keep the exact uploaded bottom unchanged.
+Pair it with a distinctive complementary top.
+Use bold footwear and statement accessories.
+"""
+            },
+
+            "outerwear": {
+
+                "casual": """
+Keep the exact uploaded outerwear unchanged
+and visibly worn over a relaxed everyday outfit.
+Use casual footwear.
+""",
+
+                "elegant": """
+Keep the exact uploaded outerwear unchanged
+and visibly worn over refined tailored clothing.
+Use elegant footwear and polished accessories.
+""",
+
+                "layered": """
+Keep the exact uploaded outerwear unchanged.
+Make it the main visible outer layer.
+Build a clearly visible layered outfit underneath.
+""",
+
+                "minimal": """
+Keep the exact uploaded outerwear unchanged.
+Wear it over a simple coordinated outfit.
+Use minimal accessories.
+""",
+
+                "street": """
+Keep the exact uploaded outerwear unchanged.
+Wear it as the focal point of a modern streetwear look.
+Use contemporary footwear and relaxed proportions.
+""",
+
+                "statement": """
+Keep the exact uploaded outerwear unchanged.
+Make it the focal point of a bold fashion look.
+Use complementary statement styling.
+"""
+            },
+
+            "scarf": {
+
+                "casual": """
+Keep the exact uploaded scarf unchanged.
+Show it casually draped around the neck
+with relaxed everyday clothing.
+""",
+
+                "elegant": """
+Keep the exact uploaded scarf unchanged.
+Show an elegant draping technique.
+Use refined clothing and sophisticated accessories.
+""",
+
+                "layered": """
+Keep the exact uploaded scarf unchanged.
+Show a creative, clearly visible layered
+wrapping or draping technique.
+""",
+
+                "minimal": """
+Keep the exact uploaded scarf unchanged.
+Show a simple, clean and understated draping technique.
+Keep the rest of the styling minimal.
+""",
+
+                "street": """
+Keep the exact uploaded scarf unchanged.
+Show a contemporary scarf styling technique
+with modern streetwear clothing.
+""",
+
+                "statement": """
+Keep the exact uploaded scarf unchanged.
+Make the scarf visually prominent.
+Show a distinctive and creative draping technique.
+"""
+            },
+
+            "shoes": {
+
+                "casual": """
+Keep the exact uploaded shoes unchanged and clearly visible.
+Style them with relaxed everyday clothing.
+""",
+
+                "elegant": """
+Keep the exact uploaded shoes unchanged and clearly visible.
+Create a sophisticated outfit that complements them.
+""",
+
+                "layered": """
+Keep the exact uploaded shoes unchanged and clearly visible.
+Create a fashionable outfit with visible clothing layers.
+""",
+
+                "minimal": """
+Keep the exact uploaded shoes unchanged and clearly visible.
+Create a clean, balanced and minimal appearance.
+""",
+
+                "street": """
+Keep the exact uploaded shoes unchanged and clearly visible.
+Build a contemporary streetwear look around them.
+""",
+
+                "statement": """
+Keep the exact uploaded shoes unchanged and clearly visible.
+Create a bold look that makes the shoes stand out.
+"""
+            },
+
+            "bag": {
+
+                "casual": """
+Keep the exact uploaded bag unchanged and clearly visible.
+Style it with a relaxed everyday outfit.
+""",
+
+                "elegant": """
+Keep the exact uploaded bag unchanged and clearly visible.
+Create a sophisticated outfit that complements it.
+""",
+
+                "layered": """
+Keep the exact uploaded bag unchanged and clearly visible.
+Create a look with distinct clothing layers.
+""",
+
+                "minimal": """
+Keep the exact uploaded bag unchanged and clearly visible.
+Create a minimal, clean and coordinated appearance.
+""",
+
+                "street": """
+Keep the exact uploaded bag unchanged and clearly visible.
+Create a modern streetwear appearance around it.
+""",
+
+                "statement": """
+Keep the exact uploaded bag unchanged and clearly visible.
+Create a bold appearance that highlights the bag.
+"""
+            },
+
+            "other": {
+
+                "casual": "Style the exact uploaded item casually.",
+                "elegant": "Style the exact uploaded item elegantly.",
+                "layered": "Show the exact uploaded item in a visibly layered look.",
+                "minimal": "Style the exact uploaded item minimally.",
+                "street": "Style the exact uploaded item in a contemporary streetwear look.",
+                "statement": "Make the exact uploaded item the focal point of a bold look."
+            }
+        }
+
+        return styling_rules.get(
+            category,
+            styling_rules["other"]
+        ).get(
+            strategy,
+            styling_rules["other"]["casual"]
+        )
+
+    # ==========================================================
     # BUILD IMAGE GENERATION PROMPT
     # ==========================================================
 
-    def build_prompt(
-        self,
-        garment_analysis,
-        style
-    ):
+    def build_prompt(self, garment_analysis, style):
 
         occasion = (
             self.piece.occasion
@@ -273,77 +638,134 @@ Return valid JSON:
             or "modern and fashionable"
         )
 
+        category = self.get_garment_category(
+            garment_analysis
+        )
+
+        transformation = self.get_styling_instruction(
+            category,
+            style["strategy"]
+        )
+
         return f"""
-Create a premium, realistic fashion editorial photograph.
+You are a professional personal fashion stylist.
 
-THE REFERENCE IMAGE:
+YOUR PRODUCT TASK:
 
-The uploaded image contains the exact garment that must
-be worn by the fashion model.
+This is STYLE MY PIECE.
 
-GARMENT ANALYSIS:
+The user has uploaded ONE fashion item.
+Your job is to demonstrate a different way
+of wearing, styling or displaying that exact item.
+
+THIS IS NOT OUTFIT COMBINATION GENERATION.
+
+Do not treat this as a request to randomly
+create another complete outfit.
+
+UPLOADED ITEM ANALYSIS:
 
 {json.dumps(garment_analysis, ensure_ascii=False)}
 
-ABSOLUTE GARMENT PRESERVATION RULES:
+DETECTED ITEM CATEGORY:
 
-1. Keep the uploaded garment as the central clothing item.
-2. Preserve its original color, pattern, fabric appearance,
-   silhouette, cut and distinctive details.
-3. Do not replace it with a similar-looking garment.
-4. Do not redesign, recolor or alter the garment.
-5. Do not invent logos, prints or decorative details.
-6. The garment must be clearly visible in the final image.
+{category}
 
-STYLING CONCEPT:
+ORIGINAL ITEM PRESERVATION:
+
+The reference image contains the exact item
+that the user owns.
+
+You MUST preserve:
+
+1. Original color.
+2. Original pattern.
+3. Fabric appearance.
+4. Shape and silhouette.
+5. Cut and design.
+6. Distinctive visible details.
+
+Never replace the uploaded item.
+Never invent a similar substitute.
+Never redesign or recolor it.
+
+SELECTED STYLING TRANSFORMATION:
 
 Title: {style["title"]}
 
-Concept: {style["description"]}
+Description: {style["description"]}
 
-User preference: {preference}
+SPECIFIC INSTRUCTIONS:
 
-Occasion: {occasion}
+{transformation}
 
-Create a complete, coordinated outfit around the uploaded
-garment.
+USER STYLE PREFERENCE:
 
-You may add suitable complementary clothing, shoes,
-bags, jewelry and accessories depending on the garment.
+{preference}
 
-For example:
-- A top can be styled with suitable trousers or skirts.
-- Bottoms can be styled with a complementary top.
-- A dress should remain the main one-piece garment.
-- Outerwear should be visibly worn over a suitable outfit.
-- Shoes and accessories should complement the garment.
+OCCASION:
 
-IMPORTANT:
+{occasion}
 
-Create an outfit that clearly follows the selected styling
-concept. Do not simply reuse the same outfit combination
-for every look.
+VARIATION REQUIREMENTS:
 
-MODEL AND PHOTOGRAPHY:
+The purpose of this image is to show
+a genuinely different styling approach.
 
-Show a stylish adult fashion model wearing the outfit.
+Do not rely on changing only a handbag,
+jewelry or small accessories.
 
-Use a full-body fashion photograph.
+The selected transformation must be
+visually apparent in the final photograph.
 
-Use natural, realistic proportions and anatomically
-correct hands and feet.
+For clothing items, change suitable
+complementary clothing, layering,
+proportions or footwear as instructed.
 
-Create premium fashion editorial lighting,
-a tasteful background and professional composition.
+For dresses, preserve the complete dress
+as one garment.
 
-Make the uploaded garment easy to see.
+For scarves, show the specified draping.
 
-Do not include text, labels, watermarks or collages.
+For shoes and bags, preserve the exact item
+and make it clearly visible.
 
-This is one individual styling concept, not a comparison
-image or a six-panel collage.
+Do not add unnecessary garments.
+Do not create an unrelated outfit.
 
-The result should look like a real fashion campaign.
+PHOTOGRAPHY:
+
+Create one premium realistic fashion editorial photograph.
+
+Show a stylish adult fashion model
+wearing or displaying the exact uploaded item.
+
+Use full-body framing for wearable clothing
+when appropriate.
+
+For accessories, frame the model so the
+uploaded item is clearly visible.
+
+Use natural body proportions,
+realistic anatomy and professional lighting.
+
+Use a tasteful editorial background.
+
+The original uploaded item must be
+the most important recognizable element.
+
+OUTPUT:
+
+One individual realistic fashion photograph.
+
+No text.
+No labels.
+No watermarks.
+No collages.
+No six-panel layouts.
+No comparison images.
+
+Create a visually distinct styling interpretation.
 """
 
     # ==========================================================
@@ -410,7 +832,8 @@ The result should look like a real fashion campaign.
 
         try:
 
-            # Get the next requested look.
+            # STEP 1: Get next requested look.
+
             look_number = self.piece.next_look_number
 
             if (
@@ -427,13 +850,13 @@ The result should look like a real fashion campaign.
                 look_number - 1
             ]
 
-            # STEP 1: Prepare garment image.
+            # STEP 2: Prepare uploaded item.
 
             temp_directory, image_path = (
                 self.prepare_image()
             )
 
-            # STEP 2: Reuse or create garment analysis.
+            # STEP 3: Analyze or reuse saved analysis.
 
             garment_analysis = (
                 self.get_garment_analysis(
@@ -441,7 +864,18 @@ The result should look like a real fashion campaign.
                 )
             )
 
-            # STEP 3: Build the selected style prompt.
+            # STEP 4: Identify item category.
+
+            category = self.get_garment_category(
+                garment_analysis
+            )
+
+            print(
+                f"Uploaded item category: {category}",
+                flush=True
+            )
+
+            # STEP 5: Build transformation prompt.
 
             print(
                 f"Generating look {look_number}/{self.NUMBER_OF_LOOKS}: "
@@ -454,7 +888,7 @@ The result should look like a real fashion campaign.
                 style
             )
 
-            # STEP 4: Generate ONE image.
+            # STEP 6: Generate ONE image.
 
             generated_image = self.generate_image(
                 image_path,
@@ -467,9 +901,10 @@ The result should look like a real fashion campaign.
                 flush=True
             )
 
+            # STEP 7: Return result.
             # The dispatcher must save the result first.
-            # It should increment next_look_number only
-            # after the database save succeeds.
+            # Increment next_look_number only after
+            # the database save succeeds.
 
             return {
                 "look_number": look_number,
