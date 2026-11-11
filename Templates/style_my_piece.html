@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -62,25 +63,71 @@
 
 <main class="max-w-2xl mx-auto">
 
+    <!-- PROFILE DROPDOWN -->
+
     {% if request.user.is_authenticated %}
-    <div class="flex justify-start mb-4">
-        <div class="w-11 h-11 rounded-full bg-white border border-stone-200 shadow-sm flex items-center justify-center text-[#8b6d52]"
-             title="Your Styriva account" aria-label="Your Styriva account">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
-                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+    <div class="relative flex justify-start mb-4" id="profileDropdown">
+
+        <button
+            type="button"
+            id="profileButton"
+            class="w-11 h-11 rounded-full bg-white border border-stone-200 shadow-sm flex items-center justify-center text-[#8b6d52] hover:bg-stone-50 transition"
+            title="Your Styriva account"
+            aria-label="Open your account menu"
+            aria-expanded="false"
+            aria-controls="profileMenu"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="22"
+                 height="22"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="1.8"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
                  aria-hidden="true">
                 <circle cx="12" cy="8" r="4"></circle>
                 <path d="M5 21v-2a7 7 0 0 1 14 0v2"></path>
             </svg>
+        </button>
+
+        <div
+            id="profileMenu"
+            class="hidden absolute left-0 top-14 z-50 w-64 bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden"
+        >
+            <div class="px-4 py-4 bg-stone-50">
+                <strong class="block text-sm text-stone-800">
+                    {{ request.user.username }}
+                </strong>
+
+                <small class="block text-xs text-stone-500 mt-1">
+                    {{ request.user.email }}
+                </small>
+            </div>
+
+            <div class="border-t border-stone-100"></div>
+
+            <a href="{% url 'profile' %}"
+               class="block px-4 py-3 text-sm text-stone-700 hover:bg-stone-50">
+                My Profile
+            </a>
+
+            <a href="{% url 'logout' %}"
+               class="block px-4 py-3 text-sm text-red-600 hover:bg-red-50">
+                Logout
+            </a>
         </div>
+
     </div>
     {% endif %}
+
 
     <a href="{% url 'choose_feature' %}"
        class="text-sm text-stone-500">
         ← Back
     </a>
+
 
     <div class="text-center mt-8 mb-10">
 
@@ -411,6 +458,40 @@
 
 
 <script>
+
+    // =====================================================
+    // PROFILE DROPDOWN
+    // =====================================================
+
+    const profileButton = document.getElementById("profileButton");
+    const profileMenu = document.getElementById("profileMenu");
+
+    if (profileButton && profileMenu) {
+
+        profileButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+
+            profileMenu.classList.toggle("hidden");
+
+            const isOpen = !profileMenu.classList.contains("hidden");
+            profileButton.setAttribute("aria-expanded", String(isOpen));
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!event.target.closest("#profileDropdown")) {
+                profileMenu.classList.add("hidden");
+                profileButton.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                profileMenu.classList.add("hidden");
+                profileButton.setAttribute("aria-expanded", "false");
+            }
+        });
+    }
+
 
     // =====================================================
     // ELEMENTS
