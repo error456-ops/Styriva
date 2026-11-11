@@ -1,4 +1,3 @@
-
 import time
 
 from django.db import transaction
@@ -10,6 +9,9 @@ from jobs.constants import (
 )
 from jobs.models import Job
 from jobs.services import JobDispatcher
+
+from accounts.services import CreditManager
+from selfmirror.models import PieceStylingResult
 
 
 class Worker:
@@ -83,132 +85,126 @@ class Worker:
     # Process Job
     # ==========================================================
 
-    def process_job(
-        self,
-        job
-    ):
+    def process_job(self, job):
 
         try:
+            JobDispatcher.execute(job)
 
-            # --------------------------------------------------
-            # Execute job
-            # --------------------------------------------------
-
-            JobDispatcher.execute(
-                job
-            )
-
-            # --------------------------------------------------
-            # Job completed successfully
-            # --------------------------------------------------
-
-            job.job_status = (
-                JobStatus.COMPLETED
-            )
-
-            job.completed_at = (
-                timezone.now()
-            )
-
+            job.job_status = JobStatus.COMPLETED
+            job.completed_at = timezone.now()
             job.error_message = ""
 
-            print(
-                f"Job {job.id} completed successfully."
-            )
+            print(f"Job {job.id} completed successfully.")
 
         except Exception as error:
 
-            # --------------------------------------------------
-            # Job failed
-            # --------------------------------------------------
-
-            job.job_status = (
-                JobStatus.FAILED
-            )
-
-            job.completed_at = (
-                timezone.now()
-            )
+            job.job_status = JobStatus.FAILED
+            job.completed_at = timezone.now()
 
             error_text = str(error).lower()
 
             if "insufficient_quota" in error_text:
-
                 job.error_message = (
                     "Our AI styling service is temporarily unavailable. "
                     "Please try again in a few minutes."
                 )
-
             elif "timeout" in error_text:
-
                 job.error_message = (
                     "Your styling session took longer than expected. "
                     "Please try again."
                 )
-
             elif "connection" in error_text:
-
                 job.error_message = (
                     "Unable to connect to our AI styling service. "
-                    "Please check your internet connection and try again."
+                    "Please try again."
                 )
-
             else:
-
                 job.error_message = (
                     "Something went wrong while generating "
-                    "your personalized look. "
-                    "Please try again later."
+                    "your personalized look. Please try again later."
                 )
 
-            print(
-                f"Job {job.id} failed."
-            )
-
-            print(
-                "Error:",
-                type(error).__name__,
-                str(error)
-            )
+            print(f"Job {job.id} failed.")
+            print("Error:", type(error).__name__, str(error))
 
             # --------------------------------------------------
-            # If Style Evolution failed,
-            # update consultation status.
+            # Refund a paid Style My Piece look only once.
             # --------------------------------------------------
-
-            if (
-                job.job_type
-                == JobType.STYLE_EVOLUTION
-            ):
+            if job.job_type == JobType.PIECE_STYLING:
 
                 try:
+                    with transaction.atomic():
 
-                    consultation = (
-                        job.consultation
-                    )
-
-                    if consultation is not None:
-
-                        consultation.style_evolution_status = (
-                            "failed"
+                        locked_job = (
+                            Job.objects
+                            .select_for_update()
+                            .get(pk=job.pk)
                         )
 
+                        payload = locked_job.payload or {}
+
+                        if (
+                            payload.get("credit_charged")
+                            and not payload.get("credit_refunded")
+                        ):
+
+                            piece = locked_job.piece_styling
+
+                            look_number = payload.get("look_number")
+
+                            result_exists = (
+                                PieceStylingResult.objects.filter(
+                                    piece_styling=piece,
+                                    order=look_number,
+                                ).exists()
+                            )
+
+                            if not result_exists and piece.user_id:
+
+                                CreditManager.add_credits(
+                                    piece.user,
+                                    1,
+                                )
+
+                                payload["credit_refunded"] = True
+
+                                locked_job.payload = payload
+                                locked_job.save(
+                                    update_fields=["payload"]
+                                )
+
+                                job.payload = payload
+
+                                print(
+                                    f"One credit refunded for job {job.id}."
+                                )
+
+                except Exception as refund_error:
+                    print("Credit refund failed:")
+                    print(
+                        type(refund_error).__name__,
+                        str(refund_error),
+                    )
+
+            # --------------------------------------------------
+            # Preserve Style Evolution failure handling.
+            # --------------------------------------------------
+            if job.job_type == JobType.STYLE_EVOLUTION:
+
+                try:
+                    consultation = job.consultation
+
+                    if consultation is not None:
+                        consultation.style_evolution_status = "failed"
                         consultation.save(
-                            update_fields=[
-                                "style_evolution_status"
-                            ]
+                            update_fields=["style_evolution_status"]
                         )
 
                 except Exception as status_error:
-
-                    print(
-                        "Could not update "
-                        "Style Evolution status:"
-                    )
-
+                    print("Could not update Style Evolution status:")
                     print(
                         type(status_error).__name__,
-                        str(status_error)
+                        str(status_error),
                     )
 
         # ======================================================
@@ -216,4 +212,3 @@ class Worker:
         # ======================================================
 
         job.save()
-

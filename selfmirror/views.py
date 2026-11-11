@@ -1263,11 +1263,17 @@ def generate_next_piece_look(request, piece_id):
 
                 # Check whether this exact look was already charged.
                 already_charged = Job.objects.filter(
+                    
                     piece_styling=locked_piece,
                     job_type=JobType.PIECE_STYLING,
                     payload__look_number=expected_number,
                     payload__credit_charged=True,
-                ).exists()
+                    
+                    ).exclude(
+                        
+                        payload__credit_refunded=True
+                        
+                        ).exists()
 
                 # First six account-wide looks are free.
                 # Every additional look costs one credit.
