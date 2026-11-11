@@ -13,12 +13,13 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from accounts.models import Payment
+from accounts.models import Payment, Profile
 from accounts.services import CreditManager
 from jobs.constants import JobStatus, JobType
 from jobs.models import Job
 from jobs.queue import JobQueue
 from media_manager.manager import MediaManager
+from selfmirror.models import PieceStylingResult
 
 from .abuse_protection import is_rate_limited
 from .models import (
@@ -41,9 +42,9 @@ RAZORPAY_PLANS = {
     "creator": {"name": "Creator", "amount": 69900, "credits": 100},
 }
 
-# Style My Piece: the first batch of looks is free (guests included).
-# Every further batch of FREE_PIECE_LOOKS looks costs one credit
-# and requires an account.
+# Style My Piece: guests get one trial upload per session with a single
+# look. For accounts, the first FREE_PIECE_LOOKS looks (counted across
+# all garments) are free; every further look costs one credit.
 FREE_PIECE_LOOKS = 6
 
 
@@ -846,6 +847,45 @@ def get_piece_for_request(request, piece_id):
     return piece
 
 
+def get_account_piece_look_usage(user):
+    """
+    Count completed looks and active jobs that have not
+    produced a result yet. Avoid counting the same look twice.
+    """
+
+    completed_count = PieceStylingResult.objects.filter(
+        piece_styling__user=user
+    ).count()
+
+    active_jobs = Job.objects.filter(
+        piece_styling__user=user,
+        job_type=JobType.PIECE_STYLING,
+        job_status__in=[
+            JobStatus.PENDING,
+            JobStatus.RUNNING,
+        ],
+    )
+
+    reserved_count = 0
+
+    for job in active_jobs:
+        look_number = (job.payload or {}).get("look_number")
+
+        if look_number is None:
+            reserved_count += 1
+            continue
+
+        result_exists = PieceStylingResult.objects.filter(
+            piece_styling_id=job.piece_styling_id,
+            order=look_number,
+        ).exists()
+
+        if not result_exists:
+            reserved_count += 1
+
+    return completed_count + reserved_count
+
+
 # ----------------------------------------------------------
 # Upload clothing and start first look
 # ----------------------------------------------------------
@@ -857,6 +897,19 @@ def style_my_piece(request):
 
     if is_rate_limited(request):
         return rate_limited_response()
+
+    # Guests get only one trial upload per session.
+    if not request.user.is_authenticated:
+        if request.session.get("style_my_piece_guest_trial_started"):
+            return JsonResponse(
+                {
+                    "success": False,
+                    "requires_signup": True,
+                    "redirect_url": reverse("signup"),
+                    "message": "Create an account to style more pieces.",
+                },
+                status=403,
+            )
 
     garment_image = request.FILES.get("garment_image")
     garment_type = request.POST.get("garment_type")
@@ -871,13 +924,8 @@ def style_my_piece(request):
         )
 
     allowed_types = [
-        "top",
-        "bottom",
-        "dress",
-        "outerwear",
-        "shoes",
-        "accessory",
-        "other",
+        "top", "bottom", "dress", "outerwear",
+        "shoes", "accessory", "other",
     ]
 
     if garment_type not in allowed_types:
@@ -900,6 +948,47 @@ def style_my_piece(request):
     try:
         with transaction.atomic():
 
+            credit_charged = False
+            credits_remaining = 0
+
+            if request.user.is_authenticated:
+
+                # Lock the account wallet to prevent simultaneous
+                # uploads from bypassing the free allowance.
+                profile = Profile.objects.select_for_update().get(
+                    user=request.user
+                )
+
+                total_used_or_reserved = get_account_piece_look_usage(
+                    request.user
+                )
+
+                # First six account-wide looks are free.
+                if total_used_or_reserved >= FREE_PIECE_LOOKS:
+
+                    credit_result = CreditManager.consume_piece_generation(
+                        request.user
+                    )
+
+                    if credit_result is None:
+                        return JsonResponse(
+                            {
+                                "success": False,
+                                "requires_upgrade": True,
+                                "credits_required": 1,
+                                "credits_remaining": profile.credits,
+                                "message": "You need one credit to generate another look.",
+                            },
+                            status=403,
+                        )
+
+                    credit_charged = True
+                    credits_remaining = credit_result
+
+                else:
+                    credits_remaining = profile.credits
+
+            # Create the uploaded piece.
             piece = PieceStyling.objects.create(
                 user=request.user if request.user.is_authenticated else None,
                 garment_image=garment_image,
@@ -908,45 +997,47 @@ def style_my_piece(request):
                 style_preference=request.POST.get("style_preference", ""),
             )
 
-            # Automatically queue the first look (free batch 0).
+            # Queue its first look.
             job = JobQueue.create_piece_styling_job(
                 piece,
                 payload={
                     "look_number": 1,
                     "batch_number": 0,
+                    "credit_charged": credit_charged,
                 },
             )
 
-        # Allow the guest session to access its own piece.
-        if not request.user.is_authenticated:
-            allowed_ids = request.session.get("style_my_piece_ids", [])
-            allowed_ids.append(piece.id)
-            request.session["style_my_piece_ids"] = allowed_ids
-            request.session.modified = True
+            # Save guest ownership in the session.
+            if not request.user.is_authenticated:
+                allowed_ids = request.session.get(
+                    "style_my_piece_ids", []
+                )
+
+                allowed_ids.append(piece.id)
+
+                request.session["style_my_piece_ids"] = allowed_ids
+                request.session["style_my_piece_guest_trial_started"] = True
+                request.session.modified = True
 
         return JsonResponse(
             {
                 "success": True,
-                "message": (
-                    "Your clothing piece has been uploaded. "
-                    "Your first look is starting!"
-                ),
+                "message": "Your first look is starting!",
                 "status": "processing",
                 "piece_id": piece.id,
                 "job_id": job.id,
                 "next_look_number": 1,
+                "credits_remaining": credits_remaining,
             }
         )
 
     except Exception:
         logger.exception("Style My Piece upload or job creation failed")
+
         return JsonResponse(
             {
                 "success": False,
-                "message": (
-                    "We couldn't save your clothing image or start "
-                    "styling. Please try again."
-                ),
+                "message": "We couldn't start styling. Please try again.",
             },
             status=500,
         )
@@ -963,7 +1054,10 @@ def piece_styling_status(request, piece_id):
 
     if piece is None:
         return JsonResponse(
-            {"success": False, "message": "Styling session not found."},
+            {
+                "success": False,
+                "message": "Styling session not found.",
+            },
             status=404,
         )
 
@@ -1009,18 +1103,33 @@ def piece_styling_status(request, piece_id):
     next_number = piece.next_look_number
 
     if request.user.is_authenticated:
+
         credits_remaining = request.user.profile.credits
+
+        total_used_or_reserved = get_account_piece_look_usage(
+            request.user
+        )
+
+        remaining_looks = max(
+            0,
+            FREE_PIECE_LOOKS - total_used_or_reserved,
+        )
+
+        next_requires_credit = (
+            total_used_or_reserved >= FREE_PIECE_LOOKS
+        )
+
+        next_requires_signup = False
+
     else:
+
         credits_remaining = 0
 
-    next_requires_signup = (
-        next_number > FREE_PIECE_LOOKS
-        and not request.user.is_authenticated
-    )
+        remaining_looks = 0
 
-    next_requires_credit = (
-        next_number > FREE_PIECE_LOOKS
-    )
+        next_requires_signup = next_number > 1
+
+        next_requires_credit = False
 
     return JsonResponse(
         {
@@ -1033,18 +1142,17 @@ def piece_styling_status(request, piece_id):
             "look_count": len(result_data),
             "next_look_number": next_number,
 
-            # Number of free looks still available.
-            "remaining_looks": max(
-                0,
-                FREE_PIECE_LOOKS - len(result_data),
-            ),
+            "remaining_looks": remaining_looks,
 
             "next_requires_credit": next_requires_credit,
             "next_requires_signup": next_requires_signup,
+
             "credits_remaining": credits_remaining,
+
             "credits_required": (
                 1 if next_requires_credit else 0
             ),
+
             "can_generate_more": not active_job,
 
             "message": (
@@ -1083,13 +1191,22 @@ def generate_next_piece_look(request, piece_id):
 
         with transaction.atomic():
 
+            # Lock the account wallet first to serialize
+            # generation checks across all uploaded garments.
+            profile = None
+
+            if request.user.is_authenticated:
+                profile = Profile.objects.select_for_update().get(
+                    user=request.user
+                )
+
             locked_piece = (
                 PieceStyling.objects
                 .select_for_update()
                 .get(pk=piece.id)
             )
 
-            # Prevent duplicate or outdated requests.
+            # Prevent outdated or duplicate requests.
             if expected_number != locked_piece.next_look_number:
                 return JsonResponse(
                     {
@@ -1101,26 +1218,7 @@ def generate_next_piece_look(request, piece_id):
                     status=409,
                 )
 
-            # First six looks are free for everyone.
-            # Look seven onward requires an account.
-            if (
-                expected_number > FREE_PIECE_LOOKS
-                and not request.user.is_authenticated
-            ):
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "requires_signup": True,
-                        "redirect_url": reverse("signup"),
-                        "message": (
-                            "Create an account to generate "
-                            "more looks."
-                        ),
-                    },
-                    status=403,
-                )
-
-            # Make sure no other look is currently processing.
+            # Prevent multiple active jobs for this garment.
             existing_active_job = Job.objects.filter(
                 piece_styling=locked_piece,
                 job_type=JobType.PIECE_STYLING,
@@ -1137,28 +1235,33 @@ def generate_next_piece_look(request, piece_id):
                         "status": "processing",
                         "job_id": existing_active_job.id,
                         "look_number": expected_number,
-                        "message": (
-                            "Your look is already being generated."
-                        ),
+                        "message": "Your look is already being generated.",
                     }
                 )
 
-            # Every look after the first six costs one credit.
-            if expected_number > FREE_PIECE_LOOKS:
+            # Guests can generate only their first look.
+            if not request.user.is_authenticated and expected_number > 1:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "requires_signup": True,
+                        "redirect_url": reverse("signup"),
+                        "message": "Create an account to generate more looks.",
+                    },
+                    status=403,
+                )
 
-                # Extra ownership protection.
-                if locked_piece.user_id != request.user.id:
-                    return JsonResponse(
-                        {
-                            "success": False,
-                            "message": "Account mismatch.",
-                        },
-                        status=403,
-                    )
+            credit_charged = False
 
-                # Check whether this exact look was already paid for.
-                # This prevents charging twice when a failed job
-                # is retried.
+            if request.user.is_authenticated:
+
+                # Completed looks plus reserved (in-progress) looks
+                # across every garment on this account.
+                total_used_or_reserved = get_account_piece_look_usage(
+                    request.user
+                )
+
+                # Check whether this exact look was already charged.
                 already_charged = Job.objects.filter(
                     piece_styling=locked_piece,
                     job_type=JobType.PIECE_STYLING,
@@ -1166,58 +1269,55 @@ def generate_next_piece_look(request, piece_id):
                     payload__credit_charged=True,
                 ).exists()
 
-                if not already_charged:
+                # First six account-wide looks are free.
+                # Every additional look costs one credit.
+                if total_used_or_reserved >= FREE_PIECE_LOOKS:
 
-                    credit_result = (
-                        CreditManager.consume_piece_generation(
-                            request.user
-                        )
-                    )
+                    if not already_charged:
 
-                    if credit_result is None:
-                        return JsonResponse(
-                            {
-                                "success": False,
-                                "requires_upgrade": True,
-                                "credits_required": 1,
-                                "credits_remaining": (
-                                    request.user.profile.credits
-                                ),
-                                "message": (
-                                    "You need one credit to "
-                                    "generate this look."
-                                ),
-                            },
-                            status=403,
+                        credit_result = (
+                            CreditManager.consume_piece_generation(
+                                request.user
+                            )
                         )
+
+                        if credit_result is None:
+                            return JsonResponse(
+                                {
+                                    "success": False,
+                                    "requires_upgrade": True,
+                                    "credits_required": 1,
+                                    "credits_remaining": profile.credits,
+                                    "message": (
+                                        "You need one credit to generate "
+                                        "this look."
+                                    ),
+                                },
+                                status=403,
+                            )
+
+                    else:
+                        credit_result = profile.credits
+
+                    credit_charged = True
 
                 else:
-                    credit_result = request.user.profile.credits
+                    credit_result = profile.credits
 
             else:
-                credit_result = (
-                    request.user.profile.credits
-                    if request.user.is_authenticated
-                    else 0
-                )
+                credit_result = 0
 
             # Queue exactly one look.
-            # The transaction also rolls back the credit deduction
-            # if job creation fails.
             job = JobQueue.create_piece_styling_job(
                 locked_piece,
                 payload={
                     "look_number": expected_number,
-                    "credit_charged": (
-                        expected_number > FREE_PIECE_LOOKS
-                    ),
+                    "credit_charged": credit_charged,
                 },
             )
 
             locked_piece.status = "processing"
-            locked_piece.save(
-                update_fields=["status"]
-            )
+            locked_piece.save(update_fields=["status"])
 
         return JsonResponse(
             {
@@ -1254,6 +1354,7 @@ def generate_next_piece_look(request, piece_id):
             },
             status=500,
         )
+
 
 # ==========================================================
 # Static / Informational Pages

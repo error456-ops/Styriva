@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% load static %}
@@ -15,15 +16,11 @@ My Profile | STYRIVA
 
 <section class="profile-page">
 
-    <!-- =========================
-         PROFILE HERO
-    ========================== -->
+    <!-- PROFILE HERO -->
 
     <div class="profile-hero">
 
-        <span class="profile-label">
-            MY PROFILE
-        </span>
+        <span class="profile-label">MY PROFILE</span>
 
         <h1 class="profile-name">
             {{ request.user.username }}
@@ -39,81 +36,51 @@ My Profile | STYRIVA
 
     </div>
 
-    <!-- =========================
-         STATS
-    ========================== -->
+    <!-- STATS -->
 
     <section class="stats-section">
 
         <div class="stat-card">
-
-            <span class="stat-number">
-                {{ consultation_count }}
-            </span>
-
-            <span class="stat-title">
-                Consultations
-            </span>
-
+            <span class="stat-number">{{ consultation_count }}</span>
+            <span class="stat-title">Consultations</span>
         </div>
 
         <div class="stat-card">
-
-            <span class="stat-number">
-                {{ generated_look_count }}
-            </span>
-
-            <span class="stat-title">
-                AI Looks
-            </span>
-
+            <span class="stat-number">{{ generated_look_count }}</span>
+            <span class="stat-title">Wardrobe AI Looks</span>
         </div>
 
         <div class="stat-card">
-
-            <span class="stat-number">
-                {{ evolved_look_count }}
-            </span>
-
-            <span class="stat-title">
-                Evolutions
-            </span>
-
+            <span class="stat-number">{{ evolved_look_count }}</span>
+            <span class="stat-title">Evolutions</span>
         </div>
 
-        <!-- NEW: CREDITS CARD -->
         <div class="stat-card">
+            <span class="stat-number">{{ piece_look_count }}</span>
+            <span class="stat-title">Style My Piece Looks</span>
+        </div>
 
-            <span class="stat-number">
-                {{ request.user.profile.credits }}
-            </span>
-
-            <span class="stat-title">
-                Credits
-            </span>
+        <div class="stat-card">
+            <span class="stat-number">{{ profile.credits }}</span>
+            <span class="stat-title">Credits</span>
 
             <a href="/premium/" class="buy-more-link">
                 Buy More
             </a>
-
         </div>
 
     </section>
 
-    <!-- =========================
-         RECENT LOOKS
-    ========================== -->
+    <!-- WARDROBE HISTORY -->
 
     <section class="recent-section">
 
         <div class="section-header">
 
-            <span class="section-label">
-                RECENT LOOKS
-            </span>
+            <span class="section-label">WARDROBE STYLING</span>
 
             <h2 class="section-title">
-                Your Latest AI Creations
+                Your Latest AI Outfits
             </h2>
 
         </div>
@@ -134,38 +101,28 @@ My Profile | STYRIVA
 
                 {% else %}
 
-                    <div class="look-placeholder">
-
-                        ✨
-
-                    </div>
+                    <div class="look-placeholder">✨</div>
 
                 {% endif %}
 
                 <div class="look-content">
 
                     <h3>
-
                         {% if look.title %}
                             {{ look.title }}
                         {% else %}
                             AI Styled Look
                         {% endif %}
-
                     </h3>
 
                     <p>
-
                         {% if look.consultation %}
                             {{ look.consultation.occasion }}
                         {% endif %}
-
                     </p>
 
                     <span>
-
                         {{ look.created_at|date:"M d, Y" }}
-
                     </span>
 
                 </div>
@@ -176,12 +133,10 @@ My Profile | STYRIVA
 
             <div class="empty-state">
 
-                <h3>
-                    No Looks Yet
-                </h3>
+                <h3>No Wardrobe Looks Yet</h3>
 
                 <p>
-                    Your generated AI outfits will appear here.
+                    Your generated wardrobe outfits will appear here.
                 </p>
 
             </div>
@@ -192,17 +147,83 @@ My Profile | STYRIVA
 
     </section>
 
-    <!-- =========================
-         QUICK ACTIONS
-    ========================== -->
+    <!-- STYLE MY PIECE HISTORY -->
+
+    <section class="recent-section">
+
+        <div class="section-header">
+
+            <span class="section-label">STYLE MY PIECE</span>
+
+            <h2 class="section-title">
+                Your Styled Pieces
+            </h2>
+
+        </div>
+
+        <div class="looks-grid">
+
+            {% for look in recent_piece_looks %}
+
+            <div class="look-card">
+
+                {% if look.generated_image %}
+
+                    <img
+                        src="{{ look.generated_image.url|cl_opt:'f_auto,q_auto,w_500' }}"
+                        alt="{{ look.title|default:'Styled Piece Look' }}"
+                        class="look-image"
+                    >
+
+                {% else %}
+
+                    <div class="look-placeholder">✨</div>
+
+                {% endif %}
+
+                <div class="look-content">
+
+                    <h3>
+                        {{ look.title|default:"Styled Piece Look" }}
+                    </h3>
+
+                    <p>
+                        {{ look.piece_styling.garment_type|default:"Your garment" }}
+                    </p>
+
+                    <span>
+                        {{ look.created_at|date:"M d, Y" }}
+                    </span>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="empty-state">
+
+                <h3>No Styled Pieces Yet</h3>
+
+                <p>
+                    Your Style My Piece creations will appear here.
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    <!-- QUICK ACTIONS -->
 
     <section class="actions-section">
 
         <div class="section-header">
 
-            <span class="section-label">
-                QUICK ACTIONS
-            </span>
+            <span class="section-label">QUICK ACTIONS</span>
 
             <h2 class="section-title">
                 Continue Your Style Journey
@@ -212,23 +233,24 @@ My Profile | STYRIVA
 
         <div class="action-buttons">
 
-            <a href="{% url 'generate_style_look' %}" class="action-btn primary-action">
-
-                ✨ Generate New Look
-
+            <a href="{% url 'generate_style_look' %}"
+               class="action-btn primary-action">
+                ✨ Generate New Wardrobe Look
             </a>
 
-            <!-- NEW: BUY CREDITS BUTTON -->
-            <a href="/premium/" class="action-btn secondary-action">
+            <a href="{% url 'style_my_piece' %}"
+               class="action-btn secondary-action">
+                👗 Style My Piece
+            </a>
 
+            <a href="/premium/"
+               class="action-btn secondary-action">
                 🪙 Buy Credits
-
             </a>
 
-            <a href="{% url 'logout' %}" class="action-btn secondary-action">
-
+            <a href="{% url 'logout' %}"
+               class="action-btn secondary-action">
                 Logout
-
             </a>
 
         </div>

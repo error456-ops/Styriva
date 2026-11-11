@@ -1,33 +1,25 @@
-from django.shortcuts import render
 
-# Create your views here.
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.urls import reverse
 
 from .forms import LoginForm, SignupForm
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-
 from .models import Profile
+
 from selfmirror.models import (
     StyleConsultation,
     GeneratedLook,
     EvolvedLook,
     PieceStyling,
-    
-    
+    PieceStylingResult,
 )
-
-from django.urls import reverse
-
-from selfmirror.models import PieceStyling
 
 
 def transfer_guest_piece_stylings(request, user):
     """
-    Transfer only guest styling sessions recorded
+    Transfer guest styling sessions recorded
     in this browser session to the newly authenticated user.
     """
 
@@ -75,8 +67,8 @@ def transfer_guest_piece_stylings(request, user):
     return latest_piece_id
 
 
-
 def signup_view(request):
+
     if request.user.is_authenticated:
         return redirect("home")
 
@@ -116,6 +108,7 @@ def signup_view(request):
 
 
 def login_view(request):
+
     if request.user.is_authenticated:
         return redirect("home")
 
@@ -153,8 +146,13 @@ def login_view(request):
         {"form": form},
     )
 
+
 @login_required
 def profile(request):
+
+    # ==========================================
+    # WARDROBE HISTORY
+    # ==========================================
 
     consultation_count = StyleConsultation.objects.filter(
         user=request.user
@@ -172,12 +170,37 @@ def profile(request):
         consultation__user=request.user
     ).order_by("-created_at")[:6]
 
+    # ==========================================
+    # STYLE MY PIECE HISTORY
+    # ==========================================
+
+    piece_look_count = PieceStylingResult.objects.filter(
+        piece_styling__user=request.user
+    ).count()
+
+    recent_piece_looks = (
+        PieceStylingResult.objects
+        .filter(piece_styling__user=request.user)
+        .select_related("piece_styling")
+        .order_by("-created_at")[:12]
+    )
+
+    # ==========================================
+    # PROFILE CONTEXT
+    # ==========================================
+
     context = {
         "profile": request.user.profile,
+
+        # Wardrobe
         "consultation_count": consultation_count,
         "generated_look_count": generated_look_count,
         "evolved_look_count": evolved_look_count,
         "recent_looks": recent_looks,
+
+        # Style My Piece
+        "piece_look_count": piece_look_count,
+        "recent_piece_looks": recent_piece_looks,
     }
 
     return render(
@@ -185,7 +208,8 @@ def profile(request):
         "profile.html",
         context,
     )
-    
+
+
 def logout_view(request):
     logout(request)
     return redirect("login")
