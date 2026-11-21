@@ -16,10 +16,10 @@
 
     <link rel="stylesheet" href="{% static 'pricing.css' %}">
 
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#4f46e5">
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'manifest' %}">
+    <meta name="theme-color" content="#4f46e5">
 
 </head>
 <body>
@@ -36,18 +36,12 @@
 
     <div class="container nav-wrapper">
 
-        <a href="/" class="logo">
-            STYRIVA
-        </a>
+        <a href="/" class="logo">STYRIVA</a>
 
         <nav>
-
             <a href="#features">Features</a>
-
             <a href="#pricing">Pricing</a>
-
             <a href="#faq">FAQ</a>
-
         </nav>
 
         <div class="nav-right">
@@ -55,26 +49,13 @@
             {% if user.is_authenticated %}
 
             <div class="credit-pill">
-
                 🪙
-
-                <span>
-
-                    {{ request.user.profile.credits }}
-
-                    Credits
-
-                </span>
-
+                <span>{{ request.user.profile.credits }} Credits</span>
             </div>
 
             {% else %}
 
-            <a href="{% url 'login' %}" class="login-btn">
-
-                Create Account
-
-            </a>
+            <a href="{% url 'login' %}" class="login-btn">Create Account</a>
 
             {% endif %}
 
@@ -94,70 +75,40 @@
 
         <div class="hero-content">
 
-            <span class="premium-tag">
-
-                PREMIUM EXPERIENCE
-
-            </span>
+            <span class="premium-tag">PREMIUM EXPERIENCE</span>
 
             <h1>
-
                 Unlock the
                 <span>Full Power</span>
                 of AI Styling
-
             </h1>
 
             <p>
-
-                Generate unlimited premium looks,
+                Generate premium looks,
                 evolve your wardrobe with AI,
                 and enjoy future premium features.
-
             </p>
 
             <div class="hero-buttons">
-
-                <a href="#pricing"
-                   class="primary-btn">
-
-                    Explore Credit Packs
-
-                </a>
-
-                <a href="#features"
-                   class="secondary-btn">
-
-                    Learn More
-
-                </a>
-
+                <a href="#pricing" class="primary-btn">Explore Credit Packs</a>
+                <a href="#features" class="secondary-btn">Learn More</a>
             </div>
 
             <div class="hero-stats">
 
                 <div>
-
                     <h2>10K+</h2>
-
                     <p>Looks Generated</p>
-
                 </div>
 
                 <div>
-
                     <h2>99%</h2>
-
                     <p>User Satisfaction</p>
-
                 </div>
 
                 <div>
-
                     <h2>24/7</h2>
-
                     <p>AI Availability</p>
-
                 </div>
 
             </div>
@@ -165,15 +116,9 @@
         </div>
 
         <div class="hero-image">
-
             <div class="image-card">
-
-                <img
-                    src="{% static 'logo.png' %}"
-                    alt="Luxury Fashion">
-
+                <img src="{% static 'logo.png' %}" alt="Luxury Fashion">
             </div>
-
         </div>
 
     </div>
@@ -192,27 +137,14 @@
 
         <div class="warning-box">
 
-            <span>
-
-                ✨
-
-            </span>
+            <span>✨</span>
 
             <div>
-
-                <h3>
-
-                    You're just one credit away.
-
-                </h3>
-
+                <h3>You're just one credit away.</h3>
                 <p>
-
                     Continue where you left off by purchasing
                     another credit pack.
-
                 </p>
-
             </div>
 
         </div>
@@ -222,9 +154,6 @@
 </section>
 
 {% endif %}
-
-<!-- Features section starts here -->
-
 
 <!-- ===========================================
                 WHY UPGRADE
@@ -236,13 +165,9 @@
 
         <div class="section-heading">
 
-            <span class="section-tag">
-                PREMIUM BENEFITS
-            </span>
+            <span class="section-tag">PREMIUM BENEFITS</span>
 
-            <h2>
-                Why Upgrade?
-            </h2>
+            <h2>Why Upgrade?</h2>
 
             <p>
                 STYRIVA Premium unlocks advanced AI styling tools,
@@ -254,120 +179,60 @@
 
         <div class="feature-grid">
 
-            <!-- Card -->
-
             <div class="feature-card">
-
-                <div class="feature-icon">
-                    ✨
-                </div>
-
-                <h3>
-                    Unlimited AI Styling
-                </h3>
-
+                <div class="feature-icon">✨</div>
+                <h3>Flexible AI Styling</h3>
                 <p>
                     Create as many AI outfit recommendations as
                     your credits allow with no daily limits.
                 </p>
-
             </div>
 
-            <!-- Card -->
-
             <div class="feature-card">
-
-                <div class="feature-icon">
-                    👗
-                </div>
-
-                <h3>
-                    AI Style Evolution
-                </h3>
-
+                <div class="feature-icon">👗</div>
+                <h3>AI Style Evolution</h3>
                 <p>
                     Instantly evolve your wardrobe into fresh,
                     modern combinations generated by AI.
                 </p>
-
             </div>
 
-            <!-- Card -->
-
             <div class="feature-card">
-
-                <div class="feature-icon">
-                    🪙
-                </div>
-
-                <h3>
-                    Credits Never Expire
-                </h3>
-
+                <div class="feature-icon">🪙</div>
+                <h3>Credits Never Expire</h3>
                 <p>
                     Buy once.
                     Use whenever inspiration strikes.
                     Your credits stay with you.
                 </p>
-
             </div>
 
-            <!-- Card -->
-
             <div class="feature-card">
-
-                <div class="feature-icon">
-                    🚀
-                </div>
-
-                <h3>
-                    Early Access
-                </h3>
-
+                <div class="feature-icon">🚀</div>
+                <h3>Early Access</h3>
                 <p>
                     Receive future premium AI models,
                     exclusive styling features,
                     and new updates first.
                 </p>
-
             </div>
 
-            <!-- Card -->
-
             <div class="feature-card">
-
-                <div class="feature-icon">
-                    ⚡
-                </div>
-
-                <h3>
-                    Faster Processing
-                </h3>
-
+                <div class="feature-icon">⚡</div>
+                <h3>Faster Processing</h3>
                 <p>
                     Premium users receive priority generation
                     when the platform becomes busy.
                 </p>
-
             </div>
 
-            <!-- Card -->
-
             <div class="feature-card">
-
-                <div class="feature-icon">
-                    ❤️
-                </div>
-
-                <h3>
-                    Save Your Favorite Looks
-                </h3>
-
+                <div class="feature-icon">❤️</div>
+                <h3>Save Your Favorite Looks</h3>
                 <p>
                     Build your own AI fashion collection and
                     revisit your best looks anytime.
                 </p>
-
             </div>
 
         </div>
@@ -387,31 +252,22 @@
         <div class="highlight-box">
 
             <div class="highlight-item">
-
                 <h2>50K+</h2>
-
                 <p>AI Outfit Combinations</p>
-
             </div>
 
             <div class="divider"></div>
 
             <div class="highlight-item">
-
                 <h2>100%</h2>
-
                 <p>Personalized Styling</p>
-
             </div>
 
             <div class="divider"></div>
 
             <div class="highlight-item">
-
                 <h2>24/7</h2>
-
                 <p>Always Available</p>
-
             </div>
 
         </div>
@@ -430,13 +286,9 @@
 
         <div class="section-heading">
 
-            <span class="section-tag">
-                CREDIT PACKS
-            </span>
+            <span class="section-tag">CREDIT PACKS</span>
 
-            <h2>
-                Choose Your Credit Pack
-            </h2>
+            <h2>Choose Your Credit Pack</h2>
 
             <p>
                 Purchase only what you need.
@@ -448,137 +300,107 @@
 
         <div class="pricing-grid">
 
+            <!-- ===========================
+                    MINI PLAN
+            ============================ -->
 
+            <div class="pricing-card reveal">
+
+                <div class="plan-name">Mini</div>
+
+                <div class="plan-credits">1 Credit</div>
+
+                <div class="plan-price">₹49</div>
+
+                <ul class="plan-features">
+                    <li>✓ 1 AI-generated look</li>
+                    <li>✓ Access to AI styling</li>
+                    <li>✓ Credits never expire</li>
+                </ul>
+
+                <button class="buy-btn" data-plan="mini" type="button">
+                    Get Started
+                </button>
+
+            </div>
 
             <!-- ===========================
-        STARTER PLAN
-============================ -->
+                    STARTER PLAN
+            ============================ -->
 
-<div class="pricing-card reveal">
+            <div class="pricing-card reveal">
 
-    <div class="plan-name">
-        Starter
+                <div class="plan-name">Starter</div>
+
+                <div class="plan-credits">2 Credits</div>
+
+                <div class="plan-price">₹99</div>
+
+                <ul class="plan-features">
+                    <li>✓ 2 AI-generated looks</li>
+                    <li>✓ Access to AI styling</li>
+                    <li>✓ Credits never expire</li>
+                </ul>
+
+                <button class="buy-btn" data-plan="starter" type="button">
+                    Get Started
+                </button>
+
+            </div>
+
+            <!-- ===========================
+                    STYLE LOVER (POPULAR)
+            ============================ -->
+
+            <div class="pricing-card popular featured reveal">
+
+                <div class="popular-badge">⭐ MOST POPULAR</div>
+
+                <div class="plan-name">Style Lover</div>
+
+                <div class="plan-credits">5 Credits</div>
+
+                <div class="plan-price">₹199</div>
+
+                <ul class="plan-features">
+                    <li>✓ 5 AI-generated looks</li>
+                    <li>✓ Access to all styling features</li>
+                    <li>✓ Credits never expire</li>
+                </ul>
+
+                <button class="buy-btn premium-btn" data-plan="stylelover" type="button">
+                    Choose Plan
+                </button>
+
+            </div>
+
+            <!-- ===========================
+                    FASHION PRO
+            ============================ -->
+
+            <div class="pricing-card reveal">
+
+                <div class="plan-name">Fashion Pro</div>
+
+                <div class="plan-credits">10 Credits</div>
+
+                <div class="plan-price">₹399</div>
+
+                <ul class="plan-features">
+                    <li>✓ 10 AI-generated looks</li>
+                    <li>✓ Access to all styling features</li>
+                    <li>✓ Credits never expire</li>
+                </ul>
+
+                <button class="buy-btn" data-plan="fashionpro" type="button">
+                    Get Started
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
-
-    <div class="plan-credits">
-        20 Credits
-    </div>
-
-    <div class="plan-price">
-        ₹199
-    </div>
-
-    <ul class="plan-features">
-
-        <li>✓ 20 AI Generations</li>
-
-        <li>✓ Style Evolution</li>
-
-        <li>✓ Credits Never Expire</li>
-
-        <li>✓ Future Premium Features</li>
-
-    </ul>
-
-   <button
-    class="buy-btn"
-    data-plan="starter"
-    type="button"
->
-    Buy Now
-</button>
-
-</div>
-
-<!-- ===========================
-        POPULAR PLAN
-============================ -->
-
-<div class="pricing-card popular reveal">
-
-    <div class="popular-badge">
-        ⭐ MOST POPULAR
-    </div>
-
-    <div class="plan-name">
-        Premium
-    </div>
-
-    <div class="plan-credits">
-        50 Credits
-    </div>
-
-    <div class="plan-price">
-        ₹399
-    </div>
-
-    <ul class="plan-features">
-
-        <li>✓ 50 AI Generations</li>
-
-        <li>✓ Style Evolution</li>
-
-        <li>✓ Credits Never Expire</li>
-
-        <li>✓ Priority Processing</li>
-
-        <li>✓ Future Premium Features</li>
-
-    </ul>
-
-    <button
-    class="buy-btn premium-btn"
-    data-plan="premium"
-    type="button"
->
-    Buy Now
-</button>
-
-</div>
-
-<!-- ===========================
-        CREATOR PLAN
-============================ -->
-
-<div class="pricing-card reveal">
-
-    <div class="plan-name">
-        Creator
-    </div>
-
-    <div class="plan-credits">
-        100 Credits
-    </div>
-
-    <div class="plan-price">
-        ₹699
-    </div>
-
-    <ul class="plan-features">
-
-        <li>✓ 100 AI Generations</li>
-
-        <li>✓ Style Evolution</li>
-
-        <li>✓ Credits Never Expire</li>
-
-        <li>✓ Priority Queue</li>
-
-        <li>✓ Early Premium Features</li>
-
-    </ul>
-
-   <button
-    class="buy-btn"
-    data-plan="creator"
-    type="button"
->
-    Buy Now
-</button>
-
-</div>
-
-</div>
 
 </section>
 
@@ -592,114 +414,54 @@
 
         <div class="section-heading">
 
-            <span class="section-tag">
+            <span class="section-tag">SIMPLE PRICING</span>
 
-                SIMPLE PRICING
-
-            </span>
-
-            <h2>
-
-                How Credits Work
-
-            </h2>
+            <h2>How Credits Work</h2>
 
         </div>
 
         <div class="credit-timeline">
 
             <div class="timeline-item">
-
-                <div class="timeline-number">
-
-                    1
-
-                </div>
-
-                <h3>
-
-                    Upload
-
-                </h3>
-
-                <p>
-
-                    Upload your clothes and model photo.
-
-                </p>
-
+                <div class="timeline-number">1</div>
+                <h3>Upload</h3>
+                <p>Upload your clothes and model photo.</p>
             </div>
 
             <div class="timeline-line"></div>
 
             <div class="timeline-item">
-
-                <div class="timeline-number">
-
-                    2
-
-                </div>
-
-                <h3>
-
-                    AI Generates
-
-                </h3>
-
-                <p>
-
-                    STYRIVA creates your personalized look.
-
-                </p>
-
+                <div class="timeline-number">2</div>
+                <h3>AI Generates</h3>
+                <p>STYRIVA creates your personalized look.</p>
             </div>
 
             <div class="timeline-line"></div>
 
             <div class="timeline-item">
-
-                <div class="timeline-number">
-
-                    3
-
-                </div>
-
-                <h3>
-
-                    One Credit Used
-
-                </h3>
-
-                <p>
-
-                    Every generation uses only one credit.
-
-                </p>
-
+                <div class="timeline-number">3</div>
+                <h3>One Credit Used</h3>
+                <p>Every generation uses only one credit.</p>
             </div>
 
         </div>
 
         <div class="credit-note">
 
-            <h3>
-
-                💎 Credits Never Expire
-
-            </h3>
+            <h3>💎 Credits Never Expire</h3>
 
             <p>
-
                 Purchase once and use your credits whenever you want.
                 No subscriptions. No monthly renewals.
-
             </p>
 
         </div>
 
     </div>
 
-    <!-- ===========================================
+</section>
+
+<!-- ===========================================
                     FAQ
 =========================================== -->
 
@@ -709,100 +471,62 @@
 
         <div class="section-heading">
 
-            <span class="section-tag">
-                QUESTIONS
-            </span>
+            <span class="section-tag">QUESTIONS</span>
 
-            <h2>
-                Frequently Asked Questions
-            </h2>
+            <h2>Frequently Asked Questions</h2>
 
-            <p>
-                Everything you need to know about STYRIVA Premium.
-            </p>
+            <p>Everything you need to know about STYRIVA Premium.</p>
 
         </div>
 
         <div class="faq-container">
 
             <div class="faq-item">
-
                 <button class="faq-question">
-
                     <span>Do my credits expire?</span>
-
                     <span class="faq-icon">+</span>
-
                 </button>
-
                 <div class="faq-answer">
-
                     <p>
                         No. Every credit you purchase stays in your account until you use it.
                     </p>
-
                 </div>
-
             </div>
 
             <div class="faq-item">
-
                 <button class="faq-question">
-
                     <span>How many credits does one AI look use?</span>
-
                     <span class="faq-icon">+</span>
-
                 </button>
-
                 <div class="faq-answer">
-
                     <p>
                         One AI Style Generation uses one credit. One Style Evolution also uses one credit.
                     </p>
-
                 </div>
-
             </div>
 
             <div class="faq-item">
-
                 <button class="faq-question">
-
                     <span>Will subscriptions be available?</span>
-
                     <span class="faq-icon">+</span>
-
                 </button>
-
                 <div class="faq-answer">
-
                     <p>
                         Right now STYRIVA uses a credit-based model so you only pay for what you actually use.
                     </p>
-
                 </div>
-
             </div>
 
             <div class="faq-item">
-
                 <button class="faq-question">
-
                     <span>How will I pay?</span>
-
                     <span class="faq-icon">+</span>
-
                 </button>
-
                 <div class="faq-answer">
-
                     <p>
                         Razorpay Checkout will be available soon with support for cards, UPI and more.
                     </p>
-
                 </div>
-
             </div>
 
         </div>
@@ -823,37 +547,21 @@
 
         <div class="cta-card">
 
-            <span class="section-tag">
-
-                START TODAY
-
-            </span>
+            <span class="section-tag">START TODAY</span>
 
             <h2>
-
                 Your Next Favorite Look
                 Starts Here.
-
             </h2>
 
             <p>
-
                 Unlock premium AI styling, evolve your wardrobe,
                 and create beautiful personalized looks with STYRIVA.
-
             </p>
 
             <div class="cta-buttons">
-
-               <a href="#pricing" class="primary-btn">
-             Buy Credits
-</a>
-                <a href="#pricing" class="secondary-btn">
-
-                    View Plans
-
-                </a>
-
+                <a href="#pricing" class="primary-btn">Buy Credits</a>
+                <a href="#pricing" class="secondary-btn">View Plans</a>
             </div>
 
         </div>
@@ -873,54 +581,30 @@
         <div class="footer-top">
 
             <div class="footer-brand">
-
                 <h2>STYRIVA</h2>
-
-                <p>
-                    Luxury AI Styling powered by artificial intelligence.
-                </p>
-
+                <p>Luxury AI Styling powered by artificial intelligence.</p>
             </div>
 
             <div class="footer-links">
-
                 <a href="#">Home</a>
-
                 <a href="#">Privacy Policy</a>
-
                 <a href="#">Terms</a>
-
                 <a href="#">Contact</a>
-
             </div>
 
         </div>
 
         <div class="footer-bottom">
-
-            <p>
-
-                © {% now "Y" %} STYRIVA. All rights reserved.
-
-            </p>
-
+            <p>© {% now "Y" %} STYRIVA. All rights reserved.</p>
         </div>
 
     </div>
 
 </footer>
 
-
-
-
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-
-
 
 <script src="{% static 'pricing.js' %}"></script>
 
 </body>
 </html>
-
-</section>

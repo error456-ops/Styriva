@@ -5,35 +5,38 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     /* ==========================================
+            PRICING PLAN CONFIGURATION
+            (must match the plan keys in your Django view)
+    ========================================== */
+
+    const allowedPlans = [
+        "mini",
+        "starter",
+        "stylelover",
+        "fashionpro"
+    ];
+
+    /* ==========================================
             REVEAL ON SCROLL
     ========================================== */
 
     const reveals = document.querySelectorAll(".reveal");
 
     function revealElements() {
-
         const trigger = window.innerHeight * 0.88;
 
         reveals.forEach(item => {
-
-            const top = item.getBoundingClientRect().top;
-
-            if (top < trigger) {
-
+            if (item.getBoundingClientRect().top < trigger) {
                 item.classList.add("active");
-
             }
-
         });
-
     }
 
     window.addEventListener("scroll", revealElements);
-
     revealElements();
 
     /* ==========================================
-                FAQ
+            FAQ
     ========================================== */
 
     const faqs = document.querySelectorAll(".faq-item");
@@ -41,37 +44,29 @@ document.addEventListener("DOMContentLoaded", () => {
     faqs.forEach(faq => {
 
         const btn = faq.querySelector(".faq-question");
-
         const answer = faq.querySelector(".faq-answer");
-
         const icon = faq.querySelector(".faq-icon");
+
+        if (!btn || !answer || !icon) return;
 
         btn.addEventListener("click", () => {
 
             faqs.forEach(other => {
-
                 if (other !== faq) {
+                    const otherAnswer = other.querySelector(".faq-answer");
+                    const otherIcon = other.querySelector(".faq-icon");
 
-                    other.querySelector(".faq-answer").style.maxHeight = null;
-
-                    other.querySelector(".faq-icon").textContent = "+";
-
+                    if (otherAnswer) otherAnswer.style.maxHeight = null;
+                    if (otherIcon) otherIcon.textContent = "+";
                 }
-
             });
 
             if (answer.style.maxHeight) {
-
                 answer.style.maxHeight = null;
-
                 icon.textContent = "+";
-
             } else {
-
                 answer.style.maxHeight = answer.scrollHeight + "px";
-
                 icon.textContent = "−";
-
             }
 
         });
@@ -81,29 +76,55 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ==========================================
             RAZORPAY PAYMENT
     ========================================== */
-    console.log("PAYMENT SECTION LOADED");
-    const buyButtons = document.querySelectorAll(".buy-btn[data-plan]")
 
+    const buyButtons = document.querySelectorAll(".buy-btn[data-plan]");
 
     buyButtons.forEach(button => {
-    button.addEventListener("click", function (event) {
-        event.preventDefault();
 
-        const plan = this.dataset.plan;
+        button.addEventListener("click", async function (event) {
 
-        console.log("BUY NOW CLICKED:", plan);
+            event.preventDefault();
 
-        startPayment(plan);
+            const plan = this.dataset.plan;
+
+            if (!allowedPlans.includes(plan)) {
+                alert("Invalid pricing plan.");
+                console.error("Invalid plan:", plan);
+                return;
+            }
+
+            if (this.disabled) return;
+
+            this.disabled = true;
+
+            const originalText = this.textContent;
+            this.textContent = "Please wait...";
+
+            try {
+                await startPayment(plan);
+            } finally {
+                this.disabled = false;
+                this.textContent = originalText;
+            }
+
+        });
+
     });
-});
 
+    /* ==========================================
+            CREATE RAZORPAY ORDER
+    ========================================== */
 
     async function startPayment(plan) {
 
         try {
 
-            const csrfToken = getCSRFToken();
+            if (typeof Razorpay === "undefined") {
+                alert("Payment system failed to load. Please refresh the page and try again.");
+                return;
+            }
 
+            const csrfToken = getCSRFToken();
             const formData = new FormData();
 
             formData.append("plan", plan);
@@ -113,28 +134,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 {
                     method: "POST",
                     headers: {
-                        "X-CSRFToken": csrfToken,
+                        "X-CSRFToken": csrfToken
                     },
-                    body: formData,
+                    body: formData
                 }
             );
 
-            const data = await response.json();
-
             if (response.status === 403) {
-
                 window.location.href = "/login/";
-
                 return;
             }
 
-            if (!data.success) {
+            const data = await response.json();
 
-                alert(
-                    data.message ||
-                    "Unable to start payment."
-                );
-
+            if (!response.ok || !data.success) {
+                alert(data.message || "Unable to start payment.");
                 return;
             }
 
@@ -148,62 +162,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 name: "STYRIVA",
 
-                description:
-                    `${data.credits} AI Styling Credits`,
+                description: `${data.credits} AI Styling Credits`,
 
                 order_id: data.order_id,
 
                 handler: async function (paymentResponse) {
-
                     await verifyPayment(paymentResponse);
-
                 },
 
                 theme: {
-                    color: "#000000",
-                },
+                    color: "#000000"
+                }
 
             };
 
             const razorpay = new Razorpay(options);
 
-            razorpay.on(
-                "payment.failed",
-                function (response) {
+            razorpay.on("payment.failed", function (response) {
 
-                    console.error(
-                        "Payment failed:",
-                        response
-                    );
+                console.error("Payment failed:", response);
 
-                    alert(
-                        "Payment failed. Please try again."
-                    );
+                alert("Payment failed. Please try again.");
 
-                }
-            );
+            });
 
             razorpay.open();
 
         } catch (error) {
 
-            console.error(error);
+            console.error("Payment error:", error);
 
-            alert(
-                "Something went wrong while starting payment."
-            );
+            alert("Something went wrong while starting payment.");
 
         }
 
     }
 
+    /* ==========================================
+            VERIFY PAYMENT
+    ========================================== */
 
     async function verifyPayment(paymentResponse) {
 
         try {
 
             const csrfToken = getCSRFToken();
-
             const formData = new FormData();
 
             formData.append(
@@ -226,19 +229,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 {
                     method: "POST",
                     headers: {
-                        "X-CSRFToken": csrfToken,
+                        "X-CSRFToken": csrfToken
                     },
-                    body: formData,
+                    body: formData
                 }
             );
 
             const data = await response.json();
 
-            if (!data.success) {
+            if (!response.ok || !data.success) {
 
                 alert(
                     data.message ||
-                    "Payment verification failed."
+                    "Payment verification failed. Please contact support if money was deducted."
                 );
 
                 return;
@@ -252,16 +255,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            console.error(error);
+            console.error("Verification error:", error);
 
             alert(
-                "Something went wrong while verifying payment."
+                "Unable to verify payment. Please contact support if money was deducted."
             );
 
         }
 
     }
 
+    /* ==========================================
+            CSRF TOKEN
+    ========================================== */
 
     function getCSRFToken() {
 
@@ -269,18 +275,13 @@ document.addEventListener("DOMContentLoaded", () => {
             .split("; ")
             .find(row => row.startsWith("csrftoken="));
 
-        if (!cookieValue) {
-            return "";
-        }
+        if (!cookieValue) return "";
 
         return decodeURIComponent(
             cookieValue.split("=")[1]
         );
 
     }
-
-});
-
 
     /* ==========================================
             NAVBAR SCROLL EFFECT
@@ -311,10 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     window.addEventListener("scroll", updateNavbar);
-
     updateNavbar();
-
-
 
     /* ==========================================
             SMOOTH SCROLL
@@ -322,49 +320,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
-        anchor.addEventListener("click", function(e) {
+        anchor.addEventListener("click", function (event) {
 
-            const target = document.querySelector(this.getAttribute("href"));
+            const href = this.getAttribute("href");
+
+            if (!href || href === "#") return;
+
+            const target = document.querySelector(href);
 
             if (!target) return;
 
-            e.preventDefault();
+            event.preventDefault();
 
             target.scrollIntoView({
-
                 behavior: "smooth",
-
                 block: "start"
-
             });
 
         });
 
     });
 
-
-
     /* ==========================================
             CARD HOVER GLOW
     ========================================== */
 
-    document.querySelectorAll(".pricing-card, .feature-card").forEach(card => {
+    document.querySelectorAll(
+        ".pricing-card, .feature-card"
+    ).forEach(card => {
 
         card.addEventListener("mouseenter", () => {
-
             card.style.boxShadow = "0 30px 70px rgba(201,161,74,.20)";
-
         });
 
         card.addEventListener("mouseleave", () => {
-
             card.style.boxShadow = "";
-
         });
 
     });
-
-
 
     /* ==========================================
             HERO IMAGE FLOAT
@@ -372,92 +365,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const heroImage = document.querySelector(".image-card");
 
-    if(heroImage){
+    if (heroImage) {
 
         let direction = 1;
 
         setInterval(() => {
 
             heroImage.style.transform =
-
-                direction === 1 ?
-
-                "translateY(-8px)" :
-
-                "translateY(0px)";
+                direction === 1
+                    ? "translateY(-8px)"
+                    : "translateY(0px)";
 
             direction *= -1;
 
-        },2500);
+        }, 2500);
 
     }
-
-
 
     /* ==========================================
             BUTTON SCALE
     ========================================== */
 
-    document.querySelectorAll(".buy-btn").forEach(btn=>{
+    document.querySelectorAll(".buy-btn").forEach(btn => {
 
-        btn.addEventListener("mouseenter",()=>{
-
-            btn.style.transform="translateY(-4px) scale(1.03)";
-
+        btn.addEventListener("mouseenter", () => {
+            btn.style.transform = "translateY(-4px) scale(1.03)";
         });
 
-        btn.addEventListener("mouseleave",()=>{
-
-            btn.style.transform="";
-
+        btn.addEventListener("mouseleave", () => {
+            btn.style.transform = "";
         });
 
     });
-
-
 
     /* ==========================================
             ACTIVE NAV LINK
     ========================================== */
 
-    const sections=document.querySelectorAll("section[id]");
+    const sections = document.querySelectorAll("section[id]");
+    const navLinks = document.querySelectorAll("nav a");
 
-    const navLinks=document.querySelectorAll("nav a");
+    function updateActiveNav() {
 
-    function updateActiveNav(){
+        let current = "";
 
-        let current="";
+        sections.forEach(section => {
 
-        sections.forEach(section=>{
+            const top = window.scrollY;
+            const offset = section.offsetTop - 120;
+            const height = section.offsetHeight;
 
-            const top=window.scrollY;
-
-            const offset=section.offsetTop-120;
-
-            const height=section.offsetHeight;
-
-            if(top>=offset && top<offset+height){
-
-                current=section.getAttribute("id");
-
+            if (top >= offset && top < offset + height) {
+                current = section.getAttribute("id");
             }
 
         });
 
-        navLinks.forEach(link=>{
+        navLinks.forEach(link => {
 
             link.classList.remove("active");
 
-            if(link.getAttribute("href")==="#"+current){
-
+            if (link.getAttribute("href") === "#" + current) {
                 link.classList.add("active");
-
             }
 
         });
 
     }
 
-    window.addEventListener("scroll",updateActiveNav);
-
+    window.addEventListener("scroll", updateActiveNav);
     updateActiveNav();
+
+});

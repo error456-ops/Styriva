@@ -48,11 +48,8 @@ class UserUsage(models.Model):
 
     def __str__(self):
         return f"{self.user.username} Usage"
-        
-        
 
-    
-    
+
 class Payment(models.Model):
 
     STATUS_CHOICES = [
@@ -62,9 +59,14 @@ class Payment(models.Model):
     ]
 
     PLAN_CHOICES = [
+        ("mini", "Mini"),
         ("starter", "Starter"),
-        ("premium", "Premium"),
-        ("creator", "Creator"),
+        ("stylelover", "Style Lover"),
+        ("fashionpro", "Fashion Pro"),
+
+        # Legacy plans: kept so old payment records stay valid
+        ("premium", "Premium (legacy)"),
+        ("creator", "Creator (legacy)"),
     ]
 
     user = models.ForeignKey(
@@ -78,6 +80,7 @@ class Payment(models.Model):
         choices=PLAN_CHOICES,
     )
 
+    # Amount in paise (e.g. ₹199 = 19900)
     amount = models.PositiveIntegerField()
     credits = models.PositiveIntegerField()
 

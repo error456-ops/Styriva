@@ -37,9 +37,10 @@ logger = logging.getLogger(__name__)
 # ==========================================================
 
 RAZORPAY_PLANS = {
-    "starter": {"name": "Starter", "amount": 19900, "credits": 20},
-    "premium": {"name": "Premium", "amount": 39900, "credits": 50},
-    "creator": {"name": "Creator", "amount": 69900, "credits": 100},
+    "mini":       {"name": "Mini",        "amount": 4900,  "credits": 1},
+    "starter":    {"name": "Starter",     "amount": 9900,  "credits": 2},
+    "stylelover": {"name": "Style Lover", "amount": 19900, "credits": 5},
+    "fashionpro": {"name": "Fashion Pro", "amount": 39900, "credits": 10},
 }
 
 # Style My Piece: guests get one trial upload per session with a single
