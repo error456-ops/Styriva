@@ -37,7 +37,7 @@
 
             {% csrf_token %}
 
-            <input type="hidden" name="next" value="{{ request.GET.next|default:request.POST.next }}">
+            <input type="hidden" name="next" value="{% firstof request.GET.next request.POST.next %}">
 
             <div class="form-group">
 
