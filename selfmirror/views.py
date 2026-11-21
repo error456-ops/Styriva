@@ -30,6 +30,8 @@ from .models import (
     StyleConsultation,
 )
 
+import time
+
 logger = logging.getLogger(__name__)
 
 
@@ -718,8 +720,14 @@ def verify_razorpay_payment(request):
             }
         )
 
-        # Fetch payment from Razorpay
+        # Fetch payment from Razorpay (wait briefly for capture)
         razorpay_payment = client.payment.fetch(razorpay_payment_id)
+
+        for _ in range(4):
+            if razorpay_payment.get("status") == "captured":
+                break
+            time.sleep(1.5)
+            razorpay_payment = client.payment.fetch(razorpay_payment_id)
 
         # Payment must belong to this order
         if razorpay_payment.get("order_id") != razorpay_order_id:
