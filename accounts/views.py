@@ -1,9 +1,9 @@
-
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .forms import LoginForm, SignupForm
 from .models import Profile
@@ -67,6 +67,34 @@ def transfer_guest_piece_stylings(request, user):
     return latest_piece_id
 
 
+def post_auth_redirect(request, user):
+    """
+    Decide where to send the user after signup/login.
+    Honors a safe ?next= URL, so each product (Style My Wardrobe /
+    Style My Piece) sends people back to where they came from.
+    """
+
+    next_url = request.POST.get("next") or request.GET.get("next")
+
+    if not (next_url and url_has_allowed_host_and_scheme(
+        next_url, allowed_hosts={request.get_host()}
+    )):
+        next_url = None
+
+    piece_id = transfer_guest_piece_stylings(request, user)
+
+    if next_url:
+        # Only resume a piece if they came from Style My Piece
+        if piece_id and next_url.split("?")[0] == reverse("style_my_piece"):
+            return redirect(f"{next_url}?piece_id={piece_id}")
+        return redirect(next_url)
+
+    if piece_id:
+        return redirect(f"{reverse('style_my_piece')}?piece_id={piece_id}")
+
+    return redirect("generate_style_look")
+
+
 def signup_view(request):
 
     if request.user.is_authenticated:
@@ -80,22 +108,12 @@ def signup_view(request):
 
             login(request, user)
 
-            piece_id = transfer_guest_piece_stylings(
-                request,
-                user,
-            )
-
             messages.success(
                 request,
                 "Your account has been created successfully.",
             )
 
-            if piece_id:
-                return redirect(
-                    f"{reverse('style_my_piece')}?piece_id={piece_id}"
-                )
-
-            return redirect("generate_style_look")
+            return post_auth_redirect(request, user)
 
     else:
         form = SignupForm()
@@ -120,22 +138,12 @@ def login_view(request):
 
             login(request, user)
 
-            piece_id = transfer_guest_piece_stylings(
-                request,
-                user,
-            )
-
             messages.success(
                 request,
                 "Welcome back!",
             )
 
-            if piece_id:
-                return redirect(
-                    f"{reverse('style_my_piece')}?piece_id={piece_id}"
-                )
-
-            return redirect("generate_style_look")
+            return post_auth_redirect(request, user)
 
     else:
         form = LoginForm()

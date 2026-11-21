@@ -37,6 +37,8 @@
 
             {% csrf_token %}
 
+            <input type="hidden" name="next" value="{{ request.GET.next|default:request.POST.next }}">
+
             <div class="form-group">
 
                 <label for="{{ form.username.id_for_label }}">
@@ -153,7 +155,7 @@
 
             Already have an account?
 
-            <a href="{% url 'login' %}">
+            <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}">
                 Login
             </a>
 

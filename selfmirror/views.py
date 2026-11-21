@@ -1,5 +1,6 @@
 import json
 import logging
+from urllib.parse import urlencode
 
 import razorpay
 
@@ -64,6 +65,11 @@ def rate_limited_response():
     )
 
 
+def signup_url_with_next(next_url):
+    """Build /signup/?next=<where the user should return after signup>."""
+    return reverse("signup") + "?" + urlencode({"next": next_url})
+
+
 def razorpay_client():
     return razorpay.Client(
         auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
@@ -107,7 +113,9 @@ def generate_style_look(request):
                 {
                     "success": False,
                     "requires_signup": True,
-                    "redirect_url": reverse("signup"),
+                    "redirect_url": signup_url_with_next(
+                        reverse("generate_style_look")
+                    ),
                     "message": (
                         "Your complimentary styling session "
                         "has been completed."
@@ -325,11 +333,24 @@ def generate_style_evolution(request):
     if not request.user.is_authenticated:
 
         if request.session.get("free_evolution_used", False):
+
+            # Send the guest back to the result page they were on.
+            # Fall back to the style page if the id is missing/invalid.
+            consultation_id = request.POST.get("consultation_id", "")
+
+            if str(consultation_id).isdigit():
+                return_url = reverse(
+                    "result_view",
+                    kwargs={"consultation_id": int(consultation_id)},
+                )
+            else:
+                return_url = reverse("generate_style_look")
+
             return JsonResponse(
                 {
                     "success": False,
                     "requires_signup": True,
-                    "redirect_url": reverse("signup"),
+                    "redirect_url": signup_url_with_next(return_url),
                     "message": (
                         "Your complimentary Style Evolution "
                         "has been completed."
@@ -906,7 +927,9 @@ def style_my_piece(request):
                 {
                     "success": False,
                     "requires_signup": True,
-                    "redirect_url": reverse("signup"),
+                    "redirect_url": signup_url_with_next(
+                        reverse("style_my_piece")
+                    ),
                     "message": "Create an account to style more pieces.",
                 },
                 status=403,
@@ -1246,7 +1269,9 @@ def generate_next_piece_look(request, piece_id):
                     {
                         "success": False,
                         "requires_signup": True,
-                        "redirect_url": reverse("signup"),
+                        "redirect_url": signup_url_with_next(
+                            reverse("style_my_piece")
+                        ),
                         "message": "Create an account to generate more looks.",
                     },
                     status=403,
@@ -1264,17 +1289,13 @@ def generate_next_piece_look(request, piece_id):
 
                 # Check whether this exact look was already charged.
                 already_charged = Job.objects.filter(
-                    
                     piece_styling=locked_piece,
                     job_type=JobType.PIECE_STYLING,
                     payload__look_number=expected_number,
                     payload__credit_charged=True,
-                    
-                    ).exclude(
-                        
-                        payload__credit_refunded=True
-                        
-                        ).exists()
+                ).exclude(
+                    payload__credit_refunded=True
+                ).exists()
 
                 # First six account-wide looks are free.
                 # Every additional look costs one credit.
