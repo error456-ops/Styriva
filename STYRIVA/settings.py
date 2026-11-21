@@ -27,10 +27,10 @@ DEBUG = env.bool("DEBUG", default=False)
 '''SECRET_KEY = 'django-insecure-60!0zx)t%+*i0r8_j8t(o#aepf!co+l(cgch1ammcza0ul432^'''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-'''DEBUG = True
+'''DEBUG = True'''
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-ALLOWED_HOSTS = []'''
+'''ALLOWED_HOSTS = []'''
 
 ALLOWED_HOSTS = env.list(
     "ALLOWED_HOSTS",
@@ -153,7 +153,6 @@ DATABASES = {
 }
 
 DATABASES["default"]["CONN_MAX_AGE"] = 600
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
