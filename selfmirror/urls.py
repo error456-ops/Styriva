@@ -120,7 +120,7 @@ path(
     name="verify_razorpay_payment",
 ),
 
-
+path("payment/callback/", views.razorpay_callback, name="razorpay_callback"),
 
 path("razorpay/webhook/", views.razorpay_webhook, name="razorpay_webhook"),
 

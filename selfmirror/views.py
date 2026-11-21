@@ -794,7 +794,61 @@ def verify_razorpay_payment(request):
             {"success": False, "message": str(error)},
             status=500,
         )
+@csrf_exempt
+@require_POST
+def razorpay_callback(request):
+    order_id = request.POST.get("razorpay_order_id")
+    payment_id = request.POST.get("razorpay_payment_id")
+    signature = request.POST.get("razorpay_signature")
 
+    if not all([order_id, payment_id, signature]):
+        return redirect("premium")
+
+    client = razorpay_client()
+
+    try:
+        client.utility.verify_payment_signature({
+            "razorpay_order_id": order_id,
+            "razorpay_payment_id": payment_id,
+            "razorpay_signature": signature,
+        })
+
+        rp = client.payment.fetch(payment_id)
+
+        for _ in range(4):
+            if rp.get("status") == "captured":
+                break
+            time.sleep(1.5)
+            rp = client.payment.fetch(payment_id)
+
+        with transaction.atomic():
+            payment = (
+                Payment.objects.select_for_update()
+                .filter(razorpay_order_id=order_id)
+                .first()
+            )
+
+            if (
+                payment
+                and payment.status != "paid"
+                and rp.get("order_id") == order_id
+                and rp.get("amount") == payment.amount
+                and rp.get("status") == "captured"
+            ):
+                payment.razorpay_payment_id = payment_id
+                payment.razorpay_signature = signature
+                payment.status = "paid"
+                payment.paid_at = timezone.now()
+                payment.save(update_fields=[
+                    "razorpay_payment_id", "razorpay_signature",
+                    "status", "paid_at",
+                ])
+                CreditManager.add_credits(payment.user, payment.credits)
+
+    except Exception:
+        logger.exception("Razorpay callback failed")
+
+    return redirect("premium")
 
 @csrf_exempt
 @require_POST
