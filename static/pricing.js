@@ -74,6 +74,66 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     /* ==========================================
+            PAYMENT STATUS OVERLAY
+    ========================================== */
+
+    function showPaymentOverlay(message) {
+
+        let overlay = document.getElementById("payment-overlay");
+
+        if (!overlay) {
+
+            overlay = document.createElement("div");
+            overlay.id = "payment-overlay";
+
+            overlay.style.cssText = [
+                "position:fixed",
+                "inset:0",
+                "z-index:99999",
+                "display:flex",
+                "align-items:center",
+                "justify-content:center",
+                "background:rgba(0,0,0,.82)",
+                "color:#fff",
+                "font-family:inherit",
+                "text-align:center",
+                "padding:24px"
+            ].join(";");
+
+            const box = document.createElement("div");
+            box.id = "payment-overlay-text";
+            box.style.cssText = "max-width:340px;font-size:18px;line-height:1.5;";
+
+            overlay.appendChild(box);
+            document.body.appendChild(overlay);
+        }
+
+        document.getElementById("payment-overlay-text").textContent = message;
+    }
+
+    function hidePaymentOverlay() {
+
+        const overlay = document.getElementById("payment-overlay");
+
+        if (overlay) overlay.remove();
+
+    }
+
+    function updateCreditPill(credits) {
+
+        const pill = document.querySelector(".credit-pill span");
+
+        if (pill && credits !== undefined && credits !== null) {
+            pill.textContent = credits + " Credits";
+        }
+
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /* ==========================================
             RAZORPAY PAYMENT
     ========================================== */
 
@@ -166,8 +226,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 order_id: data.order_id,
 
-                handler: async function (paymentResponse) {
-                    await verifyPayment(paymentResponse);
+                handler: function (paymentResponse) {
+                    // Show the overlay immediately so the user never
+                    // sees a blank or stale page while we confirm.
+                    showPaymentOverlay("Confirming your payment…");
+                    verifyPayment(paymentResponse);
                 },
 
                 theme: {
@@ -199,69 +262,118 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ==========================================
-            VERIFY PAYMENT
+            VERIFY PAYMENT (with retries)
+            Razorpay can take a few seconds to mark a
+            payment as captured. We retry instead of
+            giving up on the first answer.
     ========================================== */
 
     async function verifyPayment(paymentResponse) {
 
-        try {
+        const MAX_ATTEMPTS = 5;
+        const WAIT_BETWEEN_MS = 2000;
 
-            const csrfToken = getCSRFToken();
-            const formData = new FormData();
+        for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
 
-            formData.append(
-                "razorpay_order_id",
-                paymentResponse.razorpay_order_id
-            );
+            try {
 
-            formData.append(
-                "razorpay_payment_id",
-                paymentResponse.razorpay_payment_id
-            );
+                const formData = new FormData();
 
-            formData.append(
-                "razorpay_signature",
-                paymentResponse.razorpay_signature
-            );
-
-            const response = await fetch(
-                "/payment/verify/",
-                {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": csrfToken
-                    },
-                    body: formData
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok || !data.success) {
-
-                alert(
-                    data.message ||
-                    "Payment verification failed. Please contact support if money was deducted."
+                formData.append(
+                    "razorpay_order_id",
+                    paymentResponse.razorpay_order_id
                 );
 
-                return;
+                formData.append(
+                    "razorpay_payment_id",
+                    paymentResponse.razorpay_payment_id
+                );
+
+                formData.append(
+                    "razorpay_signature",
+                    paymentResponse.razorpay_signature
+                );
+
+                const response = await fetch(
+                    "/payment/verify/",
+                    {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": getCSRFToken()
+                        },
+                        body: formData
+                    }
+                );
+
+                let data = {};
+
+                try {
+                    data = await response.json();
+                } catch (parseError) {
+                    data = {};
+                }
+
+                // SUCCESS
+                if (response.ok && data.success) {
+
+                    updateCreditPill(data.credits);
+
+                    showPaymentOverlay(
+                        `Payment successful! You now have ${data.credits} credits.`
+                    );
+
+                    await sleep(1500);
+
+                    window.location.reload();
+
+                    return;
+                }
+
+                // Only retry when the problem is temporary
+                const message = (data.message || "").toLowerCase();
+
+                const isTemporary =
+                    response.status >= 500 ||
+                    message.includes("captured");
+
+                if (!isTemporary) {
+
+                    hidePaymentOverlay();
+
+                    alert(
+                        data.message ||
+                        "Payment verification failed. Please contact support if money was deducted."
+                    );
+
+                    return;
+                }
+
+            } catch (error) {
+
+                // Network problem: try again
+                console.error("Verification error (attempt " + attempt + "):", error);
+
             }
 
-            alert(
-                `Payment successful! You now have ${data.credits} credits.`
-            );
+            if (attempt < MAX_ATTEMPTS) {
 
-            window.location.reload();
+                showPaymentOverlay("Confirming your payment…");
 
-        } catch (error) {
+                await sleep(WAIT_BETWEEN_MS);
 
-            console.error("Verification error:", error);
-
-            alert(
-                "Unable to verify payment. Please contact support if money was deducted."
-            );
+            }
 
         }
+
+        // Still not confirmed. The money is safe: reloading runs the
+        // server-side payment sync, which adds the credits.
+        showPaymentOverlay(
+            "We're still confirming your payment. Your credits will appear in a moment."
+        );
+
+        await sleep(3000);
+
+        window.location.reload();
 
     }
 
