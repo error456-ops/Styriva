@@ -2715,3 +2715,265 @@ STYRIVA PREMIUM MODAL
 }
 
 }
+
+
+/* ==========================================
+   STYRIVA PREMIUM MODAL — MOBILE RESPONSIVE
+   Fix for short screens and smaller phones
+========================================== */
+
+/* Main modal */
+.premium-modal {
+    padding: 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-items: center;
+}
+
+/* Premium card */
+.premium-card {
+    width: 100%;
+    max-width: 520px;
+
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 35px 40px;
+    margin: auto;
+
+    box-sizing: border-box;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+/* Custom scrollbar */
+.premium-card::-webkit-scrollbar {
+    width: 4px;
+}
+
+.premium-card::-webkit-scrollbar-thumb {
+    background: rgba(212,175,55,.45);
+    border-radius: 20px;
+}
+
+/* Close button */
+.premium-close {
+    position: sticky;
+    top: 0;
+    float: right;
+    z-index: 10;
+}
+
+/* ==========================================
+   TABLET AND MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+
+    .premium-modal {
+        padding: 12px;
+        align-items: center;
+    }
+
+    .premium-card {
+        max-width: 460px;
+        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
+
+        padding: 30px 24px;
+        border-radius: 24px;
+    }
+
+    .premium-logo {
+        width: 65px;
+        height: 65px;
+        margin-bottom: 12px;
+    }
+
+    .premium-tag {
+        font-size: 9px;
+        padding: 7px 13px;
+        margin-bottom: 12px;
+    }
+
+    .premium-card h2 {
+        font-size: 27px;
+        margin-bottom: 10px;
+    }
+
+    .premium-description {
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 18px;
+    }
+
+    .premium-divider {
+        margin-bottom: 20px;
+    }
+
+    .premium-benefits {
+        gap: 13px;
+        margin-bottom: 22px;
+    }
+
+    .premium-item {
+        gap: 12px;
+    }
+
+    .premium-item strong {
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .premium-item small {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .premium-upgrade {
+        padding: 15px;
+        font-size: 13px;
+        border-radius: 13px;
+    }
+
+    .premium-later {
+        margin-top: 12px;
+        font-size: 12px;
+    }
+
+    .premium-footer {
+        margin-top: 17px;
+        font-size: 10px;
+    }
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+
+    .premium-modal {
+        padding: 8px;
+    }
+
+    .premium-card {
+        max-width: 100%;
+        max-height: calc(100vh - 16px);
+        max-height: calc(100dvh - 16px);
+
+        padding: 25px 20px;
+        border-radius: 20px;
+    }
+
+    .premium-logo {
+        width: 55px;
+        height: 55px;
+        margin-bottom: 10px;
+    }
+
+    .premium-card h2 {
+        font-size: 24px;
+    }
+
+    .premium-description {
+        font-size: 12px;
+        margin-bottom: 15px;
+    }
+
+    .premium-benefits {
+        gap: 11px;
+        margin-bottom: 18px;
+    }
+
+    .premium-item small {
+        font-size: 10px;
+    }
+
+    .premium-upgrade {
+        padding: 14px 12px;
+        font-size: 12px;
+    }
+}
+
+/* ==========================================
+   SHORT SCREEN / SMALL HEIGHT PHONES
+========================================== */
+
+@media (max-height: 650px) {
+
+    .premium-modal {
+        align-items: flex-start;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .premium-card {
+        max-height: calc(100vh - 16px);
+        max-height: calc(100dvh - 16px);
+
+        padding-top: 20px;
+        padding-bottom: 20px;
+
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+    .premium-logo {
+        width: 45px;
+        height: 45px;
+        margin-bottom: 8px;
+    }
+
+    .premium-tag {
+        margin-bottom: 8px;
+        padding: 5px 12px;
+    }
+
+    .premium-card h2 {
+        font-size: 23px;
+        margin-bottom: 8px;
+    }
+
+    .premium-description {
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+
+    .premium-divider {
+        margin-bottom: 14px;
+    }
+
+    .premium-benefits {
+        gap: 9px;
+        margin-bottom: 15px;
+    }
+
+    .premium-footer {
+        margin-top: 12px;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 360px) {
+
+    .premium-card {
+        padding: 20px 16px;
+    }
+
+    .premium-card h2 {
+        font-size: 21px;
+    }
+
+    .premium-item strong {
+        font-size: 12px;
+    }
+
+    .premium-item small {
+        font-size: 10px;
+    }
+}
