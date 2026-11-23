@@ -720,3 +720,28 @@ nav a.active::after{width:100%;}
     inset:0 !important;
     z-index:2147483647 !important;
 }
+
+/* Lighter page on phones: prevents the tab crash after payment */
+@media (max-width: 900px) {
+    .noise,
+    .gradient-one,
+    .gradient-two,
+    .cta-glow {
+        display: none !important;
+    }
+
+    .navbar,
+    .pricing-card,
+    .feature-card,
+    .highlight-box,
+    .cta-card,
+    .warning-box {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    .reveal {
+        transition: none !important;
+        animation: none !important;
+    }
+}
