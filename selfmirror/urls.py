@@ -51,6 +51,7 @@ path(
 
 
 path("premium/", views.premium_pricing, name="premium"),
+path("payment-status/", views.payment_status, name="payment_status"),
 
 
 

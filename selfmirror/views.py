@@ -607,6 +607,22 @@ def premium_pricing(request):
         sync_pending_payments(request.user)
     return render(request, "pricing.html")
 
+@login_required
+def payment_status(request):
+    order_id = request.GET.get("order_id", "")
+
+    sync_pending_payments(request.user)
+
+    payment = Payment.objects.filter(
+        user=request.user, razorpay_order_id=order_id
+    ).first()
+    credits = Profile.objects.get(user=request.user).credits
+
+    return JsonResponse({
+        "paid": bool(payment and payment.status == "paid"),
+        "credits": credits,
+    })
+
 
 @login_required
 def create_razorpay_order(request):

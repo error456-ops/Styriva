@@ -74,6 +74,105 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     /* ==========================================
+            CREDIT COUNTER HELPERS
+    ========================================== */
+
+    const PENDING_KEY = "styriva_pending_payment";
+
+    function getCreditElement() {
+        return document.getElementById("credit-count");
+    }
+
+    function readCurrentCredits() {
+        const el = getCreditElement();
+        if (!el) return 0;
+        const n = parseInt(el.textContent, 10);
+        return isNaN(n) ? 0 : n;
+    }
+
+    function setCredits(value) {
+        const el = getCreditElement();
+        if (el) el.textContent = value + " Credits";
+    }
+
+    function clearPending() {
+        try {
+            sessionStorage.removeItem(PENDING_KEY);
+        } catch (e) {}
+    }
+
+    /* ==========================================
+            AFTER PAYMENT: WAIT FOR CREDITS
+
+            Razorpay sends the browser back to this page.
+            If credits are not added yet, keep asking the
+            server every 2 seconds until they show up, then
+            update the number without a manual refresh.
+    ========================================== */
+
+    async function watchPendingPayment() {
+
+        let pending = null;
+
+        try {
+            pending = JSON.parse(sessionStorage.getItem(PENDING_KEY));
+        } catch (e) {}
+
+        if (!pending) return;
+
+        // Ignore very old flags (older than 10 minutes)
+        if (Date.now() - pending.time > 10 * 60 * 1000) {
+            clearPending();
+            return;
+        }
+
+        const el = getCreditElement();
+        if (!el) return;
+
+        el.textContent = "Updating credits...";
+
+        for (let i = 0; i < 25; i++) {   // about 50 seconds max
+
+            try {
+                const response = await fetch("/payment-status/", {
+                    credentials: "same-origin",
+                    cache: "no-store"
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.credits > pending.credits) {
+                        setCredits(data.credits);
+                        clearPending();
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.error("Credit check failed:", e);
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+
+        // Gave up waiting: show the latest number we know and stop
+        try {
+            const response = await fetch("/payment-status/", {
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setCredits(data.credits);
+            }
+        } catch (e) {}
+
+        clearPending();
+    }
+
+    watchPendingPayment();
+
+    /* ==========================================
             RAZORPAY PAYMENT
     ========================================== */
 
@@ -116,8 +215,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             Redirect mode: after payment, Razorpay sends the
             browser to /payment/callback/. Your server verifies
-            and credits the payment BEFORE the pricing page
-            loads, so the credits are correct straight away.
+            and credits the payment, then sends the user back
+            here, where watchPendingPayment() above waits for
+            the credits to appear.
     ========================================== */
 
     async function startPayment(plan) {
@@ -175,6 +275,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 redirect: true,
 
+                modal: {
+                    ondismiss: function () {
+                        clearPending();
+                    }
+                },
+
                 theme: {
                     color: "#000000"
                 }
@@ -187,15 +293,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 console.error("Payment failed:", response);
 
+                clearPending();
+
                 alert("Payment failed. Please try again.");
 
             });
+
+            // Remember how many credits we have right now, so after
+            // the redirect we know when the new credits have arrived.
+            try {
+                sessionStorage.setItem(PENDING_KEY, JSON.stringify({
+                    credits: readCurrentCredits(),
+                    time: Date.now()
+                }));
+            } catch (e) {}
 
             razorpay.open();
 
         } catch (error) {
 
             console.error("Payment error:", error);
+
+            clearPending();
 
             alert("Something went wrong while starting payment.");
 
