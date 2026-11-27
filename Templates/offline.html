@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#171923">
+    <meta name="description" content="STYRIVA - Your Personal AI Fashion Stylist">
+
+    <title>STYRIVA — You're Offline</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: #f8f7f4;
+            color: #171923;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .offline-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 42px 28px;
+            background: #ffffff;
+            border: 1px solid #e9e5dc;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+        }
+
+        .logo {
+            font-family: Georgia, serif;
+            font-size: 32px;
+            letter-spacing: 5px;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            color: #a58b55;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 38px;
+        }
+
+        .offline-icon {
+            width: 82px;
+            height: 82px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f4f0e8;
+            font-size: 36px;
+        }
+
+        h1 {
+            font-family: Georgia, serif;
+            font-size: 27px;
+            font-weight: 400;
+            margin-bottom: 14px;
+        }
+
+        .description {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+        .offline-status {
+            display: inline-block;
+            padding: 9px 16px;
+            margin-bottom: 25px;
+            border-radius: 30px;
+            background: #f5f1e9;
+            color: #8a7040;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .retry-button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 9px;
+            background: #171923;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .retry-button:hover {
+            background: #333746;
+        }
+
+        .footer {
+            margin-top: 28px;
+            color: #aaa;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="offline-card">
+
+        <div class="logo">STYRIVA</div>
+
+        <div class="tagline">
+            Your Personal AI Stylist
+        </div>
+
+        <div class="offline-icon">✦</div>
+
+        <h1>Your Style Journey Awaits</h1>
+
+        <p class="description">
+            It looks like your internet connection is unavailable.
+            Don't worry. Your STYRIVA experience will be ready
+            when you're connected again.
+        </p>
+
+        <div class="offline-status">
+            ● YOU'RE CURRENTLY OFFLINE
+        </div>
+
+        <button class="retry-button" onclick="retryConnection()">
+            Try Again
+        </button>
+
+        <div class="footer">
+            MADE WITH CARE BY STYRIVA
+        </div>
+
+    </main>
+
+    <script>
+        function retryConnection() {
+            if (navigator.onLine) {
+                window.location.href = "/";
+            } else {
+                alert("You're still offline. Please check your internet connection.");
+            }
+        }
+
+        window.addEventListener("online", function () {
+            window.location.href = "/";
+        });
+    </script>
+
+</body>
+</html>

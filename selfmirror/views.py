@@ -34,6 +34,11 @@ import time
 
 logger = logging.getLogger(__name__)
 
+from django.shortcuts import render
+
+def offline_view(request):
+    return render(request, "offline.html")
+
 
 # ==========================================================
 # Constants
