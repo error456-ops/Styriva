@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -18,10 +19,7 @@
         content="STYRIVA - Your AI Styling Concierge"
     >
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link
         rel="preconnect"
@@ -47,12 +45,15 @@
     {% block extra_css %}
     {% endblock %}
 
-
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#4f46e5">
-
+    <!-- STYRIVA PWA Metadata -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'manifest' %}">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="STYRIVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 </head>
 
@@ -64,10 +65,7 @@
 
         <div class="container">
 
-            <a
-                href="/"
-                class="logo"
-            >
+            <a href="/" class="logo">
                 STYRIVA
             </a>
 
@@ -91,10 +89,7 @@
                         Login
                     </a>
 
-                    <a
-                        href="{% url 'signup' %}"
-                        class="btn-nav"
-                    >
+                    <a href="{% url 'signup' %}" class="btn-nav">
                         Get Started
                     </a>
 
@@ -115,10 +110,7 @@
     </header>
 
 
-    <div
-        id="mobileMenu"
-        class="mobile-menu"
-    >
+    <div id="mobileMenu" class="mobile-menu">
 
         <a href="/">Home</a>
 
@@ -154,9 +146,7 @@
             {% for message in messages %}
 
                 <div class="alert {{ message.tags }}">
-
                     {{ message }}
-
                 </div>
 
             {% endfor %}
@@ -248,10 +238,44 @@
 
 </div>
 
+
 <script src="{% static 'base.js' %}"></script>
 
 {% block extra_js %}
 {% endblock %}
+
+
+<!-- STYRIVA PWA Service Worker Registration -->
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+        try {
+            const registration =
+                await navigator.serviceWorker.register("/sw.js", {
+                    scope: "/",
+                    updateViaCache: "none"
+                });
+
+            console.log(
+                "STYRIVA PWA registered:",
+                registration.scope
+            );
+
+            await registration.update();
+
+        } catch (error) {
+            console.error(
+                "STYRIVA PWA registration failed:",
+                error
+            );
+        }
+    });
+}
+</script>
+</body>
+</html>
+
 
 </body>
 </html>

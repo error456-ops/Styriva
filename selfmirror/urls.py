@@ -5,30 +5,12 @@ from django.contrib.staticfiles import finders
 from django.http import HttpResponse, Http404
 
 
-def serve_service_worker(request):
-    worker_path = finders.find("service-worker.js")
 
-    if not worker_path:
-        raise Http404("Service worker not found")
-
-    with open(worker_path, "r", encoding="utf-8") as file:
-        response = HttpResponse(
-            file.read(),
-            content_type="application/javascript"
-        )
-
-    response["Service-Worker-Allowed"] = "/"
-    response["Cache-Control"] = "no-cache"
-
-    return response
 
 urlpatterns = [
     
-    path(
-    "sw.js",
-    serve_service_worker,
-    name="service_worker"
-),
+   
+
 
     path(
         "",
@@ -163,6 +145,6 @@ path(
     name="generate_next_piece_look",
 ),
 
-path("offline/", views.offline_view, name="offline"),
+
 
 ]

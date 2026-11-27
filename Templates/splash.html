@@ -50,6 +50,35 @@
         </div>
     </div>
 
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+        try {
+            const registration = await navigator.serviceWorker.register(
+                "/sw.js",
+                {
+                    scope: "/",
+                    updateViaCache: "none"
+                }
+            );
+
+            console.log(
+                "STYRIVA PWA registered:",
+                registration.scope
+            );
+
+        } catch (error) {
+            console.error(
+                "STYRIVA PWA registration failed:",
+                error
+            );
+        }
+    });
+}
+</script>
+
+
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             // Step 1: Wait 3 seconds for the luxury brand intro to show
@@ -66,5 +95,118 @@
             }, 3000); // 3000ms total showcase time
         });
     </script>
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>STYRIVA - Your Virtual Stylist</title>
+
+    <meta name="description" content="Your personal AI fashion stylist.">
+    <meta name="theme-color" content="#4f46e5">
+
+    <!-- STYRIVA PWA -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'manifest' %}">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="STYRIVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes loadingBar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 1.2s ease-out forwards;
+        }
+
+        .animate-loading-bar {
+            animation: loadingBar 1.8s infinite ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="bg-[#fbf9f6] min-h-screen flex items-center justify-center m-0 overflow-hidden">
+
+    <div id="splash-container" class="text-center opacity-100 transition-opacity duration-1000 ease-out">
+
+        <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center animate-fade-in">
+            <img src="{% static 'logo.png' %}" alt="STYRIVA Logo" class="max-w-full max-h-full object-contain">
+        </div>
+
+        <div class="animate-fade-in" style="animation-delay: 0.3s;">
+            <h1 class="text-4xl font-serif text-[#3a3530] tracking-[0.3em] uppercase font-light mb-1">Stryiva</h1>
+            <p class="text-[10px] text-stone-400 tracking-[0.5em] uppercase font-medium">Your Intelligent Wardrobe</p>
+        </div>
+
+        <div class="mt-10 w-24 h-[1px] bg-stone-200 mx-auto relative overflow-hidden animate-fade-in" style="animation-delay: 0.6s;">
+            <div class="absolute inset-0 bg-[#3a3530] animate-loading-bar"></div>
+        </div>
+
+    </div>
+
+    <!-- PWA SERVICE WORKER -->
+    <script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", async () => {
+            try {
+                const registration =
+                    await navigator.serviceWorker.register("/sw.js", {
+                        scope: "/",
+                        updateViaCache: "none"
+                    });
+
+                console.log(
+                    "STYRIVA PWA registered:",
+                    registration.scope
+                );
+
+            } catch (error) {
+                console.error(
+                    "STYRIVA PWA registration failed:",
+                    error
+                );
+            }
+        });
+    }
+    </script>
+
+    <!-- ORIGINAL SPLASH REDIRECT -->
+    <script>
+    window.addEventListener('DOMContentLoaded', () => {
+
+        setTimeout(() => {
+
+            const splash = document.getElementById('splash-container');
+            splash.style.opacity = '0';
+
+            setTimeout(() => {
+                window.location.href = "{% url 'choose_feature' %}";
+            }, 1000);
+
+        }, 3000);
+
+    });
+    </script>
+
+</body>
+</html>
+
 </body>
 </html>

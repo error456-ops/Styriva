@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "styriva-static-v1";
+const CACHE_NAME = "styriva-static-v2";
 const OFFLINE_URL = "/offline/";
 
 // INSTALL
@@ -38,7 +38,6 @@ self.addEventListener("fetch", event => {
     const request = event.request;
     const url = new URL(request.url);
 
-    // Only handle same-origin GET requests
     if (
         request.method !== "GET" ||
         url.origin !== self.location.origin
@@ -46,17 +45,19 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    // Never intercept sensitive or dynamic sections
+    // Never cache sensitive or transactional sections
     if (
         url.pathname.startsWith("/admin/") ||
         url.pathname.startsWith("/api/") ||
         url.pathname.startsWith("/accounts/") ||
-        url.pathname.startsWith("/payments/")
+        url.pathname.startsWith("/payments/") ||
+        url.pathname.startsWith("/payment/") ||
+        url.pathname.startsWith("/razorpay/")
     ) {
         return;
     }
 
-    // Navigation requests: network first, offline fallback
+    // Network first for pages, offline fallback if unavailable
     if (request.mode === "navigate") {
         event.respondWith(
             (async () => {
@@ -66,7 +67,7 @@ self.addEventListener("fetch", event => {
                     const cachedPage = await caches.match(OFFLINE_URL);
 
                     return cachedPage || new Response(
-                        "STYRIVA is currently offline.",
+                        "STYRIVA is currently offline. Please try again.",
                         {
                             status: 503,
                             headers: {
