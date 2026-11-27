@@ -145,6 +145,8 @@ path(
     name="generate_next_piece_look",
 ),
 
+path("manifest.json", views.manifest, name="manifest"),
+
 
 
 ]

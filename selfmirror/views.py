@@ -36,6 +36,15 @@ logger = logging.getLogger(__name__)
 
 from django.shortcuts import render
 
+from django.shortcuts import render
+
+def manifest(request):
+    return render(
+        request,
+        "manifest.json",
+        content_type="application/manifest+json"
+    )
+
 def offline_view(request):
     return render(request, "offline.html")
 
