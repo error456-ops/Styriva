@@ -1,101 +1,3 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STYRIVA - Your Virtual Stylist</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Smooth fade-in animation for elements */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* Custom progress bar animation */
-        @keyframes loadingBar {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 1.2s ease-out forwards;
-        }
-        .animate-loading-bar {
-            animation: loadingBar 1.8s infinite ease-in-out;
-        }
-    </style>
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#4f46e5">
-
-
-
-</head>
-<body class="bg-[#fbf9f6] min-h-screen flex items-center justify-center m-0 overflow-hidden">
-
-    <div id="splash-container" class="text-center opacity-100 transition-opacity duration-1000 ease-out">
-        
-        <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center animate-fade-in">
-            <img src="{% static 'logo.png' %}" alt="STYRIVA Logo" class="max-w-full max-h-full object-contain">
-        </div>
-
-        <div class="animate-fade-in" style="animation-delay: 0.3s;">
-            <h1 class="text-4xl font-serif text-[#3a3530] tracking-[0.3em] uppercase font-light mb-1">Stryiva</h1>
-            <p class="text-[10px] text-stone-400 tracking-[0.5em] uppercase font-medium">Your Intelligent Wardrobe</p>
-        </div>
-        
-        <div class="mt-10 w-24 h-[1px] bg-stone-200 mx-auto relative overflow-hidden animate-fade-in" style="animation-delay: 0.6s;">
-            <div class="absolute inset-0 bg-[#3a3530] animate-loading-bar"></div>
-        </div>
-    </div>
-
-
-<script>
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async () => {
-        try {
-            const registration = await navigator.serviceWorker.register(
-                "/sw.js",
-                {
-                    scope: "/",
-                    updateViaCache: "none"
-                }
-            );
-
-            console.log(
-                "STYRIVA PWA registered:",
-                registration.scope
-            );
-
-        } catch (error) {
-            console.error(
-                "STYRIVA PWA registration failed:",
-                error
-            );
-        }
-    });
-}
-</script>
-
-
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            // Step 1: Wait 3 seconds for the luxury brand intro to show
-            setTimeout(() => {
-                const splash = document.getElementById('splash-container');
-                splash.style.opacity = '0'; // Starts the smooth 1-second fade out
-                
-                // Step 2: Wait exactly 1 second (1000ms) for the fade-out to finish, then go!
-                setTimeout(() => {
-                    window.location.href = "{% url 'choose_feature' %}";
-                    
-                }, 1000); 
-
-            }, 3000); // 3000ms total showcase time
-        });
-    </script>
-
 
 {% load static %}
 <!DOCTYPE html>
@@ -119,17 +21,29 @@ if ("serviceWorker" in navigator) {
     <meta name="apple-mobile-web-app-title" content="STYRIVA">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Splash Screen Animations -->
     <style>
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes loadingBar {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         .animate-fade-in {
@@ -140,73 +54,105 @@ if ("serviceWorker" in navigator) {
             animation: loadingBar 1.8s infinite ease-in-out;
         }
     </style>
+
 </head>
 
 <body class="bg-[#fbf9f6] min-h-screen flex items-center justify-center m-0 overflow-hidden">
 
-    <div id="splash-container" class="text-center opacity-100 transition-opacity duration-1000 ease-out">
+    <!-- STYRIVA SPLASH SCREEN -->
+    <div id="splash-container"
+         class="text-center opacity-100 transition-opacity duration-1000 ease-out">
 
+        <!-- Logo -->
         <div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center animate-fade-in">
-            <img src="{% static 'logo.png' %}" alt="STYRIVA Logo" class="max-w-full max-h-full object-contain">
+            <img
+                src="{% static 'logo.png' %}"
+                alt="STYRIVA Logo"
+                class="max-w-full max-h-full object-contain"
+            >
         </div>
 
+        <!-- Brand Name -->
         <div class="animate-fade-in" style="animation-delay: 0.3s;">
-            <h1 class="text-4xl font-serif text-[#3a3530] tracking-[0.3em] uppercase font-light mb-1">Stryiva</h1>
-            <p class="text-[10px] text-stone-400 tracking-[0.5em] uppercase font-medium">Your Intelligent Wardrobe</p>
+
+            <h1 class="text-4xl font-serif text-[#3a3530] tracking-[0.3em] uppercase font-light mb-1">
+                Stryiva
+            </h1>
+
+            <p class="text-[10px] text-stone-400 tracking-[0.5em] uppercase font-medium">
+                Your Intelligent Wardrobe
+            </p>
+
         </div>
 
-        <div class="mt-10 w-24 h-[1px] bg-stone-200 mx-auto relative overflow-hidden animate-fade-in" style="animation-delay: 0.6s;">
+        <!-- Loading Bar -->
+        <div class="mt-10 w-24 h-[1px] bg-stone-200 mx-auto relative overflow-hidden animate-fade-in"
+             style="animation-delay: 0.6s;">
+
             <div class="absolute inset-0 bg-[#3a3530] animate-loading-bar"></div>
+
         </div>
 
     </div>
 
-    <!-- PWA SERVICE WORKER -->
+
+    <!-- PWA SERVICE WORKER REGISTRATION -->
     <script>
-    if ("serviceWorker" in navigator) {
-        window.addEventListener("load", async () => {
-            try {
-                const registration =
-                    await navigator.serviceWorker.register("/sw.js", {
-                        scope: "/",
-                        updateViaCache: "none"
-                    });
+        if ("serviceWorker" in navigator) {
 
-                console.log(
-                    "STYRIVA PWA registered:",
-                    registration.scope
-                );
+            window.addEventListener("load", async () => {
 
-            } catch (error) {
-                console.error(
-                    "STYRIVA PWA registration failed:",
-                    error
-                );
-            }
-        });
-    }
+                try {
+
+                    const registration =
+                        await navigator.serviceWorker.register("/sw.js", {
+                            scope: "/",
+                            updateViaCache: "none"
+                        });
+
+                    console.log(
+                        "STYRIVA PWA registered:",
+                        registration.scope
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "STYRIVA PWA registration failed:",
+                        error
+                    );
+
+                }
+
+            });
+
+        }
     </script>
 
-    <!-- ORIGINAL SPLASH REDIRECT -->
+
+    <!-- SPLASH SCREEN REDIRECT -->
     <script>
-    window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', () => {
 
-        setTimeout(() => {
-
-            const splash = document.getElementById('splash-container');
-            splash.style.opacity = '0';
-
+            // Show splash screen for 3 seconds
             setTimeout(() => {
-                window.location.href = "{% url 'choose_feature' %}";
-            }, 1000);
 
-        }, 3000);
+                const splash = document.getElementById('splash-container');
 
-    });
+                // Fade out animation
+                splash.style.opacity = '0';
+
+                // Redirect after fade-out completes
+                setTimeout(() => {
+
+                    window.location.href = "{% url 'choose_feature' %}";
+
+                }, 1000);
+
+            }, 3000);
+
+        });
     </script>
-
-</body>
-</html>
 
 </body>
 </html>
