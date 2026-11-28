@@ -1,3 +1,4 @@
+
 {% load static %}
 {% load cloudinary_extras %}
 <!DOCTYPE html>
@@ -11,12 +12,19 @@
 
     <link rel="stylesheet" href="{% static 'result.css' %}">
     <script src="{% static 'result.js' %}" defer></script>
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#4f46e5">
 
+    <!-- STYRIVA PWA -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'manifest' %}">
 
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="description" content="Your personal AI fashion stylist. Create personalised outfits using your own wardrobe.">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="STYRIVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 </head>
 
@@ -60,12 +68,12 @@
         <div class="preview-card">
             <div class="preview-image">
                 {% if generated_look.generated_image %}
-<img src="{{ generated_look.generated_image.url|cl_opt:'f_auto,q_auto,w_900' }}" alt="Generated Look">
-{% else %}
-                <div class="placeholder">
-                    <div class="placeholder-icon">✨</div>
-                    <p>Visual generation complete</p>
-                </div>
+                    <img src="{{ generated_look.generated_image.url|cl_opt:'f_auto,q_auto,w_900' }}" alt="Generated Look">
+                {% else %}
+                    <div class="placeholder">
+                        <div class="placeholder-icon">✨</div>
+                        <p>Visual generation complete</p>
+                    </div>
                 {% endif %}
 
                 <div class="vibe-badge">
@@ -77,8 +85,8 @@
             <div class="preview-footer">
                 <span class="preview-label">Virtual Try-On Render</span>
                 <a href="{{ generated_look.generated_image.url|cl_download }}" download class="download-btn">
-    Download Portrait ↓
-</a>
+                    Download Portrait ↓
+                </a>
             </div>
         </div>
 
@@ -90,9 +98,9 @@
                 <div class="piece">
                     <div class="piece-image">
                         {% if selected_top_url %}
-                        <img src="{{ selected_top_url }}" alt="Top">
+                            <img src="{{ selected_top_url }}" alt="Top">
                         {% else %}
-                        👕
+                            👕
                         {% endif %}
                     </div>
                     <div class="piece-content">
@@ -104,9 +112,9 @@
                 <div class="piece">
                     <div class="piece-image">
                         {% if selected_bottom_url %}
-                        <img src="{{ selected_bottom_url }}" alt="Bottom">
+                            <img src="{{ selected_bottom_url }}" alt="Bottom">
                         {% else %}
-                        👖
+                            👖
                         {% endif %}
                     </div>
                     <div class="piece-content">
@@ -118,9 +126,9 @@
                 <div class="piece">
                     <div class="piece-image">
                         {% if selected_scarf_url %}
-                        <img src="{{ selected_scarf_url }}" alt="Scarf">
+                            <img src="{{ selected_scarf_url }}" alt="Scarf">
                         {% else %}
-                        🧣
+                            🧣
                         {% endif %}
                     </div>
                     <div class="piece-content">
@@ -134,7 +142,7 @@
                 <div class="note-header">
                     ✨ <span>Stylist Execution Note</span>
                 </div>
-                <p>{{generated_look.styling_rationale }}</p>
+                <p>{{ generated_look.styling_rationale }}</p>
             </div>
 
             <div class="card">
@@ -142,7 +150,7 @@
 
                 <div class="recommendation">
                     <h4>Makeup</h4>
-                    <p>{{  generated_look.makeup_recommendation }}</p>
+                    <p>{{ generated_look.makeup_recommendation }}</p>
                 </div>
 
                 <div class="recommendation">
@@ -218,7 +226,7 @@
 
         <section id="evolutionFormSection" class="evolution-form-section">
             <div class="evolution-form-card">
-                
+
                 <form id="styleEvolutionForm">
                     {% csrf_token %}
                     <input type="hidden" id="consultationId" value="{{ consultation.id }}">
@@ -303,8 +311,8 @@
                             Generate Style Evolution
                         </button>
                     </div>
-                    
-                </form> 
+
+                </form>
             </div>
         </section>
 
@@ -350,12 +358,10 @@
                 </div>
             </div>
         </section>
-        
+
     </div>
 
-    <!-- ==========================================
-    PREMIUM UPGRADE MODAL
-    ========================================== -->
+    <!-- PREMIUM UPGRADE MODAL -->
     <div id="premiumModal" class="premium-modal">
         <div class="premium-overlay"></div>
         <div class="premium-card">
@@ -365,9 +371,7 @@
                 ✕
             </button>
             <div class="premium-logo">
-                <img
-                    src="{% static 'logo.png' %}"
-                    alt="STYRIVA">
+                <img src="{% static 'logo.png' %}" alt="STYRIVA">
             </div>
             <div class="premium-tag">
                 STYRIVA PREMIUM
@@ -411,13 +415,15 @@
                     </div>
                 </div>
             </div>
-           <button
-    type="button"
-    id="upgradePremiumButton"
-    class="premium-upgrade"
-    onclick="window.location.href='{% url 'premium' %}'">
-    Upgrade to Premium
-</button>
+
+            <button
+                type="button"
+                id="upgradePremiumButton"
+                class="premium-upgrade"
+                onclick="window.location.href='{% url 'premium' %}'">
+                Upgrade to Premium
+            </button>
+
             <button
                 class="premium-later"
                 onclick="closePremiumModal()">
@@ -467,5 +473,29 @@
 
     </div>
 </footer>
+
+<!-- STYRIVA PWA SERVICE WORKER -->
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+        try {
+            const registration = await navigator.serviceWorker.register(
+                "/service-worker.js",
+                {
+                    scope: "/",
+                    updateViaCache: "none"
+                }
+            );
+
+            console.log("STYRIVA PWA registered:", registration.scope);
+            await registration.update();
+
+        } catch (error) {
+            console.error("STYRIVA PWA registration failed:", error);
+        }
+    });
+}
+</script>
+
 </body>
 </html>

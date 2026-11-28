@@ -21,6 +21,16 @@
         content="Learn how STYRIVA handles information, uploaded images, AI styling requests, cookies, and advertising."
     >
     <meta property="og:type" content="website">
+    <!-- STYRIVA PWA METADATA -->
+<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+<link rel="manifest" href="{% url 'manifest' %}">
+
+<meta name="theme-color" content="#4f46e5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="STYRIVA">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
         * {
@@ -1138,6 +1148,37 @@
 
 
 </div>
+
+<!-- STYRIVA PWA SERVICE WORKER -->
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+        try {
+            const registration =
+                await navigator.serviceWorker.register(
+                    "/service-worker.js",
+                    {
+                        scope: "/",
+                        updateViaCache: "none"
+                    }
+                );
+
+            console.log(
+                "STYRIVA PWA registered:",
+                registration.scope
+            );
+
+            await registration.update();
+
+        } catch (error) {
+            console.error(
+                "STYRIVA PWA registration failed:",
+                error
+            );
+        }
+    });
+}
+</script>
 
 </body>
 </html>
