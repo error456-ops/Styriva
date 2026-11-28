@@ -41,9 +41,28 @@ from django.shortcuts import render
 def manifest(request):
     return render(
         request,
-        "manifest.json",
+        "manifest.webmanifest",
         content_type="application/manifest+json"
     )
+    
+    
+
+from pathlib import Path
+from django.http import FileResponse
+
+def service_worker(request):
+    file_path = Path(settings.BASE_DIR) / "static" / "service-worker.js"
+
+    response = FileResponse(
+        open(file_path, "rb"),
+        content_type="application/javascript"
+    )
+
+    response["Service-Worker-Allowed"] = "/"
+    response["Cache-Control"] = "no-cache"
+
+    return response
+
 
 def offline_view(request):
     return render(request, "offline.html")

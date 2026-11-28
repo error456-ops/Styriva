@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "styriva-static-v2";
+const CACHE_NAME = "styriva-static-v3";
 const OFFLINE_URL = "/offline/";
 
 // INSTALL
@@ -45,7 +45,7 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    // Never cache sensitive or transactional sections
+    // Never cache sensitive sections
     if (
         url.pathname.startsWith("/admin/") ||
         url.pathname.startsWith("/api/") ||
@@ -57,14 +57,15 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    // Network first for pages, offline fallback if unavailable
+    // Network first with offline fallback
     if (request.mode === "navigate") {
         event.respondWith(
             (async () => {
                 try {
                     return await fetch(request);
                 } catch (error) {
-                    const cachedPage = await caches.match(OFFLINE_URL);
+                    const cachedPage =
+                        await caches.match(OFFLINE_URL);
 
                     return cachedPage || new Response(
                         "STYRIVA is currently offline. Please try again.",
