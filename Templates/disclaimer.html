@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -9,27 +10,31 @@
 
     <meta
         name="description"
-        content="Read the STYRIVA disclaimer covering AI-generated styling recommendations, personal preferences, accuracy, and use of the service."
+        content="Read the STYRIVA disclaimer covering AI-generated styling recommendations, image generation, personal preferences, accuracy and use of the service."
     >
 
     <meta name="robots" content="index, follow">
 
     <!-- STYRIVA PWA METADATA -->
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'manifest' %}">
 
-<meta name="theme-color" content="#4f46e5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="STYRIVA">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="STYRIVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -54,7 +59,6 @@
             max-width: 1150px;
             margin: 0 auto;
             padding: 20px 24px;
-
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -86,6 +90,10 @@
             border-radius: 999px;
             background: #1d1d1d;
             color: white !important;
+        }
+
+        .nav-button:hover {
+            opacity: 0.85;
         }
 
         .hero {
@@ -151,6 +159,10 @@
             margin-bottom: 9px;
         }
 
+        .section a {
+            text-decoration: underline;
+        }
+
         .note {
             margin-top: 24px;
             padding: 22px 24px;
@@ -173,7 +185,6 @@
             max-width: 1150px;
             margin: 0 auto;
             padding: 45px 24px;
-
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -201,6 +212,10 @@
             color: #666;
         }
 
+        .footer-links a:hover {
+            color: #111;
+        }
+
         .copyright {
             text-align: center;
             padding: 18px 24px;
@@ -210,7 +225,6 @@
         }
 
         @media (max-width: 700px) {
-
             .nav-container {
                 padding: 18px;
             }
@@ -232,6 +246,10 @@
                 padding: 0 20px 60px;
             }
 
+            .section h2 {
+                font-size: 24px;
+            }
+
             .footer-container {
                 flex-direction: column;
             }
@@ -241,269 +259,375 @@
             }
         }
     </style>
-
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#4f46e5">
-
 </head>
 
 <body>
 
+<!-- NAVIGATION -->
 <nav class="navbar">
-
     <div class="nav-container">
 
-        <a href="/" class="logo">
+        <a href="{% url 'splash' %}" class="logo">
             STYRIVA
         </a>
 
         <div class="nav-links">
-
-            <a href="/">Home</a>
-            <a href="/about/">About</a>
-            <a href="/how-it-works/">How It Works</a>
-            <a href="/guides/">Guides</a>
-            <a href="/faq/">FAQ</a>
-            <a href="/contact/">Contact</a>
+            <a href="{% url 'splash' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'how_it_works' %}">How It Works</a>
+            <a href="{% url 'guides' %}">Guides</a>
+            <a href="{% url 'faq' %}">FAQ</a>
+            <a href="{% url 'contact' %}">Contact</a>
 
             <a href="/generate/" class="nav-button">
                 Create Your Look
             </a>
-
         </div>
 
     </div>
-
 </nav>
 
-
+<!-- HERO -->
 <header class="hero">
 
-    <div class="eyebrow">
-        STYRIVA
-    </div>
+    <div class="eyebrow">STYRIVA</div>
 
-    <h1>
-        Disclaimer
-    </h1>
+    <h1>Disclaimer</h1>
 
     <p>
         Important information about STYRIVA's AI-generated styling
-        recommendations and the use of the service.
+        recommendations, generated images and use of the service.
     </p>
 
 </header>
 
-
 <main class="content">
 
-
+    <!-- 1. GENERAL INFORMATION -->
     <section class="section">
 
-        <h2>
-            1. General information
-        </h2>
+        <h2>1. General Information</h2>
 
         <p>
-            STYRIVA is an AI-powered styling assistance tool designed to
-            provide outfit and appearance suggestions based on information
-            and images provided by users.
+            STYRIVA is an AI-powered styling assistance platform designed
+            to help users explore outfit combinations and styling ideas
+            using information and images they provide.
         </p>
 
         <p>
-            The information and recommendations provided by STYRIVA are
-            intended for general informational and personal styling purposes.
+            The content, recommendations and generated results available
+            through STYRIVA are provided for general informational,
+            creative and personal styling purposes.
+        </p>
+
+        <p>
+            Nothing on STYRIVA should be interpreted as a guarantee of
+            a particular appearance, result or outcome.
         </p>
 
     </section>
 
-
+    <!-- 2. AI GENERATED RECOMMENDATIONS -->
     <section class="section">
 
-        <h2>
-            2. AI-generated recommendations
-        </h2>
+        <h2>2. AI-Generated Recommendations</h2>
 
         <p>
-            STYRIVA uses artificial intelligence to generate styling
-            recommendations. AI systems can make mistakes, misunderstand
-            information, or produce recommendations that may not be suitable
-            for every individual or situation.
+            STYRIVA uses artificial intelligence to analyse submitted
+            information and generate styling recommendations.
+            AI systems may misunderstand images, misinterpret details,
+            or produce results that are incomplete, inaccurate or
+            unsuitable for a particular situation.
         </p>
 
         <p>
-            Recommendations should therefore be treated as suggestions
-            rather than guaranteed or authoritative advice.
+            AI-generated recommendations are suggestions, not
+            guaranteed or authoritative advice.
+        </p>
+
+        <p>
+            Users should independently evaluate recommendations before
+            relying on them for personal styling decisions.
         </p>
 
     </section>
 
-
+    <!-- 3. GENERATED IMAGES -->
     <section class="section">
 
-        <h2>
-            3. Personal taste and judgment
-        </h2>
+        <h2>3. AI-Generated Images and Visual Results</h2>
 
         <p>
-            Clothing, fashion, appearance, comfort, and personal style are
-            subjective. A recommendation that works for one person may not
-            work for another.
+            Images generated through STYRIVA may be illustrative
+            representations of styling ideas. They may not accurately
+            reproduce the exact appearance of uploaded clothing,
+            accessories or other visual references.
         </p>
 
         <p>
-            You are responsible for deciding whether a recommended outfit,
-            combination, material, accessory, or styling suggestion is
-            appropriate for you.
+            Generated results may differ from the original images in
+            aspects including:
+        </p>
+
+        <ul>
+            <li>Garment colour, shade or pattern.</li>
+            <li>Fabric texture, material or appearance.</li>
+            <li>Clothing shape, fit, length or proportions.</li>
+            <li>Accessory details and placement.</li>
+            <li>Other visual elements of the generated image.</li>
+        </ul>
+
+        <p>
+            STYRIVA does not guarantee that generated images will be
+            exact replicas of real clothing items or physical products.
+        </p>
+
+        <p>
+            Generated images should not be treated as product
+            photographs, manufacturing specifications or proof of
+            the exact appearance of a physical item.
         </p>
 
     </section>
 
-
+    <!-- 4. PERSONAL TASTE -->
     <section class="section">
 
-        <h2>
-            4. Weather and practical conditions
-        </h2>
+        <h2>4. Personal Taste and Judgment</h2>
 
         <p>
-            Weather information may be provided by the user and may change
-            after a recommendation is generated.
+            Clothing, fashion, appearance, comfort and personal style
+            are subjective. A recommendation that works for one person
+            may not work for another.
         </p>
 
         <p>
-            STYRIVA's recommendations should not be relied upon as a
-            substitute for checking current weather conditions or making
-            appropriate decisions about safety, health, travel, or outdoor
-            activities.
+            Users are responsible for deciding whether a recommended
+            outfit, combination, material, accessory or styling
+            suggestion is appropriate for their preferences and needs.
+        </p>
+
+        <p>
+            STYRIVA is intended to assist personal styling decisions,
+            not replace individual judgment or personal taste.
         </p>
 
     </section>
 
-
+    <!-- 5. WEATHER AND PRACTICAL CONDITIONS -->
     <section class="section">
 
-        <h2>
-            5. No professional advice
-        </h2>
+        <h2>5. Weather and Practical Conditions</h2>
 
         <p>
-            STYRIVA provides general styling suggestions and is not a
-            substitute for professional medical, dermatological, psychological,
-            legal, financial, or other professional advice.
+            Weather information used during styling may be supplied
+            by the user and may become outdated or inaccurate as
+            conditions change.
         </p>
 
         <p>
-            If you require professional advice, you should consult a
-            qualified professional.
+            Users should independently check current weather conditions
+            and consider their own comfort, safety and practical
+            requirements before choosing an outfit.
+        </p>
+
+        <p>
+            STYRIVA's styling suggestions are not a substitute for
+            professional advice or independent decisions concerning
+            health, safety, travel or outdoor activities.
         </p>
 
     </section>
 
-
+    <!-- 6. NO PROFESSIONAL ADVICE -->
     <section class="section">
 
-        <h2>
-            6. Uploaded images and information
-        </h2>
+        <h2>6. No Professional Advice</h2>
+
+        <p>
+            STYRIVA provides general styling and creative suggestions.
+            It does not provide medical, dermatological, psychological,
+            legal, financial or other professional advice.
+        </p>
+
+        <p>
+            Users who require professional guidance should consult
+            an appropriately qualified professional.
+        </p>
+
+    </section>
+
+    <!-- 7. UPLOADED IMAGES -->
+    <section class="section">
+
+        <h2>7. Uploaded Images and User-Provided Information</h2>
 
         <p>
             Users are responsible for ensuring that the images and
-            information they provide to STYRIVA are appropriate for use
-            with the service and that they have the necessary rights or
-            permissions to provide them.
+            information they submit to STYRIVA are appropriate for
+            use with the service.
         </p>
 
         <p>
-            Information about how submitted information is handled is
-            available in the
-            <a href="{% url 'privacy_policy' %}" style="text-decoration: underline;">
-                Privacy Policy
-            </a>
+            Users must have the necessary rights, permissions or
+            lawful basis to upload and use images they provide,
+            including photographs containing other people.
+        </p>
+
+        <p>
+            Users should not upload content that infringes another
+            person's rights or that they are not authorised to use.
+        </p>
+
+        <p>
+            Information about the handling and processing of uploaded
+            images and personal information is available in our
+            <a href="{% url 'privacy_policy' %}">Privacy Policy</a>.
         </p>
 
     </section>
 
-
+    <!-- 8. THIRD PARTY SERVICES -->
     <section class="section">
 
-        <h2>
-            7. No guarantee of results
-        </h2>
+        <h2>8. Third-Party Services and Technology</h2>
 
         <p>
-            STYRIVA does not guarantee that an AI-generated styling
-            recommendation will meet a user's expectations, preferences,
-            or intended outcome.
+            Certain STYRIVA features may rely on external technology
+            providers and services to support hosting, image processing
+            and AI-powered functionality.
         </p>
 
         <p>
-            Users should use their own judgment when applying any
-            recommendation provided by the service.
+            The availability, performance and operation of these
+            external services may affect the availability or results
+            of certain STYRIVA features.
+        </p>
+
+        <p>
+            STYRIVA cannot guarantee uninterrupted availability or
+            error-free operation of services provided by third parties.
+        </p>
+
+    </section>
+
+    <!-- 9. NO GUARANTEE -->
+    <section class="section">
+
+        <h2>9. No Guarantee of Results</h2>
+
+        <p>
+            STYRIVA does not guarantee that any recommendation,
+            generated image or styling result will meet a user's
+            expectations, preferences or intended outcome.
+        </p>
+
+        <p>
+            Results may vary depending on the images, information,
+            selected options, AI processing and other factors.
+        </p>
+
+        <p>
+            Users should use their own judgment when applying
+            recommendations provided by the service.
         </p>
 
         <div class="note">
-
             <p>
                 STYRIVA is designed to assist with styling decisions,
                 not to make those decisions for you.
             </p>
-
         </div>
 
     </section>
 
-
+    <!-- 10. AVAILABILITY AND CHANGES -->
     <section class="section">
 
-        <h2>
-            8. Changes to this disclaimer
-        </h2>
+        <h2>10. Service Availability and Changes</h2>
 
         <p>
-            This Disclaimer may be updated as STYRIVA's features, services,
-            or policies change.
+            STYRIVA may update, modify, improve, restrict or discontinue
+            features as the platform develops.
+        </p>
+
+        <p>
+            The availability of particular styling tools, AI features,
+            usage allowances and other services may change over time.
+        </p>
+
+        <p>
+            STYRIVA does not guarantee that every feature will remain
+            available without interruption.
+        </p>
+
+    </section>
+
+    <!-- 11. LIMITATION -->
+    <section class="section">
+
+        <h2>11. Use of the Service</h2>
+
+        <p>
+            Users are responsible for how they interpret and use
+            the information, recommendations and generated content
+            provided through STYRIVA.
+        </p>
+
+        <p>
+            Nothing in this Disclaimer is intended to exclude or
+            restrict any rights or protections that cannot lawfully
+            be excluded or restricted under applicable law.
+        </p>
+
+        <p>
+            For additional information about the conditions governing
+            use of STYRIVA, please review our
+            <a href="{% url 'terms' %}">Terms and Conditions</a>.
+        </p>
+
+    </section>
+
+    <!-- 12. CHANGES -->
+    <section class="section">
+
+        <h2>12. Changes to This Disclaimer</h2>
+
+        <p>
+            This Disclaimer may be updated as STYRIVA's features,
+            services, technology or policies change.
         </p>
 
         <p>
             Any updated version will be published on this page.
+            Users are encouraged to review this page periodically.
         </p>
 
     </section>
 
-
+    <!-- 13. CONTACT -->
     <section class="section">
 
-        <h2>
-            9. Contact
-        </h2>
+        <h2>13. Contact</h2>
 
         <p>
-            If you have questions about this Disclaimer or STYRIVA,
-            please visit our
-            <a href="/contact/" style="text-decoration: underline;">
-                Contact
-            </a>
-            page.
+            If you have questions about this Disclaimer or the
+            STYRIVA platform, please visit our
+            <a href="{% url 'contact' %}">Contact</a> page.
         </p>
 
     </section>
-
 
 </main>
 
-
+<!-- FOOTER -->
 <footer>
 
     <div class="footer-container">
 
         <div class="footer-brand">
 
-            <h3>
-                STYRIVA
-            </h3>
+            <h3>STYRIVA</h3>
 
             <p>
                 An AI-powered styling assistant designed to help you
@@ -512,59 +636,29 @@
 
         </div>
 
-
         <div class="footer-links">
 
-            <a href="{% url 'splash' %}">
-                Home
-            </a>
-
-            <a href="{% url 'about' %}">
-                About
-            </a>
-
-            <a href="{% url 'how_it_works' %}">
-                How It Works
-            </a>
-
-            <a href="{% url 'guides' %}">
-                Styling Guides
-            </a>
-
-            <a href="{% url 'faq' %}">
-                FAQ
-            </a>
-
-            <a href="{% url 'contact' %}">
-                Contact
-            </a>
-
-            <a href="{% url 'privacy_policy' %}">
-                Privacy Policy
-            </a>
-
-            <a href="{% url 'terms' %}">
-                Terms & Conditions
-            </a>
-
-            <a href="{% url 'cookies' %}">
-                Cookie Policy
-            </a>
-
-            <a href="{% url 'disclaimer' %}">
-                Disclaimer
-            </a>
+            <a href="{% url 'splash' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'how_it_works' %}">How It Works</a>
+            <a href="{% url 'guides' %}">Styling Guides</a>
+            <a href="{% url 'faq' %}">FAQ</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+            <a href="{% url 'terms' %}">Terms &amp; Conditions</a>
+            <a href="{% url 'cookies' %}">Cookie Policy</a>
+            <a href="{% url 'disclaimer' %}">Disclaimer</a>
 
         </div>
 
     </div>
-
 
     <div class="copyright">
         © {% now "Y" %} STYRIVA. All rights reserved.
     </div>
 
 </footer>
+
 <!-- STYRIVA PWA SERVICE WORKER -->
 <script>
 if ("serviceWorker" in navigator) {

@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -7,22 +8,20 @@
 
     <title>Styling Guides | STYRIVA</title>
 
-    <meta
-        name="description"
-        content="Explore practical styling guides from STYRIVA covering outfit combinations, color harmony, weather, occasions, accessories, and everyday styling."
-    >
+    <meta name="description"
+          content="Explore practical styling guides from STYRIVA covering outfit combinations, color harmony, weather, occasions, accessories and everyday styling.">
 
     <meta name="robots" content="index, follow">
-    <!-- STYRIVA PWA METADATA -->
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
 
-<meta name="theme-color" content="#4f46e5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="STYRIVA">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- STYRIVA PWA METADATA -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'manifest' %}">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="STYRIVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
         * {
@@ -60,7 +59,6 @@
             max-width: 1150px;
             margin: 0 auto;
             padding: 20px 24px;
-
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -211,6 +209,10 @@
             margin-bottom: 15px;
         }
 
+        .featured p:last-child {
+            margin-bottom: 0;
+        }
+
         /* CTA */
 
         .cta {
@@ -260,7 +262,6 @@
             max-width: 1150px;
             margin: 0 auto;
             padding: 45px 24px;
-
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -303,7 +304,6 @@
         /* MOBILE */
 
         @media (max-width: 700px) {
-
             .nav-container {
                 padding: 18px;
             }
@@ -350,15 +350,6 @@
             }
         }
     </style>
-
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#4f46e5">
-
-
-
-
 </head>
 
 <body>
@@ -369,29 +360,29 @@
 
     <div class="nav-container">
 
-        <a href="/" class="logo">
+        <a href="{% url 'splash' %}" class="logo">
             STYRIVA
         </a>
 
         <div class="nav-links">
 
-            <a href="/">
+            <a href="{% url 'splash' %}">
                 Home
             </a>
 
-            <a href="/about/">
+            <a href="{% url 'about' %}">
                 About
             </a>
 
-            <a href="/how-it-works/">
+            <a href="{% url 'how_it_works' %}">
                 How It Works
             </a>
 
-            <a href="/faq/">
+            <a href="{% url 'faq' %}">
                 FAQ
             </a>
 
-            <a href="/contact/">
+            <a href="{% url 'contact' %}">
                 Contact
             </a>
 
@@ -420,7 +411,7 @@
 
     <p>
         Practical guides to help you understand outfit combinations,
-        colors, occasions, weather, accessories, and everyday styling.
+        colors, occasions, weather, accessories and everyday styling.
     </p>
 
 </header>
@@ -428,14 +419,20 @@
 
 <main class="content">
 
+    <!-- INTRODUCTION -->
+
     <div class="intro">
+
         <p>
             Good styling doesn't have to mean following complicated rules.
             These guides focus on simple principles you can use with the
             clothes you already own.
         </p>
+
     </div>
 
+
+    <!-- STYLING GUIDES -->
 
     <section class="guides-grid">
 
@@ -604,7 +601,7 @@
     </section>
 
 
-    <!-- FEATURED -->
+    <!-- FEATURED GUIDE -->
 
     <section class="featured">
 
@@ -615,7 +612,7 @@
         <p>
             Start with the occasion, then consider comfort and weather.
             From there, choose a main piece and build around it using
-            compatible colors, proportions, and accessories.
+            compatible colors, proportions and accessories.
         </p>
 
         <p>
@@ -669,60 +666,61 @@
         </div>
 
 
-   
-<div class="footer-links">
+        <div class="footer-links">
 
-    <a href="{% url 'splash' %}">
-        Home
-    </a>
+            <a href="{% url 'splash' %}">
+                Home
+            </a>
 
-    <a href="{% url 'about' %}">
-        About
-    </a>
+            <a href="{% url 'about' %}">
+                About
+            </a>
 
-    <a href="{% url 'how_it_works' %}">
-        How It Works
-    </a>
+            <a href="{% url 'how_it_works' %}">
+                How It Works
+            </a>
 
-    <a href="{% url 'guides' %}">
-        Styling Guides
-    </a>
+            <a href="{% url 'guides' %}">
+                Styling Guides
+            </a>
 
-    <a href="{% url 'faq' %}">
-        FAQ
-    </a>
+            <a href="{% url 'faq' %}">
+                FAQ
+            </a>
 
-    <a href="{% url 'contact' %}">
-        Contact
-    </a>
+            <a href="{% url 'contact' %}">
+                Contact
+            </a>
 
-    <a href="{% url 'privacy_policy' %}">
-        Privacy Policy
-    </a>
+            <a href="{% url 'privacy_policy' %}">
+                Privacy Policy
+            </a>
 
-    <a href="{% url 'terms' %}">
-        Terms & Conditions
-    </a>
+            <a href="{% url 'terms' %}">
+                Terms &amp; Conditions
+            </a>
 
-    <a href="{% url 'cookies' %}">
-        Cookie Policy
-    </a>
+            <a href="{% url 'cookies' %}">
+                Cookie Policy
+            </a>
 
-    <a href="{% url 'disclaimer' %}">
-        Disclaimer
-    </a>
+            <a href="{% url 'disclaimer' %}">
+                Disclaimer
+            </a>
 
-</div>
+        </div>
 
-
-
+    </div>
 
     <div class="copyright">
         © {% now "Y" %} STYRIVA. All rights reserved.
     </div>
 
 </footer>
+
+
 <!-- STYRIVA PWA SERVICE WORKER -->
+
 <script>
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", async () => {

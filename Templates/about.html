@@ -9,14 +9,10 @@
 
     <title>About STYRIVA | AI Styling Assistant</title>
 
-    <meta
-        name="description"
-        content="Learn about STYRIVA, an AI-powered styling tool designed to help you create personalized outfit recommendations from your own clothing choices."
-    >
-
+    <meta name="description" content="Discover STYRIVA, an AI-powered styling assistant that helps you create outfit ideas using your clothing choices, occasion, vibe, and weather.">
     <meta name="robots" content="index, follow">
 
-    <!-- STYRIVA PWA Metadata -->
+    <!-- PWA Metadata -->
     <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
     <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
     <link rel="manifest" href="{% url 'manifest' %}">
@@ -28,7 +24,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
-
         * {
             margin: 0;
             padding: 0;
@@ -41,7 +36,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                         Roboto, Helvetica, Arial, sans-serif;
+                Roboto, Helvetica, Arial, sans-serif;
             background: #faf9f7;
             color: #1d1d1d;
             line-height: 1.7;
@@ -345,7 +340,6 @@
         /* MOBILE */
 
         @media (max-width: 700px) {
-
             .nav-container {
                 padding: 18px;
             }
@@ -387,6 +381,11 @@
                 grid-template-columns: 1fr;
             }
 
+            .process-step {
+                gap: 14px;
+                padding: 20px;
+            }
+
             .footer-container {
                 flex-direction: column;
             }
@@ -396,454 +395,457 @@
             }
         }
 
+        @media (max-width: 380px) {
+            .hero h1 {
+                font-size: 38px;
+            }
+
+            .nav-button {
+                padding: 9px 13px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-<!-- NAVIGATION -->
+    <!-- NAVIGATION -->
 
-<nav class="navbar">
+    <nav class="navbar">
+        <div class="nav-container">
 
-    <div class="nav-container">
-
-        <a href="{% url 'splash' %}" class="logo">
-            STYRIVA
-        </a>
-
-        <div class="nav-links">
-
-            <a href="{% url 'splash' %}">Home</a>
-
-            <a href="{% url 'how_it_works' %}">
-                How It Works
+            <a href="{% url 'splash' %}" class="logo">
+                STYRIVA
             </a>
 
-            <a href="{% url 'guides' %}">
-                Guides
-            </a>
+            <div class="nav-links">
 
-            <a href="{% url 'faq' %}">FAQ</a>
+                <a href="{% url 'splash' %}">Home</a>
 
-            <a href="{% url 'contact' %}">
-                Contact
-            </a>
+                <a href="{% url 'how_it_works' %}">
+                    How It Works
+                </a>
 
-            <a
-                href="{% url 'generate_style_look' %}"
-                class="nav-button"
-            >
-                Create Your Look
-            </a>
+                <a href="{% url 'guides' %}">
+                    Guides
+                </a>
 
+                <a href="{% url 'faq' %}">FAQ</a>
+
+                <a href="{% url 'contact' %}">
+                    Contact
+                </a>
+
+                <a href="{% url 'generate_style_look' %}" class="nav-button">
+                    Create Your Look
+                </a>
+
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- HERO -->
+
+    <header class="hero">
+
+        <div class="eyebrow">
+            About STYRIVA
         </div>
 
-    </div>
-
-</nav>
-
-
-<!-- HERO -->
-
-<header class="hero">
-
-    <div class="eyebrow">
-        About STYRIVA
-    </div>
-
-    <h1>
-        Personal styling,<br>
-        made simpler.
-    </h1>
-
-    <p>
-        STYRIVA is an AI-powered styling tool designed to help you
-        make everyday outfit decisions using the clothing choices,
-        occasion, vibe, and weather you provide.
-    </p>
-
-</header>
-
-
-<main class="content">
-
-    <!-- WHAT IS STYRIVA -->
-
-    <section class="section">
-
-        <h2>What is STYRIVA?</h2>
+        <h1>
+            Personal styling,<br>
+            made simpler.
+        </h1>
 
         <p>
-            Deciding what to wear can sometimes be surprisingly difficult.
-            You may have several pieces that you like but still be unsure
-            about which ones work best together or what would be appropriate
-            for a particular occasion.
+            STYRIVA is an AI-powered styling assistant designed to help
+            you explore outfit combinations using your clothing choices,
+            occasion, preferred vibe, and weather information.
         </p>
 
-        <p>
-            STYRIVA was created to make that decision easier. It is an
-            AI-powered styling assistant that takes the options you provide
-            and generates a personalized styling recommendation based on
-            your selected occasion, vibe, and weather.
-        </p>
+    </header>
 
-        <p>
-            Instead of asking you to build an entirely new wardrobe,
-            STYRIVA focuses on helping you make better use of the clothing
-            and accessories you already have.
-        </p>
 
-    </section>
+    <main class="content">
 
+        <!-- WHAT IS STYRIVA -->
 
-    <!-- WHY WE BUILT IT -->
+        <section class="section">
 
-    <section class="section">
-
-        <h2>Why we built STYRIVA</h2>
-
-        <p>
-            Styling advice is often presented as a collection of general
-            fashion rules. But what works for one person, occasion, or
-            weather condition may not work for another.
-        </p>
-
-        <p>
-            STYRIVA was designed around a simpler idea: styling should
-            consider the choices that are actually available to you.
-        </p>
-
-        <p>
-            By combining the information you provide with AI-based analysis,
-            STYRIVA aims to turn a collection of clothing options into a
-            practical look recommendation.
-        </p>
-
-    </section>
-
-
-    <!-- WHAT IT CONSIDERS -->
-
-    <section class="section">
-
-        <h2>What STYRIVA considers</h2>
-
-        <div class="feature-grid">
-
-            <div class="feature">
-
-                <h3>Your clothing choices</h3>
-
-                <p>
-                    STYRIVA works with the clothing and accessory options
-                    you provide rather than assuming an unlimited wardrobe.
-                </p>
-
-            </div>
-
-            <div class="feature">
-
-                <h3>The occasion</h3>
-
-                <p>
-                    The intended occasion helps determine whether a
-                    combination is appropriate for the situation.
-                </p>
-
-            </div>
-
-            <div class="feature">
-
-                <h3>Your chosen vibe</h3>
-
-                <p>
-                    Your selected visual vibe helps guide the overall
-                    direction of the recommended look.
-                </p>
-
-            </div>
-
-            <div class="feature">
-
-                <h3>Weather</h3>
-
-                <p>
-                    Weather information helps STYRIVA take practical
-                    conditions into account when creating a recommendation.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- HOW IT WORKS -->
-
-    <section class="section">
-
-        <h2>How STYRIVA works</h2>
-
-        <p>
-            Creating a styling recommendation is designed to be a simple
-            process.
-        </p>
-
-        <div class="process">
-
-            <div class="process-step">
-
-                <div class="step-number">1</div>
-
-                <div>
-
-                    <h3>Provide your options</h3>
-
-                    <p>
-                        Upload the clothing and accessory choices you want
-                        STYRIVA to consider.
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div class="process-step">
-
-                <div class="step-number">2</div>
-
-                <div>
-
-                    <h3>Tell STYRIVA about the occasion</h3>
-
-                    <p>
-                        Select the occasion, visual vibe, and relevant
-                        weather information.
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div class="process-step">
-
-                <div class="step-number">3</div>
-
-                <div>
-
-                    <h3>AI analyzes the choices</h3>
-
-                    <p>
-                        STYRIVA evaluates the available options and looks
-                        for a combination that fits the information provided.
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div class="process-step">
-
-                <div class="step-number">4</div>
-
-                <div>
-
-                    <h3>Receive a styling recommendation</h3>
-
-                    <p>
-                        The result presents a curated look and styling
-                        guidance based on your selected options.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- AI APPROACH -->
-
-    <section class="section">
-
-        <h2>Our approach to AI styling</h2>
-
-        <p>
-            STYRIVA uses artificial intelligence to assist with styling
-            decisions. The system considers the information and images
-            provided by the user and generates a recommendation from the
-            available choices.
-        </p>
-
-        <p>
-            The goal is not to replace personal taste. Instead, STYRIVA is
-            designed to give you another perspective when you are deciding
-            what to wear.
-        </p>
-
-        <div class="note">
+            <h2>What is STYRIVA?</h2>
 
             <p>
-                AI-generated styling recommendations are suggestions and
-                may not always be suitable for every individual preference,
-                situation, or condition. You remain responsible for deciding
-                whether a recommended look is appropriate for you.
+                Deciding what to wear can sometimes be surprisingly difficult.
+                You may have several pieces you love but still be unsure about
+                which ones work well together or what would suit a particular
+                occasion.
             </p>
-
-        </div>
-
-    </section>
-
-
-    <!-- PRIVACY -->
-
-    <section class="section">
-
-        <h2>Your privacy matters</h2>
-
-        <p>
-            STYRIVA may process information and images that you provide
-            while using the styling service. We believe users should be
-            able to understand how their information is handled.
-        </p>
-
-        <p>
-            For detailed information about data collection, use, storage,
-            and your rights, please read our
-            <a
-                href="{% url 'privacy_policy' %}"
-                style="text-decoration: underline;"
-            >
-                Privacy Policy
-            </a>.
-        </p>
-
-    </section>
-
-
-    <!-- CTA -->
-
-    <section class="section">
-
-        <div class="cta">
-
-            <h2>Ready to create your look?</h2>
 
             <p>
-                Give STYRIVA your options, tell us about your occasion,
-                and let AI help you put the pieces together.
+                STYRIVA was created to make that decision easier. It is an
+                AI-powered styling assistant that uses the clothing options
+                and preferences you provide to generate personalized outfit
+                suggestions.
             </p>
-
-            <a
-                href="{% url 'generate_style_look' %}"
-                class="cta-button"
-            >
-                Create Your Look
-            </a>
-
-        </div>
-
-    </section>
-
-</main>
-
-
-<!-- FOOTER -->
-
-<footer>
-
-    <div class="footer-container">
-
-        <div class="footer-brand">
-
-            <h3>STYRIVA</h3>
 
             <p>
-                An AI-powered styling assistant designed to help you
-                make simpler, more personalized outfit decisions.
+                Rather than assuming you need an entirely new wardrobe,
+                STYRIVA focuses on helping you explore different ways to
+                style the clothes and accessories you already own.
             </p>
 
+        </section>
+
+
+        <!-- WHY WE BUILT IT -->
+
+        <section class="section">
+
+            <h2>Why we built STYRIVA</h2>
+
+            <p>
+                Fashion inspiration is everywhere, but not every outfit
+                works for every person, occasion, or weather condition.
+                Sometimes the challenge is not finding more clothes.
+                It is figuring out how to combine the pieces you already have.
+            </p>
+
+            <p>
+                STYRIVA was designed around a simple idea: styling
+                recommendations should consider the options that are
+                actually available to you.
+            </p>
+
+            <p>
+                By combining the information you provide with AI-based
+                image analysis and styling assistance, STYRIVA aims to
+                turn clothing options into practical outfit ideas.
+            </p>
+
+        </section>
+
+
+        <!-- WHAT IT CONSIDERS -->
+
+        <section class="section">
+
+            <h2>What STYRIVA considers</h2>
+
+            <div class="feature-grid">
+
+                <div class="feature">
+
+                    <h3>Your clothing choices</h3>
+
+                    <p>
+                        Upload the clothing and accessory options you want
+                        STYRIVA to consider when creating outfit suggestions.
+                    </p>
+
+                </div>
+
+                <div class="feature">
+
+                    <h3>The occasion</h3>
+
+                    <p>
+                        Your selected occasion helps guide the styling
+                        direction and suitability of the recommended look.
+                    </p>
+
+                </div>
+
+                <div class="feature">
+
+                    <h3>Your chosen vibe</h3>
+
+                    <p>
+                        Choose a preferred aesthetic or vibe to help guide
+                        the overall appearance of your outfit.
+                    </p>
+
+                </div>
+
+                <div class="feature">
+
+                    <h3>Weather</h3>
+
+                    <p>
+                        Relevant weather information helps guide outfit
+                        suggestions with practical conditions in mind.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- HOW IT WORKS -->
+
+        <section class="section">
+
+            <h2>How STYRIVA works</h2>
+
+            <p>
+                Creating a styling recommendation is designed to be
+                a straightforward process.
+            </p>
+
+            <div class="process">
+
+                <div class="process-step">
+
+                    <div class="step-number">1</div>
+
+                    <div>
+                        <h3>Provide your clothing options</h3>
+
+                        <p>
+                            Upload the clothing and accessory images you
+                            want STYRIVA to use for your styling request.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="process-step">
+
+                    <div class="step-number">2</div>
+
+                    <div>
+                        <h3>Choose your preferences</h3>
+
+                        <p>
+                            Select your occasion, preferred vibe, and
+                            relevant weather information.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="process-step">
+
+                    <div class="step-number">3</div>
+
+                    <div>
+                        <h3>AI analyzes your choices</h3>
+
+                        <p>
+                            AI processes the submitted images and styling
+                            information to help identify possible outfit
+                            combinations.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="process-step">
+
+                    <div class="step-number">4</div>
+
+                    <div>
+                        <h3>Explore your styling recommendation</h3>
+
+                        <p>
+                            Receive an AI-generated look and styling
+                            guidance based on the information and options
+                            you provided.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- AI APPROACH -->
+
+        <section class="section">
+
+            <h2>Our approach to AI styling</h2>
+
+            <p>
+                STYRIVA uses artificial intelligence to assist with
+                clothing analysis and outfit recommendations. The system
+                considers the images and information submitted by users
+                to generate styling suggestions.
+            </p>
+
+            <p>
+                AI is a tool to support your decisions, not to replace
+                your personal taste. You remain free to choose the
+                combinations that make you feel comfortable and confident.
+            </p>
+
+            <div class="note">
+
+                <p>
+                    AI-generated styling recommendations and images are
+                    suggestions. Results may not perfectly represent the
+                    original clothing, colours, textures, fit, or proportions.
+                    Always use your own judgment when deciding whether a
+                    recommendation is suitable for you.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRIVACY -->
+
+        <section class="section">
+
+            <h2>Your privacy matters</h2>
+
+            <p>
+                STYRIVA may process account information, styling preferences,
+                and images you provide while using the service. We aim to
+                make our data practices understandable and transparent.
+            </p>
+
+            <p>
+                For detailed information about the information we collect,
+                how it is used, and your available choices, please read our
+                <a href="{% url 'privacy_policy' %}"
+                   style="text-decoration: underline;">
+                    Privacy Policy
+                </a>.
+            </p>
+
+        </section>
+
+
+        <!-- CTA -->
+
+        <section class="section">
+
+            <div class="cta">
+
+                <h2>Ready to create your look?</h2>
+
+                <p>
+                    Explore your wardrobe, choose your preferences,
+                    and let STYRIVA help you discover new outfit
+                    combinations.
+                </p>
+
+                <a href="{% url 'generate_style_look' %}"
+                   class="cta-button">
+                    Create Your Look
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-container">
+
+            <div class="footer-brand">
+
+                <h3>STYRIVA</h3>
+
+                <p>
+                    An AI-powered styling assistant designed to help
+                    you explore clothing combinations and make
+                    everyday outfit decisions simpler.
+                </p>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="{% url 'splash' %}">Home</a>
+
+                <a href="{% url 'about' %}">About</a>
+
+                <a href="{% url 'how_it_works' %}">
+                    How It Works
+                </a>
+
+                <a href="{% url 'guides' %}">
+                    Styling Guides
+                </a>
+
+                <a href="{% url 'faq' %}">FAQ</a>
+
+                <a href="{% url 'contact' %}">Contact</a>
+
+                <a href="{% url 'privacy_policy' %}">
+                    Privacy Policy
+                </a>
+
+                <a href="{% url 'terms' %}">
+                    Terms & Conditions
+                </a>
+
+                <a href="{% url 'cookies' %}">
+                    Cookie Policy
+                </a>
+
+                <a href="{% url 'disclaimer' %}">
+                    Disclaimer
+                </a>
+
+            </div>
+
         </div>
 
-        <div class="footer-links">
 
-            <a href="{% url 'splash' %}">Home</a>
-
-            <a href="{% url 'about' %}">About</a>
-
-            <a href="{% url 'how_it_works' %}">
-                How It Works
-            </a>
-
-            <a href="{% url 'guides' %}">
-                Styling Guides
-            </a>
-
-            <a href="{% url 'faq' %}">FAQ</a>
-
-            <a href="{% url 'contact' %}">Contact</a>
-
-            <a href="{% url 'privacy_policy' %}">
-                Privacy Policy
-            </a>
-
-            <a href="{% url 'terms' %}">
-                Terms & Conditions
-            </a>
-
-            <a href="{% url 'cookies' %}">
-                Cookie Policy
-            </a>
-
-            <a href="{% url 'disclaimer' %}">
-                Disclaimer
-            </a>
-
+        <div class="copyright">
+            © {% now "Y" %} STYRIVA. All rights reserved.
         </div>
 
-    </div>
-
-    <div class="copyright">
-        © {% now "Y" %} STYRIVA. All rights reserved.
-    </div>
-
-</footer>
+    </footer>
 
 
-<!-- STYRIVA PWA SERVICE WORKER REGISTRATION -->
+    <!-- PWA SERVICE WORKER -->
 
-<script>
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async () => {
-        try {
-            const registration =
-                await navigator.serviceWorker.register(
-                    "/service-worker.js",
-                    {
-                        scope: "/",
-                        updateViaCache: "none"
-                    }
-                );
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", async () => {
+                try {
+                    const registration =
+                        await navigator.serviceWorker.register(
+                            "/service-worker.js",
+                            {
+                                scope: "/",
+                                updateViaCache: "none"
+                            }
+                        );
 
-            console.log(
-                "STYRIVA PWA registered:",
-                registration.scope
-            );
+                    console.log(
+                        "STYRIVA PWA registered:",
+                        registration.scope
+                    );
 
-            await registration.update();
+                    await registration.update();
 
-        } catch (error) {
-            console.error(
-                "STYRIVA PWA registration failed:",
-                error
-            );
+                } catch (error) {
+                    console.error(
+                        "STYRIVA PWA registration failed:",
+                        error
+                    );
+                }
+            });
         }
-    });
-}
-</script>
+    </script>
 
 </body>
 </html>

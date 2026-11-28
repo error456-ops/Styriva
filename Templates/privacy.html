@@ -1,5 +1,5 @@
-{% load static %}
 
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,30 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Privacy Policy | STYRIVA</title>
-
-    <meta
-        name="description"
-        content="Read the STYRIVA Privacy Policy to understand how we handle information, uploaded images, AI styling requests, cookies, and advertising."
-    >
-
+    <meta name="description" content="Read the STYRIVA Privacy Policy to understand how we handle personal information, uploaded images, AI styling requests, cookies and third-party services.">
     <meta name="robots" content="index, follow">
 
     <meta property="og:title" content="Privacy Policy | STYRIVA">
-    <meta
-        property="og:description"
-        content="Learn how STYRIVA handles information, uploaded images, AI styling requests, cookies, and advertising."
-    >
+    <meta property="og:description" content="Learn how STYRIVA handles personal information, uploaded images and AI styling requests.">
     <meta property="og:type" content="website">
-    <!-- STYRIVA PWA METADATA -->
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
 
-<meta name="theme-color" content="#4f46e5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="STYRIVA">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- STYRIVA PWA -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'manifest' %}">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="STYRIVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
         * {
@@ -44,13 +36,8 @@
         }
 
         body {
-            font-family:
-                Inter,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-
+            font-family: Inter, -apple-system, BlinkMacSystemFont,
+                "Segoe UI", sans-serif;
             background: #0b0b0d;
             color: #eeeeee;
             line-height: 1.7;
@@ -64,28 +51,20 @@
             min-height: 100vh;
         }
 
-        /* =========================
-           NAVBAR
-        ========================= */
-
         .navbar {
             position: sticky;
             top: 0;
             z-index: 1000;
-
             background: rgba(11, 11, 13, 0.92);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .nav-container {
             width: min(1180px, calc(100% - 40px));
             margin: 0 auto;
-
             min-height: 76px;
-
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -94,26 +73,20 @@
 
         .logo {
             text-decoration: none;
-
             font-size: 22px;
             font-weight: 800;
             letter-spacing: 0.18em;
-
             color: #ffffff;
         }
 
         .back-link {
-            text-decoration: none;
-
             display: inline-flex;
             align-items: center;
             gap: 8px;
-
+            text-decoration: none;
             color: #bdbdc4;
-
             font-size: 14px;
             font-weight: 500;
-
             transition: color 0.2s ease;
         }
 
@@ -121,125 +94,90 @@
             color: #ffffff;
         }
 
-        /* =========================
-           HERO
-        ========================= */
-
         .hero {
             width: min(900px, calc(100% - 40px));
             margin: 0 auto;
-
             padding: 90px 0 60px;
-
             text-align: center;
         }
 
         .eyebrow {
             display: inline-block;
-
             margin-bottom: 18px;
-
             font-size: 12px;
             font-weight: 700;
-
             letter-spacing: 0.18em;
             text-transform: uppercase;
-
             color: #b9b9c2;
         }
 
         .hero h1 {
             font-size: clamp(38px, 6vw, 64px);
             line-height: 1.05;
-
             letter-spacing: -0.04em;
-
             margin-bottom: 24px;
-
             color: #ffffff;
         }
 
         .hero p {
             max-width: 700px;
             margin: 0 auto;
-
             color: #a9a9b2;
-
             font-size: 17px;
         }
 
         .updated {
             margin-top: 20px;
-
             font-size: 13px !important;
             color: #777780 !important;
         }
 
-        /* =========================
-           CONTENT
-        ========================= */
-
         .content {
             width: min(900px, calc(100% - 40px));
             margin: 0 auto;
-
             padding-bottom: 100px;
         }
 
         .policy-card {
             padding: 48px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255, 255, 255, 0.055),
-                    rgba(255, 255, 255, 0.018)
-                );
-
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.055),
+                rgba(255, 255, 255, 0.018)
+            );
             border: 1px solid rgba(255, 255, 255, 0.08);
-
             border-radius: 24px;
-
-            box-shadow:
-                0 30px 80px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
         }
 
         .policy-section {
             padding-bottom: 42px;
             margin-bottom: 42px;
-
             border-bottom: 1px solid rgba(255, 255, 255, 0.07);
         }
 
         .policy-section:last-child {
             padding-bottom: 0;
             margin-bottom: 0;
-
             border-bottom: none;
         }
 
         .policy-section h2 {
             margin-bottom: 18px;
-
             font-size: 25px;
             line-height: 1.25;
-
             color: #ffffff;
         }
 
         .policy-section h3 {
             margin: 24px 0 10px;
-
             font-size: 18px;
-
             color: #eeeeee;
         }
 
         .policy-section p {
             margin-bottom: 15px;
-
             color: #b7b7bf;
-
             font-size: 15px;
         }
 
@@ -253,20 +191,15 @@
 
         .policy-section li {
             margin-bottom: 9px;
-
             color: #b7b7bf;
-
             font-size: 15px;
         }
 
         .highlight {
             margin: 24px 0;
             padding: 20px 22px;
-
             border-left: 3px solid #ffffff;
-
             background: rgba(255, 255, 255, 0.04);
-
             border-radius: 0 12px 12px 0;
         }
 
@@ -277,11 +210,8 @@
         .contact-box {
             margin-top: 22px;
             padding: 24px;
-
             background: rgba(255, 255, 255, 0.035);
-
             border: 1px solid rgba(255, 255, 255, 0.07);
-
             border-radius: 16px;
         }
 
@@ -295,24 +225,17 @@
             text-underline-offset: 3px;
         }
 
-        /* =========================
-           FOOTER
-        ========================= */
-
         .footer {
             border-top: 1px solid rgba(255, 255, 255, 0.08);
-
             padding: 38px 20px;
         }
 
         .footer-container {
             width: min(1180px, 100%);
             margin: 0 auto;
-
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             gap: 25px;
         }
 
@@ -335,11 +258,8 @@
 
         .footer-links a {
             color: #85858d;
-
             font-size: 13px;
-
             text-decoration: none;
-
             transition: color 0.2s ease;
         }
 
@@ -347,12 +267,7 @@
             color: #ffffff;
         }
 
-        /* =========================
-           MOBILE
-        ========================= */
-
         @media (max-width: 700px) {
-
             .nav-container {
                 min-height: 68px;
             }
@@ -379,7 +294,6 @@
 
             .policy-card {
                 padding: 28px 22px;
-
                 border-radius: 18px;
             }
 
@@ -407,726 +321,737 @@
             }
         }
     </style>
-
-
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#4f46e5">
-
 </head>
 
 <body>
 
 <div class="page">
 
-    <!-- =========================
-         NAVBAR
-    ========================= -->
-
     <header class="navbar">
-
         <div class="nav-container">
-
-            <a href="/" class="logo">
-                STYRIVA
-            </a>
+            <a href="/" class="logo">STYRIVA</a>
 
             <a href="/" class="back-link">
                 ← Back to STYRIVA
             </a>
-
         </div>
-
     </header>
 
-
-    <!-- =========================
-         HERO
-    ========================= -->
-
     <section class="hero">
+        <span class="eyebrow">STYRIVA • Legal</span>
 
-        <span class="eyebrow">
-            STYRIVA • Legal
-        </span>
-
-        <h1>
-            Privacy Policy
-        </h1>
+        <h1>Privacy Policy</h1>
 
         <p>
-            Your privacy matters to us. This page explains how STYRIVA
-            handles information when you use our AI styling platform.
+            Your privacy matters to us. This policy explains how
+            STYRIVA handles personal information, uploaded images
+            and information submitted when you use our AI styling platform.
         </p>
 
         <p class="updated">
-            Last updated: August 11, 2026
+            Last updated: November 29, 2026
         </p>
-
     </section>
 
-
-    <!-- =========================
-         POLICY CONTENT
-    ========================= -->
-
     <main class="content">
-
         <article class="policy-card">
 
-
             <!-- 1 -->
-
             <section class="policy-section">
-
-                <h2>
-                    1. Introduction
-                </h2>
+                <h2>1. Introduction</h2>
 
                 <p>
                     Welcome to STYRIVA ("STYRIVA", "we", "us", or "our").
-                    STYRIVA is an AI-powered styling platform designed to
-                    help users explore fashion and receive personalized
-                    styling recommendations.
+                    STYRIVA is an AI-powered fashion and styling platform
+                    that helps users explore outfits and receive styling
+                    recommendations.
                 </p>
 
                 <p>
-                    This Privacy Policy explains what information may be
-                    processed when you use STYRIVA, how that information is
-                    used, how it may be shared, and the choices available
-                    to you.
+                    This Privacy Policy explains what information may
+                    be collected or processed when you use STYRIVA,
+                    why we use it, when it may be shared and what
+                    choices may be available to you.
                 </p>
 
                 <p>
-                    STYRIVA is currently designed so that users can use the
-                    styling service without creating an account or logging in.
+                    Some STYRIVA features may require you to create
+                    an account or sign in. Other features may be
+                    available without an account.
                 </p>
 
                 <p>
-                    By using STYRIVA, you acknowledge that you have read
-                    this Privacy Policy.
+                    This policy should be read together with our
+                    Terms & Conditions and Cookie Policy.
                 </p>
-
             </section>
 
-
             <!-- 2 -->
-
             <section class="policy-section">
-
-                <h2>
-                    2. Information We Handle
-                </h2>
+                <h2>2. Information We Collect or Process</h2>
 
                 <p>
-                    The information processed by STYRIVA depends on how you
-                    use the website and its features.
+                    The information involved depends on which
+                    STYRIVA features you use and what you choose
+                    to submit.
                 </p>
 
-
-                <h3>
-                    2.1 No Account Required
-                </h3>
+                <h3>2.1 Account Information</h3>
 
                 <p>
-                    STYRIVA does not currently require users to create an
-                    account or log in to use the styling service.
-                </p>
-
-                <p>
-                    We therefore do not currently require account credentials,
-                    usernames, or account profiles for ordinary use of the
-                    styling features.
-                </p>
-
-
-                <h3>
-                    2.2 Images You Upload
-                </h3>
-
-                <p>
-                    STYRIVA allows users to upload images for AI styling
-                    and related features.
-                </p>
-
-                <p>
-                    These may include:
+                    If you create an account, we may collect and
+                    process information such as:
                 </p>
 
                 <ul>
-                    <li>A user or model photo</li>
-                    <li>Images of tops</li>
-                    <li>Images of bottoms</li>
-                    <li>Images of scarves or accessories</li>
-                    <li>Other images voluntarily submitted for styling</li>
+                    <li>Name or username, if provided.</li>
+                    <li>Email address.</li>
+                    <li>Account credentials and authentication information.</li>
+                    <li>Account settings and preferences.</li>
+                    <li>Account status and relevant activity records.</li>
                 </ul>
 
+                <p>
+                    Passwords should be stored using appropriate
+                    password-protection methods rather than as
+                    readable plain text.
+                </p>
 
-                <h3>
-                    2.3 Styling Information
-                </h3>
+                <h3>2.2 Images You Upload</h3>
 
                 <p>
-                    When you create a styling request, STYRIVA may process
-                    information you provide such as:
+                    STYRIVA allows users to submit images for
+                    styling and related features. These may include:
                 </p>
 
                 <ul>
-                    <li>Occasion</li>
-                    <li>Style or vibe preferences</li>
-                    <li>Weather information you provide</li>
-                    <li>Style Evolution preferences</li>
-                    <li>Other options selected during a styling request</li>
+                    <li>Images of clothing and garments.</li>
+                    <li>Images of tops, bottoms and dresses.</li>
+                    <li>Images of shoes, scarves and accessories.</li>
+                    <li>Reference or inspiration photographs.</li>
+                    <li>User or model photographs, where submitted.</li>
+                    <li>Other images voluntarily provided for a feature.</li>
                 </ul>
 
-
-                <h3>
-                    2.4 Usage Information
-                </h3>
+                <h3>2.3 Styling Information</h3>
 
                 <p>
-                    STYRIVA may process information needed to operate and
-                    protect the service, including styling generation usage,
-                    Style Evolution usage, daily usage limits, and security
-                    events.
+                    When you make a styling request, we may process
+                    information you provide, such as:
                 </p>
 
+                <ul>
+                    <li>Occasion or event.</li>
+                    <li>Style, aesthetic or vibe preferences.</li>
+                    <li>Weather information.</li>
+                    <li>Garment type or clothing preferences.</li>
+                    <li>Style Evolution preferences.</li>
+                    <li>Other selections or instructions submitted with a request.</li>
+                </ul>
+
+                <h3>2.4 Usage, Credits and Transactions</h3>
+
                 <p>
-                    Usage limits may be applied to help prevent abuse and
-                    manage the availability of AI-powered features.
+                    We may process information needed to operate
+                    and manage usage of STYRIVA, including:
                 </p>
 
+                <ul>
+                    <li>Generation and feature usage.</li>
+                    <li>Free usage allowances and limits.</li>
+                    <li>Credit balances and credit consumption.</li>
+                    <li>Generation status and error records.</li>
+                    <li>Payment or transaction references, where paid features are offered.</li>
+                </ul>
 
-                <h3>
-                    2.5 Technical Information
-                </h3>
+                <h3>2.5 Technical and Device Information</h3>
 
                 <p>
-                    When you access STYRIVA, our website and hosting
-                    infrastructure may process basic technical information,
+                    When you visit STYRIVA, our website and
+                    infrastructure may process technical information,
                     including:
                 </p>
 
                 <ul>
-                    <li>IP address</li>
-                    <li>Browser type</li>
-                    <li>Device information</li>
-                    <li>Operating system</li>
-                    <li>Pages or features accessed</li>
-                    <li>Basic server and security logs</li>
+                    <li>IP address.</li>
+                    <li>Browser type and version.</li>
+                    <li>Device type and operating system.</li>
+                    <li>Pages or features accessed.</li>
+                    <li>Approximate access times.</li>
+                    <li>Server logs and security events.</li>
                 </ul>
-
-                <p>
-                    This information may be processed by the website,
-                    hosting infrastructure, or security systems as necessary
-                    to operate and protect STYRIVA.
-                </p>
-
             </section>
 
-
             <!-- 3 -->
-
             <section class="policy-section">
-
-                <h2>
-                    3. How We Use Information
-                </h2>
+                <h2>3. How We Use Information</h2>
 
                 <p>
-                    We may use information processed through STYRIVA to:
+                    We may use information processed through STYRIVA
+                    for purposes such as:
                 </p>
 
                 <ul>
-                    <li>Provide AI styling services</li>
-                    <li>Process uploaded images</li>
-                    <li>Generate personalized styling recommendations</li>
-                    <li>Provide Style Evolution features</li>
-                    <li>Apply usage limits</li>
-                    <li>Prevent abuse and unauthorized use</li>
-                    <li>Maintain website and platform security</li>
-                    <li>Diagnose technical problems</li>
-                    <li>Maintain and improve STYRIVA</li>
-                    <li>Respond to communications submitted by users</li>
-                    <li>Comply with applicable legal requirements</li>
+                    <li>Creating and managing user accounts.</li>
+                    <li>Providing AI-powered styling features.</li>
+                    <li>Processing uploaded clothing and reference images.</li>
+                    <li>Generating outfit recommendations and visual results.</li>
+                    <li>Providing Style Evolution and related features.</li>
+                    <li>Managing credits, usage allowances and feature limits.</li>
+                    <li>Processing and investigating payment-related issues where applicable.</li>
+                    <li>Maintaining platform security and preventing abuse.</li>
+                    <li>Diagnosing errors and improving reliability.</li>
+                    <li>Responding to support requests and complaints.</li>
+                    <li>Meeting legal and regulatory obligations.</li>
                 </ul>
 
+                <p>
+                    We aim to use information only for purposes
+                    that are relevant to providing, maintaining
+                    and protecting the service or otherwise
+                    permitted by applicable law.
+                </p>
             </section>
 
-
             <!-- 4 -->
-
             <section class="policy-section">
-
-                <h2>
-                    4. AI and Image Processing
-                </h2>
+                <h2>4. AI and Image Processing</h2>
 
                 <p>
                     STYRIVA uses artificial intelligence to process
-                    information and images submitted by users.
+                    information and images submitted through
+                    its styling features.
                 </p>
 
                 <p>
-                    Depending on the feature being used, uploaded images
-                    and related styling information may be processed by
-                    third-party technology providers that help STYRIVA
-                    operate its AI features.
+                    Depending on the feature, your uploaded images,
+                    prompts, garment information and styling
+                    instructions may be sent to third-party
+                    technology providers to generate the
+                    requested result.
+                </p>
+
+                <h3>AI Processing Provider</h3>
+
+                <p>
+                    STYRIVA uses OpenAI services for certain
+                    AI-related processing. Information submitted
+                    to an AI feature may be transmitted to
+                    OpenAI as necessary to provide that feature.
+                </p>
+
+                <h3>Image Storage and Processing Provider</h3>
+
+                <p>
+                    STYRIVA uses Cloudinary for image-related
+                    services. Depending on the feature and
+                    configuration, images may be uploaded to,
+                    stored, delivered or processed through
+                    Cloudinary.
+                </p>
+
+                <p>
+                    The processing of information by these
+                    providers is also subject to their applicable
+                    terms, privacy documentation and the
+                    arrangements governing our use of their services.
                 </p>
 
                 <div class="highlight">
-
                     <p>
-                        Users should only upload images they have the right
-                        to use and should avoid uploading information that
-                        they do not want processed by an online service.
+                        Please upload only images you have the
+                        right to use. Avoid submitting sensitive
+                        personal information unless it is genuinely
+                        necessary for the feature you are using.
                     </p>
-
                 </div>
-
             </section>
-
 
             <!-- 5 -->
-
             <section class="policy-section">
-
-                <h2>
-                    5. Uploaded Images and Generated Results
-                </h2>
+                <h2>5. Uploaded Images and Generated Results</h2>
 
                 <p>
-                    Uploaded images are processed to provide the styling
-                    functionality requested by the user.
+                    Images submitted to STYRIVA are processed
+                    to provide the styling feature requested
+                    by the user.
                 </p>
 
                 <p>
-                    Users are responsible for ensuring that they have the
-                    necessary rights or permissions to upload images to
-                    STYRIVA.
+                    Generated results may also be processed
+                    or stored so that the relevant feature
+                    can function.
                 </p>
 
                 <p>
-                    Uploaded images and generated results may be stored
-                    temporarily or retained for as long as reasonably
-                    necessary to provide the requested service, operate
-                    the platform, maintain security, prevent abuse, or
-                    comply with applicable legal obligations.
+                    We may retain uploaded images, generated
+                    results and related records for as long
+                    as reasonably necessary for the purposes
+                    described in this policy, including providing
+                    the requested feature, maintaining the
+                    service, preventing abuse and meeting
+                    legal obligations.
                 </p>
 
                 <p>
-                    Retention periods may vary depending on the type of
-                    information, the feature used, and operational or
-                    legal requirements.
+                    Actual retention periods may differ by
+                    information type, feature, storage provider
+                    and technical configuration.
                 </p>
 
+                <p>
+                    We do not promise that every uploaded image
+                    or generated result is automatically
+                    deleted immediately after a generation
+                    is completed.
+                </p>
+
+                <p>
+                    If you want information deleted, you may
+                    contact us using the details in this policy.
+                    We will review the request under applicable
+                    law and our actual retention requirements.
+                </p>
             </section>
-
 
             <!-- 6 -->
-
             <section class="policy-section">
-
-                <h2>
-                    6. Cookies and Similar Technologies
-                </h2>
+                <h2>6. Cookies and Similar Technologies</h2>
 
                 <p>
-                    STYRIVA may use cookies, sessions, local storage, and
-                    similar technologies when necessary to operate the
-                    website and its features.
+                    STYRIVA may use cookies, browser storage,
+                    sessions and similar technologies to
+                    support website functionality and security.
                 </p>
 
-                <p>
-                    These technologies may be used to:
-                </p>
+                <p>Depending on the technologies enabled, these may be used to:</p>
 
                 <ul>
-                    <li>Provide necessary website functionality</li>
-                    <li>Maintain necessary session information</li>
-                    <li>Remember necessary settings</li>
-                    <li>Protect against abuse</li>
-                    <li>Improve website performance</li>
-                    <li>Understand website usage where applicable</li>
+                    <li>Provide essential website functionality.</li>
+                    <li>Maintain necessary session information.</li>
+                    <li>Remember relevant preferences.</li>
+                    <li>Protect against unauthorized activity.</li>
+                    <li>Understand website performance and usage, where enabled.</li>
+                    <li>Support advertising, where enabled and permitted.</li>
                 </ul>
 
                 <p>
-                    STYRIVA does not currently use these technologies for
-                    user login or account authentication because an account
-                    is not required to use the styling service.
+                    Some cookies or storage technologies may
+                    be provided by third-party services.
                 </p>
 
                 <p>
-                    Some third-party services used by STYRIVA may also use
-                    cookies or similar technologies.
+                    You can review our Cookie Policy for
+                    further information. Browser settings
+                    may also allow you to manage or delete
+                    certain cookies.
                 </p>
 
+                <p>
+                    Disabling certain technologies may affect
+                    how some parts of STYRIVA function.
+                </p>
             </section>
-
 
             <!-- 7 -->
-
             <section class="policy-section">
-
-                <h2>
-                    7. Advertising
-                </h2>
+                <h2>7. Advertising and Analytics</h2>
 
                 <p>
-                    STYRIVA may display advertisements from third-party
-                    advertising providers, including Google AdSense, if
-                    advertising is enabled on the website.
+                    STYRIVA may use analytics or advertising
+                    services if those services are enabled
+                    on the website.
                 </p>
 
                 <p>
-                    If advertising services are enabled, advertising
-                    providers may use cookies, web beacons, IP addresses,
-                    or similar technologies to deliver, measure, and
-                    personalize advertisements, subject to applicable law
-                    and the settings available to users.
+                    If Google AdSense or another advertising
+                    provider is used, that provider may
+                    process certain information, such as
+                    cookies, device information or IP address,
+                    to provide or measure advertisements,
+                    subject to applicable settings and law.
                 </p>
 
                 <p>
-                    Google and its advertising partners may use advertising
-                    cookies to help display and measure relevant
-                    advertisements based on a user's visits to STYRIVA
-                    and other websites.
+                    Advertising providers may have their
+                    own privacy policies and controls.
                 </p>
 
                 <p>
-                    Users may be able to manage personalized advertising
-                    through Google's advertising controls and other
-                    applicable privacy settings.
+                    We will provide appropriate consent
+                    mechanisms where required by applicable
+                    law before using technologies that
+                    require consent.
                 </p>
 
                 <p>
-                    Where legally required, STYRIVA will provide appropriate
-                    consent or privacy controls for cookies and advertising.
+                    We do not claim that advertising or
+                    analytics services are active unless
+                    they have actually been enabled.
                 </p>
-
             </section>
-
 
             <!-- 8 -->
-
             <section class="policy-section">
-
-                <h2>
-                    8. Information Sharing
-                </h2>
+                <h2>8. How We Share Information</h2>
 
                 <p>
-                    STYRIVA may share or provide access to information with
-                    service providers that help us operate the platform.
+                    We may share or allow access to information
+                    where reasonably necessary to operate,
+                    maintain, secure or provide STYRIVA.
                 </p>
 
-                <p>
-                    Depending on the services currently used by STYRIVA,
-                    these providers may assist with:
-                </p>
+                <p>Depending on the features used, these parties may include:</p>
 
                 <ul>
-                    <li>Website hosting</li>
-                    <li>Database and infrastructure services</li>
-                    <li>AI processing</li>
-                    <li>Image processing</li>
-                    <li>Security and abuse prevention</li>
-                    <li>Analytics, where enabled</li>
-                    <li>Communication services, where used</li>
-                    <li>Advertising services, where enabled</li>
+                    <li>
+                        <strong>OpenAI:</strong> for AI-related
+                        processing requested through STYRIVA.
+                    </li>
+                    <li>
+                        <strong>Cloudinary:</strong> for image
+                        storage, delivery or processing.
+                    </li>
+                    <li>
+                        <strong>Railway:</strong> for application
+                        hosting and related infrastructure.
+                    </li>
+                    <li>
+                        <strong>Payment providers:</strong>
+                        if paid credits or other paid features
+                        are offered and a payment provider
+                        processes the transaction.
+                    </li>
+                    <li>
+                        <strong>Other service providers:</strong>
+                        where needed for security, communication,
+                        technical operations or other functions
+                        actually used by STYRIVA.
+                    </li>
                 </ul>
 
                 <p>
-                    We do not sell users' personal information as a
-                    business practice.
+                    We may also disclose information where
+                    required by law, in response to lawful
+                    requests, to protect users or the service,
+                    investigate fraud or security incidents,
+                    or establish or defend legal claims.
                 </p>
 
                 <p>
-                    We may also disclose information when reasonably
-                    necessary to comply with applicable law, respond to
-                    lawful requests, protect users or STYRIVA, investigate
-                    security incidents, prevent fraud or abuse, or enforce
-                    our policies.
+                    We do not sell personal information as
+                    a business practice.
                 </p>
-
             </section>
-
 
             <!-- 9 -->
-
             <section class="policy-section">
-
-                <h2>
-                    9. Data Security
-                </h2>
+                <h2>9. International Processing</h2>
 
                 <p>
-                    We take reasonable technical and organizational measures
-                    to protect information processed through STYRIVA.
+                    Some technology providers used by STYRIVA
+                    may process information on infrastructure
+                    located outside your country.
                 </p>
 
                 <p>
-                    However, no website, server, database, or method of
-                    transmission over the internet can be guaranteed to be
-                    completely secure.
+                    As a result, information submitted through
+                    certain features may be transferred to
+                    or processed in other countries, depending
+                    on the provider's infrastructure and
+                    service configuration.
                 </p>
 
                 <p>
-                    Accordingly, while we work to protect information, we
-                    cannot guarantee absolute security.
+                    Where applicable, we will take steps
+                    required by relevant data protection
+                    laws in relation to such processing
+                    and transfers.
                 </p>
-
             </section>
-
 
             <!-- 10 -->
-
             <section class="policy-section">
-
-                <h2>
-                    10. Data Retention
-                </h2>
+                <h2>10. Data Security</h2>
 
                 <p>
-                    We retain information for as long as reasonably
-                    necessary for the purposes described in this Privacy
-                    Policy.
+                    We take reasonable technical and
+                    organizational measures intended to
+                    protect information processed through
+                    STYRIVA against unauthorized access,
+                    loss, misuse, alteration or disclosure.
                 </p>
 
                 <p>
-                    This may include providing STYRIVA, processing styling
-                    requests, maintaining platform functionality, preventing
-                    abuse, maintaining security, resolving disputes, and
-                    complying with legal obligations.
+                    Security measures may include access
+                    restrictions, authentication controls,
+                    infrastructure protections and other
+                    safeguards appropriate to the service.
                 </p>
 
                 <p>
-                    When information is no longer reasonably required, we
-                    may delete, anonymize, or otherwise dispose of it,
-                    subject to applicable legal, technical, and operational
-                    requirements.
+                    No website, server, database or internet
+                    transmission method can be guaranteed
+                    to be completely secure.
                 </p>
 
+                <p>
+                    We therefore cannot promise absolute
+                    security, but we aim to address
+                    security risks responsibly.
+                </p>
             </section>
 
-
             <!-- 11 -->
-
             <section class="policy-section">
-
-                <h2>
-                    11. Your Privacy Choices and Rights
-                </h2>
+                <h2>11. Data Retention</h2>
 
                 <p>
-                    Depending on your location and applicable law, you may
-                    have certain rights regarding your personal information.
+                    We retain information only for as long
+                    as reasonably necessary for the purposes
+                    described in this Privacy Policy, subject
+                    to applicable law.
                 </p>
 
                 <p>
-                    These may include the right to:
+                    Retention may be necessary for:
                 </p>
 
                 <ul>
-                    <li>Request access to certain personal information</li>
-                    <li>Request correction of inaccurate information</li>
-                    <li>Request deletion of certain information</li>
-                    <li>Ask about how your information is processed</li>
-                    <li>Withdraw consent where applicable</li>
-                    <li>Object to or restrict certain processing where applicable</li>
+                    <li>Providing requested STYRIVA features.</li>
+                    <li>Maintaining account and service functionality.</li>
+                    <li>Managing credits and usage records.</li>
+                    <li>Resolving payment disputes, where applicable.</li>
+                    <li>Preventing fraud and misuse.</li>
+                    <li>Maintaining security and technical logs.</li>
+                    <li>Meeting legal or regulatory obligations.</li>
                 </ul>
 
                 <p>
-                    To make a privacy-related request, contact STYRIVA using
-                    the contact information provided on this website.
+                    When information is no longer reasonably
+                    required, we may delete, anonymize or
+                    otherwise dispose of it, subject to
+                    applicable legal, technical and
+                    operational requirements.
                 </p>
 
                 <p>
-                    Depending on the request and applicable law, we may
-                    need sufficient information to verify the request before
-                    completing it.
+                    Copies in backups or provider systems
+                    may not be deleted immediately and
+                    may remain for limited periods under
+                    the relevant retention processes.
                 </p>
-
             </section>
-
 
             <!-- 12 -->
-
             <section class="policy-section">
-
-                <h2>
-                    12. Children's Privacy
-                </h2>
+                <h2>12. Your Privacy Rights and Choices</h2>
 
                 <p>
-                    STYRIVA does not knowingly seek to collect personal
-                    information from children in violation of applicable
-                    law.
+                    Depending on your location and applicable
+                    data protection laws, you may have rights
+                    relating to your personal information.
+                </p>
+
+                <p>These may include the right to:</p>
+
+                <ul>
+                    <li>Request information about personal data processed about you.</li>
+                    <li>Request access to personal information, where applicable.</li>
+                    <li>Request correction of inaccurate or incomplete information.</li>
+                    <li>Request deletion of personal information where legally available.</li>
+                    <li>Withdraw consent where processing is based on consent.</li>
+                    <li>Raise a grievance or privacy complaint.</li>
+                    <li>Exercise other rights provided by applicable law.</li>
+                </ul>
+
+                <p>
+                    These rights may be subject to legal
+                    exceptions and verification requirements.
                 </p>
 
                 <p>
-                    If you believe that a child has provided personal
-                    information to STYRIVA without appropriate permission,
-                    please contact us so that we can review the situation
-                    and take appropriate action.
+                    To make a request, contact us using
+                    the email address provided in the
+                    Contact section below.
                 </p>
-
             </section>
-
 
             <!-- 13 -->
-
             <section class="policy-section">
-
-                <h2>
-                    13. Third-Party Services and Links
-                </h2>
+                <h2>13. Account and Data Deletion Requests</h2>
 
                 <p>
-                    STYRIVA may use third-party services to provide,
-                    maintain, secure, analyze, or improve certain features.
+                    If you have a STYRIVA account and want
+                    to request its deletion, contact us
+                    using the details provided below or
+                    use an available account deletion
+                    feature if one is provided.
                 </p>
 
                 <p>
-                    Third-party services operate under their own terms and
-                    privacy policies. We encourage users to review those
-                    policies when interacting with third-party services.
+                    You may also request deletion of
+                    personal information or uploaded
+                    content where applicable law gives
+                    you that right.
                 </p>
 
                 <p>
-                    STYRIVA may also contain links to websites operated by
-                    third parties. We are not responsible for the privacy
-                    practices, security, or content of websites that we do
-                    not operate.
+                    We may need to verify your identity
+                    or account ownership before acting
+                    on a request.
                 </p>
 
+                <p>
+                    Some information may need to be retained
+                    where required by law or reasonably
+                    necessary for security, fraud prevention,
+                    dispute resolution or other legitimate
+                    permitted purposes.
+                </p>
+
+                <p>
+                    Deletion from active systems may not
+                    immediately remove information from
+                    backups or third-party systems that
+                    operate under separate retention
+                    schedules.
+                </p>
             </section>
-
 
             <!-- 14 -->
-
             <section class="policy-section">
-
-                <h2>
-                    14. Changes to This Privacy Policy
-                </h2>
+                <h2>14. Children's Privacy</h2>
 
                 <p>
-                    We may update this Privacy Policy from time to time as
-                    STYRIVA's services, features, technology, or legal
-                    requirements change.
+                    STYRIVA is not intended to be used
+                    by children without the involvement
+                    or authorization of a parent or legal
+                    guardian where required by applicable law.
                 </p>
 
                 <p>
-                    When we make changes, we will update the "Last updated"
-                    date displayed at the top of this page.
+                    We do not knowingly seek to collect
+                    children's personal information in
+                    violation of applicable legal requirements.
                 </p>
 
                 <p>
-                    We encourage users to review this page periodically.
+                    If you believe a child has provided
+                    personal information to STYRIVA
+                    without the required authorization,
+                    please contact us so that we can
+                    review the matter and take appropriate
+                    action.
                 </p>
-
             </section>
 
-
             <!-- 15 -->
-
             <section class="policy-section">
-
-                <h2>
-                    15. Contact STYRIVA
-                </h2>
+                <h2>15. Third-Party Websites and Services</h2>
 
                 <p>
-                    If you have questions about this Privacy Policy, your
-                    personal information, or STYRIVA's privacy practices,
-                    please contact us.
+                    STYRIVA may contain links to third-party
+                    websites or use third-party services
+                    to provide certain features.
+                </p>
+
+                <p>
+                    Those third parties may operate under
+                    their own privacy policies, terms and
+                    security practices.
+                </p>
+
+                <p>
+                    We do not control the privacy practices
+                    of websites that we do not operate.
+                    We encourage you to review their
+                    policies before submitting information
+                    to them.
+                </p>
+            </section>
+
+            <!-- 16 -->
+            <section class="policy-section">
+                <h2>16. Changes to This Privacy Policy</h2>
+
+                <p>
+                    We may update this Privacy Policy
+                    when our services, technology,
+                    providers, business practices or
+                    legal requirements change.
+                </p>
+
+                <p>
+                    When we make changes, we will update
+                    the "Last updated" date displayed
+                    at the top of this page.
+                </p>
+
+                <p>
+                    If a change materially affects how
+                    we process personal information,
+                    we will take reasonable steps to
+                    provide notice where appropriate
+                    or required by law.
+                </p>
+
+                <p>
+                    We encourage you to review this
+                    page periodically.
+                </p>
+            </section>
+
+            <!-- 17 -->
+            <section class="policy-section">
+                <h2>17. Contact and Privacy Grievances</h2>
+
+                <p>
+                    If you have questions about this
+                    Privacy Policy, your personal
+                    information, uploaded images,
+                    account deletion or a privacy
+                    concern, please contact us.
+                </p>
+
+                <p>
+                    Please describe your request clearly.
+                    Do not send passwords, full payment
+                    card numbers or other unnecessary
+                    sensitive information.
                 </p>
 
                 <div class="contact-box">
-
-                    <p>
-                        <strong>STYRIVA</strong>
-                    </p>
-
-                    <p>
-                        AI Styling Platform
-                    </p>
+                    <p><strong>STYRIVA</strong></p>
+                    <p>AI Styling Platform</p>
 
                     <p>
                         Privacy and support contact:
                         <strong>
-                            YOUR_EMAIL@example.com
+                            <a href="mailto:YOUR_SUPPORT_EMAIL">
+                                YOUR_SUPPORT_EMAIL
+                            </a>
                         </strong>
                     </p>
-
                 </div>
-
             </section>
-
-
-            <!-- 16 -->
-
-            <section class="policy-section">
-
-                <h2>
-                    16. Google Advertising Information
-                </h2>
-
-                <p>
-                    If Google AdSense or another Google advertising service
-                    is used on STYRIVA, Google and its partners may use
-                    cookies and similar technologies to provide, measure,
-                    and personalize advertising in accordance with
-                    applicable settings and law.
-                </p>
-
-                <p>
-                    Users may manage available personalized advertising
-                    controls through Google's advertising settings.
-                </p>
-
-                <p>
-                    STYRIVA may update this Privacy Policy when its
-                    advertising technologies or privacy practices
-                    materially change.
-                </p>
-
-            </section>
-
 
         </article>
-
     </main>
 
-
-    <!-- =========================
-         FOOTER
-    ========================= -->
-
     <footer class="footer">
-
         <div class="footer-container">
 
             <div>
-
-                <div class="footer-brand">
-                    STYRIVA
-                </div>
+                <div class="footer-brand">STYRIVA</div>
 
                 <div class="footer-copy">
                     © {% now "Y" %} STYRIVA. All rights reserved.
                 </div>
-
             </div>
 
-
             <div class="footer-links">
-
-                <a href="/">
-                    Home
-                </a>
+                <a href="/">Home</a>
 
                 <a href="{% url 'privacy_policy' %}">
                     Privacy Policy
@@ -1139,13 +1064,10 @@
                 <a href="{% url 'contact' %}">
                     Contact
                 </a>
-
             </div>
 
         </div>
-
     </footer>
-
 
 </div>
 

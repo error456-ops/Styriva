@@ -1,6 +1,5 @@
 
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,31 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Terms & Conditions | STYRIVA</title>
-
-    <meta
-        name="description"
-        content="Read the Terms and Conditions governing the use of STYRIVA, an AI-powered styling platform."
-    >
-
+    <meta name="description" content="Terms and Conditions governing the use of STYRIVA, an AI-powered styling platform.">
     <meta name="robots" content="index, follow">
 
     <meta property="og:title" content="Terms & Conditions | STYRIVA">
-    <meta
-        property="og:description"
-        content="Terms and conditions for using the STYRIVA AI styling platform."
-    >
+    <meta property="og:description" content="Terms and conditions for using the STYRIVA AI styling platform.">
     <meta property="og:type" content="website">
 
-    <!-- STYRIVA PWA METADATA -->
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-
-<meta name="theme-color" content="#4f46e5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="STYRIVA">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- STYRIVA PWA -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'manifest' %}">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="STYRIVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
         * {
@@ -41,45 +31,32 @@
             padding: 0;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family:
-                Inter,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-
+            font-family: Inter, -apple-system, BlinkMacSystemFont,
+                "Segoe UI", sans-serif;
             background: #0b0b0d;
             color: #eeeeee;
             line-height: 1.7;
         }
 
-        a {
-            color: inherit;
-        }
+        a { color: inherit; }
 
         .navbar {
             position: sticky;
             top: 0;
             z-index: 1000;
-
             background: rgba(11, 11, 13, 0.92);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255,255,255,.08);
         }
 
         .nav-container {
             width: min(1180px, calc(100% - 40px));
-            margin: 0 auto;
-
             min-height: 76px;
-
+            margin: auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -87,110 +64,82 @@
         }
 
         .logo {
+            color: #fff;
             text-decoration: none;
-
             font-size: 22px;
             font-weight: 800;
-            letter-spacing: 0.18em;
-
-            color: #ffffff;
+            letter-spacing: .18em;
         }
 
         .back-link {
-            text-decoration: none;
-
             color: #bdbdc4;
-
+            text-decoration: none;
             font-size: 14px;
-            font-weight: 500;
-
-            transition: color 0.2s ease;
         }
 
-        .back-link:hover {
-            color: #ffffff;
-        }
+        .back-link:hover,
+        .footer-links a:hover { color: #fff; }
 
         .hero {
             width: min(900px, calc(100% - 40px));
-            margin: 0 auto;
-
+            margin: auto;
             padding: 90px 0 60px;
-
             text-align: center;
         }
 
         .eyebrow {
             display: inline-block;
-
             margin-bottom: 18px;
-
+            color: #b9b9c2;
             font-size: 12px;
             font-weight: 700;
-
-            letter-spacing: 0.18em;
+            letter-spacing: .18em;
             text-transform: uppercase;
-
-            color: #b9b9c2;
         }
 
         .hero h1 {
+            margin-bottom: 24px;
+            color: #fff;
             font-size: clamp(38px, 6vw, 64px);
             line-height: 1.05;
-
-            letter-spacing: -0.04em;
-
-            margin-bottom: 24px;
-
-            color: #ffffff;
+            letter-spacing: -.04em;
         }
 
         .hero p {
             max-width: 700px;
-            margin: 0 auto;
-
+            margin: auto;
             color: #a9a9b2;
-
             font-size: 17px;
         }
 
         .updated {
-            margin-top: 20px;
-
-            font-size: 13px !important;
+            margin-top: 20px !important;
             color: #777780 !important;
+            font-size: 13px !important;
         }
 
         .content {
             width: min(900px, calc(100% - 40px));
-            margin: 0 auto;
-
+            margin: auto;
             padding-bottom: 100px;
         }
 
         .terms-card {
             padding: 48px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255, 255, 255, 0.055),
-                    rgba(255, 255, 255, 0.018)
-                );
-
-            border: 1px solid rgba(255, 255, 255, 0.08);
-
+            background: linear-gradient(
+                145deg,
+                rgba(255,255,255,.055),
+                rgba(255,255,255,.018)
+            );
+            border: 1px solid rgba(255,255,255,.08);
             border-radius: 24px;
-
-            box-shadow:
-                0 30px 80px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 30px 80px rgba(0,0,0,.25);
         }
 
         .terms-section {
             padding-bottom: 42px;
             margin-bottom: 42px;
-
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            border-bottom: 1px solid rgba(255,255,255,.07);
         }
 
         .terms-section:last-child {
@@ -201,96 +150,71 @@
 
         .terms-section h2 {
             margin-bottom: 18px;
-
+            color: #fff;
             font-size: 25px;
             line-height: 1.25;
-
-            color: #ffffff;
         }
 
         .terms-section h3 {
             margin: 24px 0 10px;
-
+            color: #eee;
             font-size: 18px;
-
-            color: #eeeeee;
         }
 
-        .terms-section p {
-            margin-bottom: 15px;
-
+        .terms-section p,
+        .terms-section li {
             color: #b7b7bf;
-
             font-size: 15px;
         }
 
-        .terms-section p:last-child {
-            margin-bottom: 0;
-        }
+        .terms-section p { margin-bottom: 15px; }
+
+        .terms-section p:last-child { margin-bottom: 0; }
 
         .terms-section ul {
             margin: 15px 0 15px 22px;
         }
 
-        .terms-section li {
-            margin-bottom: 9px;
-
-            color: #b7b7bf;
-
-            font-size: 15px;
-        }
+        .terms-section li { margin-bottom: 9px; }
 
         .notice {
             margin: 24px 0;
             padding: 20px 22px;
-
-            border-left: 3px solid #ffffff;
-
-            background: rgba(255, 255, 255, 0.04);
-
+            border-left: 3px solid #fff;
+            background: rgba(255,255,255,.04);
             border-radius: 0 12px 12px 0;
         }
 
-        .notice p {
-            margin: 0;
-        }
+        .notice p { margin: 0; }
 
         .contact-box {
             margin-top: 22px;
             padding: 24px;
-
-            background: rgba(255, 255, 255, 0.035);
-
-            border: 1px solid rgba(255, 255, 255, 0.07);
-
+            background: rgba(255,255,255,.035);
+            border: 1px solid rgba(255,255,255,.07);
             border-radius: 16px;
         }
 
-        .contact-box strong {
-            color: #ffffff;
-        }
+        .contact-box strong { color: #fff; }
 
         .footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-
             padding: 38px 20px;
+            border-top: 1px solid rgba(255,255,255,.08);
         }
 
         .footer-container {
             width: min(1180px, 100%);
-            margin: 0 auto;
-
+            margin: auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             gap: 25px;
         }
 
         .footer-brand {
             font-size: 14px;
             font-weight: 700;
-            letter-spacing: 0.12em;
+            letter-spacing: .12em;
         }
 
         .footer-copy {
@@ -300,767 +224,660 @@
 
         .footer-links {
             display: flex;
-            gap: 20px;
             flex-wrap: wrap;
+            gap: 20px;
         }
 
         .footer-links a {
             color: #85858d;
-
             font-size: 13px;
-
             text-decoration: none;
-
-            transition: color 0.2s ease;
-        }
-
-        .footer-links a:hover {
-            color: #ffffff;
         }
 
         @media (max-width: 700px) {
-
-            .nav-container {
-                min-height: 68px;
-            }
-
-            .logo {
-                font-size: 18px;
-            }
-
-            .back-link {
-                font-size: 13px;
-            }
-
-            .hero {
-                padding: 65px 0 40px;
-            }
-
-            .hero h1 {
-                font-size: 42px;
-            }
-
-            .hero p {
-                font-size: 15px;
-            }
-
+            .nav-container { min-height: 68px; }
+            .logo { font-size: 18px; }
+            .back-link { font-size: 13px; }
+            .hero { padding: 65px 0 40px; }
+            .hero h1 { font-size: 42px; }
+            .hero p { font-size: 15px; }
             .terms-card {
                 padding: 28px 22px;
                 border-radius: 18px;
             }
-
             .terms-section {
                 padding-bottom: 32px;
                 margin-bottom: 32px;
             }
-
-            .terms-section h2 {
-                font-size: 22px;
-            }
-
+            .terms-section h2 { font-size: 22px; }
             .terms-section p,
-            .terms-section li {
-                font-size: 14px;
-            }
-
+            .terms-section li { font-size: 14px; }
             .footer-container {
                 flex-direction: column;
                 align-items: flex-start;
             }
-
-            .footer-links {
-                gap: 14px;
-            }
+            .footer-links { gap: 14px; }
         }
     </style>
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#4f46e5">
-
-
-
 </head>
 
 <body>
 
-    <!-- =========================
-         NAVBAR
-    ========================= -->
+<header class="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">STYRIVA</a>
+        <a href="/" class="back-link">← Back to STYRIVA</a>
+    </div>
+</header>
 
-    <header class="navbar">
+<section class="hero">
+    <span class="eyebrow">STYRIVA • Legal</span>
+    <h1>Terms & Conditions</h1>
+    <p>
+        These terms explain the rules and conditions that apply when
+        you access or use the STYRIVA AI styling platform.
+    </p>
+    <p class="updated">Last updated: November 29, 2026</p>
+</section>
 
-        <div class="nav-container">
+<main class="content">
+<article class="terms-card">
 
-            <a href="/" class="logo">
-                STYRIVA
-            </a>
-
-            <a href="/" class="back-link">
-                ← Back to STYRIVA
-            </a>
-
-        </div>
-
-    </header>
-
-
-    <!-- =========================
-         HERO
-    ========================= -->
-
-    <section class="hero">
-
-        <span class="eyebrow">
-            STYRIVA • Legal
-        </span>
-
-        <h1>
-            Terms & Conditions
-        </h1>
-
+    <section class="terms-section">
+        <h2>1. Acceptance of These Terms</h2>
         <p>
-            These terms explain the rules and conditions that apply when
-            you access or use the STYRIVA AI styling platform.
+            Welcome to STYRIVA ("STYRIVA", "we", "us", or "our").
+            These Terms & Conditions govern your access to and use of
+            the STYRIVA website, applications, features and services.
         </p>
-
-        <p class="updated">
-            Last updated: August 11, 2026
+        <p>
+            By accessing or using STYRIVA, you agree to these terms.
+            If you do not agree, please do not use the service.
         </p>
-
+        <p>
+            We may update these terms when necessary. Where changes
+            materially affect your rights or obligations, we will take
+            reasonable steps to notify users. The updated version will
+            state its effective date.
+        </p>
+        <p>
+            Your continued use after an updated version becomes
+            effective constitutes acceptance where permitted by law.
+            If you do not agree to a material change, you should stop
+            using the affected service.
+        </p>
     </section>
 
-
-    <!-- =========================
-         TERMS
-    ========================= -->
-
-    <main class="content">
-
-        <article class="terms-card">
-
-
-            <!-- 1 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    1. Acceptance of These Terms
-                </h2>
-
-                <p>
-                    Welcome to STYRIVA ("STYRIVA", "we", "us", or "our").
-                    By accessing or using the STYRIVA website and services,
-                    you agree to these Terms & Conditions.
-                </p>
-
-                <p>
-                    If you do not agree with these terms, please do not use
-                    STYRIVA.
-                </p>
-
-                <p>
-                    We may update these terms from time to time. Your
-                    continued use of STYRIVA after changes are published
-                    means that you accept the updated terms.
-                </p>
-
-            </section>
-
-
-            <!-- 2 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    2. About STYRIVA
-                </h2>
-
-                <p>
-                    STYRIVA is an AI-powered styling platform designed to
-                    provide fashion and outfit recommendations based on
-                    information and images submitted by users.
-                </p>
-
-                <p>
-                    STYRIVA provides AI-generated suggestions for
-                    informational and general styling purposes. Styling
-                    recommendations are not professional fashion, medical,
-                    financial, legal, or other professional advice.
-                </p>
-
-            </section>
-
-
-            <!-- 3 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    3. Eligibility
-                </h2>
-
-                <p>
-                    You may use STYRIVA only if you are legally permitted
-                    to use the service under the laws applicable to you.
-                </p>
-
-                <p>
-                    If you are under the age required to independently
-                    consent to online services in your jurisdiction, you
-                    should use STYRIVA only with appropriate parental or
-                    guardian involvement where required by law.
-                </p>
-
-            </section>
-
-
-            <!-- 4 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    4. No Account Required
-                </h2>
-
-                <p>
-                    STYRIVA currently does not require users to create an
-                    account or log in to use its styling features.
-                </p>
-
-                <p>
-                    Users may access and use the available styling features
-                    without providing account credentials or creating a
-                    user profile.
-                </p>
-
-                <p>
-                    STYRIVA may introduce account-based features in the
-                    future. If this happens, these Terms & Conditions and
-                    the Privacy Policy may be updated accordingly.
-                </p>
-
-            </section>
-
-
-            <!-- 5 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    5. Uploaded Images and User Content
-                </h2>
-
-                <p>
-                    STYRIVA allows users to upload images and information
-                    for AI styling.
-                </p>
-
-                <p>
-                    You represent that you have the necessary rights,
-                    permissions, or authorization to upload and use the
-                    content you submit to STYRIVA.
-                </p>
-
-                <p>
-                    You must not upload content that violates applicable
-                    laws or the rights of another person.
-                </p>
-
-                <h3>
-                    You must not use STYRIVA to upload:
-                </h3>
-
-                <ul>
-
-                    <li>
-                        Content you do not have permission to use
-                    </li>
-
-                    <li>
-                        Content that infringes another person's
-                        intellectual property rights
-                    </li>
-
-                    <li>
-                        Malicious files or software
-                    </li>
-
-                    <li>
-                        Content intended to abuse, attack, or disrupt
-                        the service
-                    </li>
-
-                    <li>
-                        Unlawful or fraudulent content
-                    </li>
-
-                </ul>
-
-            </section>
-
-
-            <!-- 6 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    6. AI-Generated Results
-                </h2>
-
-                <p>
-                    STYRIVA uses artificial intelligence to generate styling
-                    recommendations and visual results.
-                </p>
-
-                <p>
-                    AI-generated results may sometimes be inaccurate,
-                    incomplete, unexpected, or unsuitable for a particular
-                    user or occasion.
-                </p>
-
-                <p>
-                    You are responsible for deciding whether a styling
-                    recommendation is appropriate for your individual
-                    circumstances.
-                </p>
-
-                <div class="notice">
-
-                    <p>
-                        STYRIVA does not guarantee that an AI-generated
-                        styling recommendation will be accurate, fashionable,
-                        suitable, or appropriate for every situation.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-            <!-- 7 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    7. Prohibited Use
-                </h2>
-
-                <p>
-                    You agree not to misuse STYRIVA or attempt to interfere
-                    with its operation.
-                </p>
-
-                <p>
-                    You must not:
-                </p>
-
-                <ul>
-
-                    <li>
-                        Attempt to gain unauthorized access to STYRIVA
-                    </li>
-
-                    <li>
-                        Circumvent security or usage restrictions
-                    </li>
-
-                    <li>
-                        Attempt to bypass daily usage limits
-                    </li>
-
-                    <li>
-                        Abuse automated systems or APIs
-                    </li>
-
-                    <li>
-                        Upload malicious software or harmful files
-                    </li>
-
-                    <li>
-                        Scrape or copy substantial portions of the service
-                        without permission
-                    </li>
-
-                    <li>
-                        Use STYRIVA for unlawful purposes
-                    </li>
-
-                    <li>
-                        Attempt to disrupt or overload STYRIVA
-                    </li>
-
-                </ul>
-
-            </section>
-
-
-            <!-- 8 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    8. Service Availability
-                </h2>
-
-                <p>
-                    We aim to keep STYRIVA available and functional, but
-                    we do not guarantee uninterrupted or error-free
-                    operation.
-                </p>
-
-                <p>
-                    STYRIVA may occasionally be unavailable because of
-                    maintenance, technical problems, infrastructure issues,
-                    security events, updates, or circumstances outside
-                    our reasonable control.
-                </p>
-
-            </section>
-
-
-            <!-- 9 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    9. AI Processing and Third-Party Services
-                </h2>
-
-                <p>
-                    Some STYRIVA features may rely on third-party services,
-                    infrastructure providers, AI providers, image-processing
-                    services, analytics services, security services, or
-                    other technology providers.
-                </p>
-
-                <p>
-                    Information and images submitted to features that rely
-                    on third-party AI or technology providers may be processed
-                    by those providers as necessary to provide the requested
-                    STYRIVA feature.
-                </p>
-
-                <p>
-                    Your use of features that depend on third-party services
-                    may also be subject to the applicable terms and policies
-                    of those providers.
-                </p>
-
-            </section>
-
-
-            <!-- 10 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    10. Intellectual Property
-                </h2>
-
-                <p>
-                    STYRIVA's website, branding, software, design,
-                    trademarks, logos, text, and other original materials
-                    are owned by or licensed to STYRIVA unless otherwise
-                    stated.
-                </p>
-
-                <p>
-                    You may not copy, reproduce, modify, distribute, sell,
-                    or commercially exploit STYRIVA's protected materials
-                    without appropriate authorization.
-                </p>
-
-                <p>
-                    You retain rights in content that you own and upload
-                    to STYRIVA, subject to the permissions necessary for
-                    STYRIVA to provide its services.
-                </p>
-
-            </section>
-
-
-            <!-- 11 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    11. Privacy
-                </h2>
-
-                <p>
-                    Your use of STYRIVA is also subject to our Privacy
-                    Policy, which explains how we handle information
-                    processed through the service.
-                </p>
-
-                <p>
-                    You can review the Privacy Policy through the legal
-                    links provided on the STYRIVA website.
-                </p>
-
-            </section>
-
-
-            <!-- 12 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    12. Advertising
-                </h2>
-
-                <p>
-                    If advertising is enabled on STYRIVA, the website may
-                    display advertisements from third-party advertising
-                    providers, including Google AdSense.
-                </p>
-
-                <p>
-                    Advertising providers may use cookies or similar
-                    technologies in accordance with their applicable
-                    policies and settings.
-                </p>
-
-                <p>
-                    Advertising content is provided by third parties and
-                    STYRIVA does not necessarily endorse every advertised
-                    product or service.
-                </p>
-
-            </section>
-
-
-            <!-- 13 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    13. Third-Party Links
-                </h2>
-
-                <p>
-                    STYRIVA may contain links to third-party websites,
-                    products, or services.
-                </p>
-
-                <p>
-                    We are not responsible for the availability, content,
-                    security, or privacy practices of third-party websites.
-                </p>
-
-                <p>
-                    You should review the applicable terms and privacy
-                    policies before using third-party services.
-                </p>
-
-            </section>
-
-
-            <!-- 14 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    14. Disclaimer
-                </h2>
-
-                <p>
-                    STYRIVA is provided on an "as available" and "as is"
-                    basis to the extent permitted by applicable law.
-                </p>
-
-                <p>
-                    We do not guarantee that the service will always be
-                    available, accurate, secure, or free from errors.
-                </p>
-
-                <p>
-                    AI-generated styling recommendations are suggestions
-                    and should not be treated as guaranteed outcomes.
-                </p>
-
-            </section>
-
-
-            <!-- 15 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    15. Limitation of Liability
-                </h2>
-
-                <p>
-                    To the maximum extent permitted by applicable law,
-                    STYRIVA and its operators will not be responsible for
-                    indirect, incidental, special, consequential, or
-                    similar damages arising from your use of the service.
-                </p>
-
-                <p>
-                    Nothing in these terms is intended to exclude or limit
-                    liability that cannot legally be excluded or limited
-                    under applicable law.
-                </p>
-
-            </section>
-
-
-            <!-- 16 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    16. Suspension or Termination
-                </h2>
-
-                <p>
-                    We may restrict, suspend, or terminate access to STYRIVA
-                    where reasonably necessary, including when a user
-                    violates these Terms & Conditions, abuses the service,
-                    creates a security risk, or uses STYRIVA unlawfully.
-                </p>
-
-                <p>
-                    We may also suspend features temporarily when necessary
-                    for maintenance, security, or technical reasons.
-                </p>
-
-            </section>
-
-
-            <!-- 17 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    17. Changes to STYRIVA
-                </h2>
-
-                <p>
-                    STYRIVA may change, improve, add, remove, or discontinue
-                    features from time to time.
-                </p>
-
-                <p>
-                    We may also modify these Terms & Conditions when
-                    necessary to reflect changes to the service, technology,
-                    business practices, or applicable legal requirements.
-                </p>
-
-            </section>
-
-
-            <!-- 18 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    18. Governing Law
-                </h2>
-
-                <p>
-                    These Terms & Conditions will be interpreted and applied
-                    in accordance with applicable law.
-                </p>
-
-                <p>
-                    Any specific governing-law or jurisdiction provisions
-                    applicable to STYRIVA may be added or updated when the
-                    legal structure of the service is finalized.
-                </p>
-
-            </section>
-
-
-            <!-- 19 -->
-
-            <section class="terms-section">
-
-                <h2>
-                    19. Contact
-                </h2>
-
-                <p>
-                    If you have questions about these Terms & Conditions,
-                    please contact STYRIVA through the contact information
-                    provided on the website.
-                </p>
-
-                <div class="contact-box">
-
-                    <p>
-                        <strong>STYRIVA</strong>
-                    </p>
-
-                    <p>
-                        AI Styling Platform
-                    </p>
-
-                    <p>
-                        Contact:
-                        <strong>
-                            www.sanianaz715@gmail.com
-                        </strong>
-                    </p>
-
-                </div>
-
-            </section>
-
-
-        </article>
-
-    </main>
-
-
-    <!-- =========================
-         FOOTER
-    ========================= -->
-
-    <footer class="footer">
-
-        <div class="footer-container">
-
-            <div>
-
-                <div class="footer-brand">
-                    STYRIVA
-                </div>
-
-                <div class="footer-copy">
-                    © {% now "Y" %} STYRIVA. All rights reserved.
-                </div>
-
+    <section class="terms-section">
+        <h2>2. About STYRIVA</h2>
+        <p>
+            STYRIVA is an AI-powered fashion and styling platform.
+            Depending on the features available, users may upload
+            clothing images, reference images and other information
+            to receive styling suggestions, outfit recommendations
+            or AI-generated visual results.
+        </p>
+        <p>
+            STYRIVA is intended to assist with fashion inspiration
+            and styling decisions. It does not guarantee that a
+            recommendation will suit every person's preferences,
+            body measurements, occasion, climate or circumstances.
+        </p>
+        <p>
+            STYRIVA is not a substitute for professional advice
+            where professional advice is required.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>3. Eligibility and Accounts</h2>
+        <p>
+            You may use STYRIVA only if you are legally permitted
+            to do so under the laws applicable to you.
+        </p>
+        <p>
+            Some STYRIVA features may require you to create an
+            account or sign in. You agree to provide accurate
+            information and keep your account details reasonably
+            up to date.
+        </p>
+        <p>
+            You are responsible for maintaining the confidentiality
+            of your login credentials and for activity carried out
+            through your account, except where applicable law
+            provides otherwise.
+        </p>
+        <p>
+            You must notify us promptly if you believe your account
+            has been accessed without authorization.
+        </p>
+        <p>
+            Do not create accounts using false information or
+            impersonate another person.
+        </p>
+        <p>
+            If you are under the age at which you can independently
+            consent to online services under applicable law, you
+            must use STYRIVA only with the involvement or
+            authorization of a parent or legal guardian where
+            required by law.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>4. Free Features, Usage Limits and Credits</h2>
+        <p>
+            STYRIVA may offer free features, trial usage, promotional
+            allowances, account-based allowances or credits. The
+            availability and limits of these benefits may vary by
+            feature, account type or promotion.
+        </p>
+        <p>
+            Some features may have generation limits, daily limits,
+            account requirements or other usage restrictions.
+            These limits may be displayed within the relevant
+            feature or account area.
+        </p>
+        <p>
+            Credits, where provided, may be used to access eligible
+            STYRIVA features. The number of credits required for
+            a feature will be displayed or communicated before
+            the relevant generation or action where reasonably
+            practicable.
+        </p>
+        <p>
+            Free credits, promotional credits and purchased credits
+            may have different conditions. Any expiry, restrictions
+            or eligibility conditions applicable to a particular
+            credit type should be disclosed when that credit is
+            issued or offered.
+        </p>
+        <p>
+            You must not attempt to bypass usage limits, manipulate
+            credit balances, exploit bugs or obtain unauthorized
+            generations.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>5. Paid Credits and Payments</h2>
+        <p>
+            If STYRIVA makes paid credits, subscriptions or other
+            paid features available, the applicable price, currency,
+            payment terms and feature details will be displayed
+            before you complete a purchase.
+        </p>
+        <p>
+            A purchase is subject to the payment terms displayed
+            at checkout and any additional terms disclosed for
+            that product or feature.
+        </p>
+        <p>
+            Payments may be handled by third-party payment
+            providers. STYRIVA may not receive or store complete
+            payment-card or banking credentials where those
+            details are handled directly by the payment provider.
+        </p>
+        <p>
+            You are responsible for ensuring that the payment
+            information you provide to the payment provider is
+            accurate and that you are authorized to use the
+            selected payment method.
+        </p>
+        <p>
+            If a payment fails, is reversed or is not confirmed
+            by the payment provider, the related paid credits
+            or feature may not be activated.
+        </p>
+        <p>
+            If a payment is successful but the purchased credits
+            or feature are not reflected in your account, contact
+            us with the relevant transaction details. Do not send
+            passwords, full card numbers or security codes.
+        </p>
+        <p>
+            Refunds, cancellations and failed-generation issues
+            will be handled according to the purchase terms
+            disclosed at checkout and applicable consumer
+            protection laws. Nothing in these terms removes
+            any refund or other right that cannot legally be
+            excluded.
+        </p>
+        <p>
+            Unless required by law or expressly stated at checkout,
+            unused credits may not be redeemable for cash or
+            transferable to another account.
+        </p>
+        <div class="notice">
+            <p>
+                The availability of paid credits or subscriptions
+                is not guaranteed. Do not assume a paid feature
+                is available unless it is actually displayed
+                and offered within STYRIVA.
+            </p>
+        </div>
+    </section>
+
+    <section class="terms-section">
+        <h2>6. Uploaded Images and User Content</h2>
+        <p>
+            STYRIVA allows users to submit images and information
+            for styling and related features. This may include
+            clothing images, outfit images, reference photographs
+            and styling preferences.
+        </p>
+        <p>
+            You retain ownership of content that you own and
+            submit to STYRIVA. You are responsible for ensuring
+            that you have the necessary rights, permissions
+            and lawful authority to upload that content.
+        </p>
+        <p>
+            By submitting content, you grant STYRIVA a limited,
+            non-exclusive permission to host, store, reproduce,
+            transmit and process that content only as reasonably
+            necessary to operate, secure and provide the features
+            you request, subject to our Privacy Policy.
+        </p>
+        <p>
+            This permission does not transfer ownership of your
+            uploaded content to STYRIVA. It ends when the content
+            is no longer required for the relevant purposes,
+            subject to legitimate retention needs and applicable law.
+        </p>
+
+        <h3>You must not upload:</h3>
+        <ul>
+            <li>Content you do not have permission or legal authority to use.</li>
+            <li>Content that infringes another person's copyright, trademark, privacy or other rights.</li>
+            <li>Malicious files, malware or harmful software.</li>
+            <li>Content intended to attack, abuse or disrupt STYRIVA.</li>
+            <li>Unlawful, fraudulent, deceptive or otherwise prohibited content.</li>
+            <li>Images of another person where you lack the required permission or lawful basis.</li>
+        </ul>
+        <p>
+            We may restrict or remove content where reasonably
+            necessary to address legal, security or service
+            integrity concerns.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>7. AI Processing and Third-Party Technology</h2>
+        <p>
+            STYRIVA uses artificial intelligence and third-party
+            technology to provide certain features.
+        </p>
+        <p>
+            Depending on the feature, submitted images and related
+            information may be processed using third-party
+            providers, including OpenAI for AI-related processing
+            and Cloudinary for image storage, delivery or
+            processing.
+        </p>
+        <p>
+            These providers may process information on our behalf
+            or as otherwise described in their applicable terms
+            and privacy documentation. The information shared
+            should be limited to what is reasonably necessary
+            for the relevant service.
+        </p>
+        <p>
+            Third-party services may experience outages,
+            interruptions, technical limitations or changes
+            outside our control.
+        </p>
+        <p>
+            Further information about the categories of data
+            processed and relevant purposes is provided in
+            our Privacy Policy.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>8. AI-Generated Results</h2>
+        <p>
+            STYRIVA may generate outfit suggestions, styling
+            recommendations, visual outputs or other results
+            using automated systems.
+        </p>
+        <p>
+            AI-generated results may be inaccurate, incomplete,
+            unexpected, misleading or unsuitable for your
+            preferences or circumstances.
+        </p>
+        <p>
+            Generated images may not accurately represent the
+            exact appearance, colour, texture, fit, size, brand
+            or availability of a real garment or product.
+        </p>
+        <p>
+            You should review generated results before relying
+            on them or making a purchase or other decision.
+        </p>
+        <div class="notice">
+            <p>
+                STYRIVA does not guarantee that every AI-generated
+                result will be accurate, realistic, original,
+                fashionable or appropriate for every user.
+            </p>
+        </div>
+    </section>
+
+    <section class="terms-section">
+        <h2>9. Prohibited Use</h2>
+        <p>You agree not to misuse STYRIVA. In particular, you must not:</p>
+        <ul>
+            <li>Attempt to gain unauthorized access to STYRIVA, its accounts or systems.</li>
+            <li>Bypass security measures, usage limits or credit restrictions.</li>
+            <li>Exploit errors, vulnerabilities or bugs to obtain unauthorized benefits.</li>
+            <li>Abuse automated systems, APIs or infrastructure.</li>
+            <li>Upload malware, malicious files or harmful content.</li>
+            <li>Scrape, copy or commercially exploit substantial portions of the service without authorization.</li>
+            <li>Reverse engineer or interfere with the service except where such restriction is prohibited by law.</li>
+            <li>Impersonate another person or misrepresent your identity.</li>
+            <li>Use STYRIVA for unlawful, fraudulent or harmful purposes.</li>
+            <li>Interfere with another user's access to or use of STYRIVA.</li>
+        </ul>
+    </section>
+
+    <section class="terms-section">
+        <h2>10. Intellectual Property</h2>
+        <p>
+            STYRIVA's name, branding, logos, website design,
+            software, original text, graphics and other
+            materials are owned by or licensed to STYRIVA,
+            unless otherwise stated.
+        </p>
+        <p>
+            These materials are protected by applicable
+            intellectual property laws. You may not reproduce,
+            distribute, modify, sell or commercially exploit
+            them without permission, except where permitted
+            by law.
+        </p>
+        <p>
+            You retain rights in content that you own and upload.
+            You are responsible for ensuring that your content
+            does not violate another person's rights.
+        </p>
+        <p>
+            AI-generated outputs may not always be unique and
+            may resemble content generated for other users.
+            The legal status and ownership of AI-generated
+            material may depend on applicable law and the
+            circumstances of its creation.
+        </p>
+        <p>
+            Nothing in these terms grants you ownership of
+            STYRIVA's software, brand or underlying technology.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>11. Privacy and Personal Information</h2>
+        <p>
+            Your use of STYRIVA is also subject to our Privacy
+            Policy, which explains how personal information
+            and submitted content are collected, used, stored,
+            shared and otherwise processed.
+        </p>
+        <p>
+            By using features that require information or
+            image submission, you acknowledge that the
+            information may be processed as described in
+            the Privacy Policy and subject to applicable law.
+        </p>
+        <p>
+            Please review the Privacy Policy to understand
+            your choices and how to contact us about privacy
+            requests.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>12. Advertising and Cookies</h2>
+        <p>
+            STYRIVA may use cookies and similar technologies
+            for essential website functions, security,
+            preferences, analytics or advertising, depending
+            on the features enabled.
+        </p>
+        <p>
+            If third-party advertising services are enabled,
+            advertisements may be provided by external
+            advertising providers. Those providers may use
+            technologies subject to their own policies
+            and applicable consent requirements.
+        </p>
+        <p>
+            Please review our Cookie Policy for further
+            information about cookies and available controls.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>13. Third-Party Services and Links</h2>
+        <p>
+            STYRIVA may rely on or link to third-party
+            websites, applications, infrastructure,
+            payment services or technology providers.
+        </p>
+        <p>
+            Third-party services are subject to their own
+            terms, privacy policies and availability.
+            We do not control every aspect of those services.
+        </p>
+        <p>
+            A link or integration does not necessarily mean
+            that STYRIVA endorses the third party or its
+            products and services.
+        </p>
+        <p>
+            You should review the relevant third-party terms
+            and privacy information before using those services.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>14. Service Availability and Changes</h2>
+        <p>
+            We aim to keep STYRIVA operational, but we do not
+            guarantee uninterrupted, error-free or continuous
+            availability.
+        </p>
+        <p>
+            The service may be unavailable or limited due to
+            maintenance, technical problems, infrastructure
+            issues, security incidents, third-party outages
+            or circumstances outside our reasonable control.
+        </p>
+        <p>
+            We may add, modify, suspend or discontinue features
+            where reasonably necessary. Where a change materially
+            affects a paid feature or an existing user entitlement,
+            we will handle it subject to the applicable purchase
+            terms and law.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>15. Disclaimer</h2>
+        <p>
+            To the extent permitted by applicable law, STYRIVA
+            is provided on an "as is" and "as available" basis.
+        </p>
+        <p>
+            We do not guarantee that the service will always
+            be available, secure, accurate, uninterrupted
+            or free from errors.
+        </p>
+        <p>
+            Styling suggestions and AI-generated results are
+            provided for general informational and creative
+            purposes. You remain responsible for evaluating
+            whether a result is appropriate for your needs.
+        </p>
+        <p>
+            Nothing in this section excludes any guarantee,
+            right or remedy that cannot legally be excluded.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>16. Limitation of Liability</h2>
+        <p>
+            To the maximum extent permitted by applicable law,
+            STYRIVA will not be liable for indirect, incidental,
+            special or consequential loss arising from the use
+            of, or inability to use, the service.
+        </p>
+        <p>
+            This includes losses arising from service
+            interruptions, third-party outages, inaccurate
+            AI-generated results or unauthorized access,
+            except to the extent liability cannot legally
+            be excluded or limited.
+        </p>
+        <p>
+            Nothing in these terms excludes or limits liability
+            for fraud, wilful misconduct, gross negligence
+            where applicable, or any other liability that
+            cannot legally be excluded or limited.
+        </p>
+        <p>
+            Nothing in these terms limits your statutory
+            consumer rights or remedies under applicable law.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>17. Suspension and Termination</h2>
+        <p>
+            We may restrict, suspend or terminate access to
+            an account or feature where reasonably necessary,
+            including where a user violates these terms,
+            abuses the service, creates a security risk
+            or uses STYRIVA unlawfully.
+        </p>
+        <p>
+            Where reasonably practicable and appropriate,
+            we may provide notice and an opportunity to
+            address the issue.
+        </p>
+        <p>
+            You may stop using STYRIVA at any time. If you
+            wish to request account deletion, please follow
+            the process described in our Privacy Policy
+            or contact us.
+        </p>
+        <p>
+            Termination does not remove rights or obligations
+            that arose before termination or rights that
+            must continue under applicable law.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>18. Complaints and Grievances</h2>
+        <p>
+            If you have a complaint about STYRIVA, an account,
+            uploaded content, a payment or a privacy matter,
+            please contact us using the contact details below.
+        </p>
+        <p>
+            Please provide enough information for us to
+            understand and investigate your complaint.
+            Do not include passwords, full payment-card
+            details or other unnecessary sensitive information.
+        </p>
+        <p>
+            We will review complaints and respond in
+            accordance with applicable legal requirements.
+            Where a specific grievance or consumer complaint
+            process applies, that process will also be followed.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>19. Governing Law and Jurisdiction</h2>
+        <p>
+            These Terms & Conditions are intended to be
+            interpreted in accordance with the laws of India,
+            subject to applicable conflict-of-law principles
+            and mandatory consumer protection provisions.
+        </p>
+        <p>
+            Disputes relating to the use of STYRIVA will be
+            subject to the jurisdiction of courts or forums
+            that are legally competent to hear the dispute.
+        </p>
+        <p>
+            Nothing in this section prevents a consumer
+            from exercising a right to approach a consumer
+            commission, regulatory authority or other forum
+            where permitted by applicable law.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>20. Severability</h2>
+        <p>
+            If any provision of these terms is found to be
+            invalid or unenforceable, that provision will
+            be interpreted or limited to the minimum extent
+            necessary, where legally possible.
+        </p>
+        <p>
+            The remaining provisions will continue to apply
+            to the extent permitted by law.
+        </p>
+    </section>
+
+    <section class="terms-section">
+        <h2>21. Contact STYRIVA</h2>
+        <p>
+            If you have questions about these Terms & Conditions,
+            payments, complaints or the STYRIVA service,
+            contact us using the details below.
+        </p>
+
+        <div class="contact-box">
+            <p><strong>STYRIVA</strong></p>
+            <p>AI Styling Platform</p>
+            <p>
+                Email:
+                <strong>
+                    <a href="mailto:YOUR_SUPPORT_EMAIL">
+                        YOUR_SUPPORT_EMAIL
+                    </a>
+                </strong>
+            </p>
+        </div>
+    </section>
+
+</article>
+</main>
+
+<footer class="footer">
+    <div class="footer-container">
+        <div>
+            <div class="footer-brand">STYRIVA</div>
+            <div class="footer-copy">
+                © {% now "Y" %} STYRIVA. All rights reserved.
             </div>
-
-
-            <div class="footer-links">
-
-                <a href="/">
-                    Home
-                </a>
-
-                <a href="{% url 'privacy_policy' %}">
-                    Privacy Policy
-                </a>
-
-                <a href="{% url 'terms' %}">
-                    Terms
-                </a>
-
-                <a href="{% url 'contact' %}">
-                    Contact
-                </a>
-
-            </div>
-
         </div>
 
-    </footer>
+        <div class="footer-links">
+            <a href="/">Home</a>
+            <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+            <a href="{% url 'terms' %}">Terms</a>
+            <a href="{% url 'contact' %}">Contact</a>
+        </div>
+    </div>
+</footer>
 
-    <!-- STYRIVA PWA SERVICE WORKER -->
+<!-- STYRIVA PWA SERVICE WORKER -->
 <script>
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", async () => {
@@ -1093,4 +910,3 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
-

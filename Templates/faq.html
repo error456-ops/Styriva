@@ -7,23 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>FAQ | STYRIVA AI Styling</title>
-
-    <meta
-        name="description"
-        content="Find answers to common questions about STYRIVA, its AI styling recommendations, uploaded images, daily usage, privacy, and how the styling service works."
-    >
-
+    <meta name="description" content="Find answers to common questions about STYRIVA AI styling, clothing uploads, accounts, credits, image processing and privacy.">
     <meta name="robots" content="index, follow">
-    <!-- STYRIVA PWA METADATA -->
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
 
-<meta name="theme-color" content="#4f46e5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="STYRIVA">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- STYRIVA PWA METADATA -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'manifest' %}">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="STYRIVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <style>
         * {
@@ -49,8 +44,6 @@
             text-decoration: none;
         }
 
-        /* NAVIGATION */
-
         .navbar {
             width: 100%;
             border-bottom: 1px solid #e8e5e0;
@@ -61,7 +54,6 @@
             max-width: 1150px;
             margin: 0 auto;
             padding: 20px 24px;
-
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -100,8 +92,6 @@
             opacity: 0.85;
         }
 
-        /* HERO */
-
         .hero {
             max-width: 900px;
             margin: 0 auto;
@@ -132,8 +122,6 @@
             font-size: 18px;
         }
 
-        /* CONTENT */
-
         .content {
             max-width: 900px;
             margin: 0 auto;
@@ -155,8 +143,6 @@
             font-weight: 600;
             margin-bottom: 25px;
         }
-
-        /* FAQ */
 
         .faq-list {
             display: grid;
@@ -183,7 +169,13 @@
             margin: 0;
         }
 
-        /* NOTE */
+        .faq-item p + p {
+            margin-top: 12px;
+        }
+
+        .faq-item a {
+            text-decoration: underline;
+        }
 
         .note {
             margin-top: 28px;
@@ -198,8 +190,6 @@
             font-size: 14px;
             margin: 0;
         }
-
-        /* CTA */
 
         .cta {
             margin-top: 20px;
@@ -237,8 +227,6 @@
             opacity: 0.9;
         }
 
-        /* FOOTER */
-
         footer {
             border-top: 1px solid #e6e2dc;
             background: #f5f3ef;
@@ -248,7 +236,6 @@
             max-width: 1150px;
             margin: 0 auto;
             padding: 45px 24px;
-
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -288,10 +275,7 @@
             font-size: 12px;
         }
 
-        /* MOBILE */
-
         @media (max-width: 700px) {
-
             .nav-container {
                 padding: 18px;
             }
@@ -342,564 +326,391 @@
             }
         }
     </style>
-
-<link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
-<link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% url 'manifest' %}">
-<meta name="theme-color" content="#4f46e5">
-
 </head>
 
 <body>
 
 <!-- NAVIGATION -->
-
 <nav class="navbar">
-
     <div class="nav-container">
 
-        <a href="/" class="logo">
-            STYRIVA
-        </a>
+        <a href="{% url 'splash' %}" class="logo">STYRIVA</a>
 
         <div class="nav-links">
-
-            <a href="/">
-                Home
-            </a>
-
-            <a href="/about/">
-                About
-            </a>
-
-            <a href="/how-it-works/">
-                How It Works
-            </a>
-
-            <a href="/guides/">
-                Guides
-            </a>
-
-            <a href="/contact/">
-                Contact
-            </a>
-
-            <a href="/generate/" class="nav-button">
-                Create Your Look
-            </a>
-
+            <a href="{% url 'splash' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'how_it_works' %}">How It Works</a>
+            <a href="{% url 'guides' %}">Guides</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            <a href="/generate/" class="nav-button">Create Your Look</a>
         </div>
 
     </div>
-
 </nav>
 
-
 <!-- HERO -->
-
 <header class="hero">
+    <div class="eyebrow">Frequently Asked Questions</div>
 
-    <div class="eyebrow">
-        Frequently Asked Questions
-    </div>
-
-    <h1>
-        Questions, answered.
-    </h1>
+    <h1>Questions, answered.</h1>
 
     <p>
-        Find answers to common questions about STYRIVA and its
-        AI-powered styling service.
+        Find answers to common questions about STYRIVA, its AI-powered
+        styling tools, clothing uploads, credits and privacy.
     </p>
-
 </header>
-
 
 <main class="content">
 
-
-    <!-- GENERAL -->
-
+    <!-- ABOUT STYRIVA -->
     <section class="section">
 
-        <h2 class="section-title">
-            About STYRIVA
-        </h2>
+        <h2 class="section-title">About STYRIVA</h2>
 
         <div class="faq-list">
 
             <article class="faq-item">
-
-                <h2>
-                    What is STYRIVA?
-                </h2>
-
+                <h2>What is STYRIVA?</h2>
                 <p>
-                    STYRIVA is an AI-powered styling tool that helps you
-                    create outfit recommendations using the clothing and
-                    accessory options you provide, along with information
-                    such as your occasion, preferred vibe, and weather.
+                    STYRIVA is an AI-powered styling assistant that helps
+                    you explore outfit combinations using clothing and
+                    accessory options you provide, together with details
+                    such as occasion, preferred vibe and weather.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    What does STYRIVA actually do?
-                </h2>
-
+                <h2>What does STYRIVA actually do?</h2>
                 <p>
-                    STYRIVA analyzes the options you provide and generates
-                    a curated styling recommendation. The goal is to help
-                    you decide how your available pieces can work together
-                    for a particular situation.
+                    STYRIVA processes the information and images you submit
+                    to generate styling recommendations. It is designed to
+                    help you discover ways to combine pieces from your
+                    available wardrobe.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    Do I need a large wardrobe to use STYRIVA?
-                </h2>
-
+                <h2>Do I need a large wardrobe to use STYRIVA?</h2>
                 <p>
-                    No. STYRIVA is designed to work with the clothing and
-                    accessory choices you provide. You can use it to
-                    explore combinations from pieces you already own.
+                    No. You can start with the clothing and accessories
+                    available to you. STYRIVA is designed to help you
+                    explore combinations rather than requiring you to
+                    purchase an entirely new wardrobe.
                 </p>
-
             </article>
 
         </div>
-
     </section>
-
 
     <!-- USING STYRIVA -->
-
     <section class="section">
 
-        <h2 class="section-title">
-            Using STYRIVA
-        </h2>
+        <h2 class="section-title">Using STYRIVA</h2>
 
         <div class="faq-list">
 
             <article class="faq-item">
-
-                <h2>
-                    Do I need to create an account?
-                </h2>
-
+                <h2>Do I need to create an account?</h2>
                 <p>
-                    No. STYRIVA currently does not require an account,
-                    signup, or login. You can use the available styling
-                    features directly without creating a user profile.
+                    Some available features may be accessible without an
+                    account. Creating an account allows you to use
+                    account-based features where available. The app will
+                    indicate when registration or login is required.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    What information do I provide?
-                </h2>
-
+                <h2>What information do I provide?</h2>
                 <p>
-                    Depending on the styling workflow, you provide clothing
-                    or accessory images and information such as the occasion,
-                    vibe, and weather. The available options shown in the
-                    styling tool determine exactly what you can submit.
+                    Depending on the styling workflow, you may provide
+                    clothing or accessory images and details such as
+                    occasion, vibe and weather. The styling tool will show
+                    you which information is needed for that particular
+                    workflow.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    Why does STYRIVA ask about the occasion?
-                </h2>
-
+                <h2>Why does STYRIVA ask about the occasion?</h2>
                 <p>
-                    An outfit that works for a casual day may not be suitable
-                    for a formal event. The occasion gives the styling system
-                    context when evaluating the available combinations.
+                    An outfit suitable for a casual day may not be suitable
+                    for a formal event. The occasion gives the styling
+                    system additional context when evaluating possible
+                    combinations.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    Why does weather matter?
-                </h2>
-
+                <h2>Why does weather matter?</h2>
                 <p>
-                    Weather can affect both comfort and practicality. Providing
-                    weather information allows it to be considered alongside
-                    the visual aspects of the styling recommendation.
+                    Weather can affect comfort and practicality. Providing
+                    weather information helps the styling system consider
+                    those factors alongside the visual aspects of an outfit.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    Can I use my own clothes?
-                </h2>
-
+                <h2>Can I use my own clothes?</h2>
                 <p>
-                    Yes. STYRIVA is designed around the clothing and accessory
-                    choices you provide rather than requiring you to shop for
-                    an entirely new outfit.
+                    Yes. STYRIVA is designed to work with the clothing and
+                    accessory images you provide, helping you explore
+                    combinations using pieces you already own.
                 </p>
-
             </article>
 
         </div>
-
     </section>
 
-
-    <!-- AI -->
-
+    <!-- AI STYLING -->
     <section class="section">
 
-        <h2 class="section-title">
-            AI styling
-        </h2>
+        <h2 class="section-title">AI Styling</h2>
 
         <div class="faq-list">
 
             <article class="faq-item">
-
-                <h2>
-                    How does the AI choose a look?
-                </h2>
-
+                <h2>How does the AI choose a look?</h2>
                 <p>
-                    STYRIVA considers the information you provide and evaluates
-                    the available styling options according to factors such as
-                    the occasion, vibe, weather, and overall compatibility.
-                    It then produces a curated recommendation.
+                    STYRIVA uses the information and images you provide
+                    to evaluate styling possibilities. Depending on the
+                    workflow, factors may include garment appearance,
+                    occasion, vibe, weather and overall compatibility.
+                    It then generates a styling recommendation.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    Is the recommendation always correct?
-                </h2>
-
+                <h2>Is the recommendation always correct?</h2>
                 <p>
                     No AI styling system can understand every personal
-                    preference or real-world situation perfectly. STYRIVA's
-                    recommendations are suggestions, and you should use your
-                    own judgment when deciding what to wear.
+                    preference or real-world situation perfectly.
+                    Recommendations are suggestions and may not always
+                    reflect your exact taste, fit requirements or needs.
+                    Use your own judgment when deciding what to wear.
                 </p>
-
             </article>
 
+            <article class="faq-item">
+                <h2>Can I follow my own preferences instead?</h2>
+                <p>
+                    Absolutely. STYRIVA is intended to assist your styling
+                    decisions, not replace your personal taste. You can
+                    adapt or ignore any recommendation to suit your
+                    preferences and comfort.
+                </p>
+            </article>
 
             <article class="faq-item">
-
-                <h2>
-                    Can I follow my own preferences instead?
-                </h2>
-
+                <h2>Does STYRIVA guarantee that generated images will look exactly like my clothes?</h2>
                 <p>
-                    Absolutely. STYRIVA is intended as a styling assistant,
-                    not a replacement for personal taste. You can use its
-                    recommendations as a starting point and adapt them to
-                    your own preferences and comfort.
+                    No. AI-generated results may differ from the original
+                    uploaded garments in appearance, colour, texture,
+                    proportions or other details. Always treat generated
+                    images as visual styling suggestions rather than
+                    exact representations of physical products.
                 </p>
-
             </article>
 
         </div>
-
     </section>
 
-
-    <!-- USAGE -->
-
+    <!-- CREDITS AND USAGE -->
     <section class="section">
 
-        <h2 class="section-title">
-            Free access and usage
-        </h2>
+        <h2 class="section-title">Free Access and Credits</h2>
 
         <div class="faq-list">
 
             <article class="faq-item">
-
-                <h2>
-                    Is STYRIVA currently free?
-                </h2>
-
+                <h2>Is STYRIVA free to use?</h2>
                 <p>
-                    Yes. STYRIVA is currently available as a free service.
-                    There is no active premium subscription or payment
-                    requirement for the current service.
+                    STYRIVA may provide free access or complimentary usage
+                    allowances for eligible users and features. Additional
+                    usage may require credits where that option is offered.
+                    The available allowance and any applicable cost will be
+                    shown in the app.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    How many AI generations can I use each day?
-                </h2>
-
+                <h2>What are STYRIVA credits?</h2>
                 <p>
-                    The current STYRIVA service allows up to
-                    <strong>2 AI generations per day</strong>.
+                    Credits are usage units that may be required for certain
+                    AI-powered styling features. The number of credits
+                    required depends on the feature and the rules displayed
+                    in the app before you generate a result.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    What happens after I use both daily generations?
-                </h2>
-
+                <h2>How many AI generations can I use?</h2>
                 <p>
-                    Once you have used your 2 daily AI generations,
-                    you will need to come back the next day when your
-                    daily allowance becomes available again.
+                    Available generations may depend on your account status,
+                    complimentary usage allowance, available credits and
+                    the specific styling feature. Your current usage or
+                    available credits should be checked inside STYRIVA.
                 </p>
-
             </article>
 
+            <article class="faq-item">
+                <h2>What happens when my free allowance is used?</h2>
+                <p>
+                    When an applicable free allowance has been exhausted,
+                    the app may ask you to wait for another allowance,
+                    sign in, or use credits, depending on the feature and
+                    the rules currently available.
+                </p>
+            </article>
 
             <article class="faq-item">
-
-                <h2>
-                    Why is there a daily limit?
-                </h2>
-
+                <h2>Do credits expire?</h2>
                 <p>
-                    AI-powered processing requires computing resources.
-                    A daily usage limit helps STYRIVA manage those resources
-                    and keep the service available to users.
+                    Any expiry conditions or other restrictions applicable
+                    to credits will be displayed with the relevant credit
+                    offer or purchase information. Please review those
+                    conditions before purchasing or using credits.
                 </p>
+            </article>
 
+            <article class="faq-item">
+                <h2>Are credit purchases subscriptions?</h2>
+                <p>
+                    A one-time credit purchase and a recurring subscription
+                    are different payment arrangements. Check the relevant
+                    offer and checkout details to confirm the payment type
+                    before completing a transaction.
+                </p>
             </article>
 
         </div>
 
         <div class="note">
-
             <p>
-                STYRIVA's current model is free-only. There is no active
-                premium subscription, upgrade requirement, or payment
-                requirement for using the current service.
+                Usage allowances, credit requirements and available
+                payment options may change as STYRIVA develops. Always
+                refer to the current information displayed inside the app
+                and at checkout.
             </p>
-
         </div>
 
     </section>
 
-
-    <!-- PRIVACY -->
-
+    <!-- IMAGES AND PRIVACY -->
     <section class="section">
 
-        <h2 class="section-title">
-            Images and privacy
-        </h2>
+        <h2 class="section-title">Images and Privacy</h2>
 
         <div class="faq-list">
 
             <article class="faq-item">
-
-                <h2>
-                    What happens to the images I upload?
-                </h2>
-
+                <h2>What happens to the images I upload?</h2>
                 <p>
-                    Uploaded images may be processed as part of providing
-                    the styling service. For details about how information
-                    and uploaded content are handled, please review the
-                    STYRIVA
-                    <a href="/privacy/" style="text-decoration: underline;">
-                        Privacy Policy
-                    </a>.
+                    Uploaded images may be processed to provide the
+                    requested styling or image-generation features.
+                    Images may be handled by service providers involved
+                    in operating those features. For more information,
+                    please read our
+                    <a href="{% url 'privacy_policy' %}">Privacy Policy</a>.
                 </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    Does STYRIVA require my email address?
-                </h2>
-
+                <h2>Does STYRIVA require my email address?</h2>
                 <p>
-                    No. STYRIVA currently does not require an email address
-                    to use the styling service because an account is not
-                    required.
+                    Guest access may not require an email address.
+                    Account registration may require the information
+                    requested during signup. The information required
+                    depends on the feature you are using.
                 </p>
-
-                <p style="margin-top: 12px;">
-                    If you voluntarily contact STYRIVA through a support or
-                    contact channel that requests an email address, that
-                    information may be processed so that we can respond to
-                    your request.
-                </p>
-
             </article>
 
-
             <article class="faq-item">
-
-                <h2>
-                    Should I upload someone else's photo?
-                </h2>
-
+                <h2>Should I upload someone else's photo?</h2>
                 <p>
-                    You should only upload images that you have permission
-                    to use and that are appropriate for the service.
+                    Only upload images that you have the right or
+                    permission to use. Do not upload images of another
+                    person without appropriate permission, and avoid
+                    submitting private or sensitive images unless
+                    necessary for the feature.
                 </p>
-
             </article>
 
+            <article class="faq-item">
+                <h2>Can I request deletion of my information?</h2>
+                <p>
+                    You can contact STYRIVA to ask about deletion of
+                    account information or uploaded content. Requests
+                    may be subject to applicable legal requirements
+                    and the technical capabilities of the services
+                    involved in processing your information.
+                </p>
+            </article>
 
             <article class="faq-item">
-
-                <h2>
-                    Where can I read about my privacy rights?
-                </h2>
-
+                <h2>Where can I read about my privacy rights?</h2>
                 <p>
-                    Detailed information about data collection, processing,
-                    storage, and applicable user rights is available in our
-                    <a href="/privacy/" style="text-decoration: underline;">
-                        Privacy Policy
-                    </a>.
+                    Please review our
+                    <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+                    for information about data collection, processing,
+                    storage, third-party services and applicable rights.
                 </p>
-
             </article>
 
         </div>
-
     </section>
-
 
     <!-- SUPPORT -->
-
     <section class="section">
 
-        <h2 class="section-title">
-            Still have a question?
-        </h2>
+        <h2 class="section-title">Still have a question?</h2>
 
         <div class="cta">
-
-            <h2>
-                We're here to help.
-            </h2>
+            <h2>We're here to help.</h2>
 
             <p>
-                If you have a question that isn't answered here, contact
-                STYRIVA and we'll do our best to help.
+                If you have a question about STYRIVA, your account,
+                credits or the styling service, get in touch with us.
             </p>
 
-            <a href="/contact/" class="cta-button">
+            <a href="{% url 'contact' %}" class="cta-button">
                 Contact STYRIVA
             </a>
-
         </div>
 
     </section>
-
 
 </main>
 
-
 <!-- FOOTER -->
-
 <footer>
 
     <div class="footer-container">
 
         <div class="footer-brand">
-
-            <h3>
-                STYRIVA
-            </h3>
+            <h3>STYRIVA</h3>
 
             <p>
                 An AI-powered styling assistant designed to help you
                 make simpler, more personalized outfit decisions.
             </p>
+        </div>
+
+        <div class="footer-links">
+
+            <a href="{% url 'splash' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'how_it_works' %}">How It Works</a>
+            <a href="{% url 'guides' %}">Styling Guides</a>
+            <a href="{% url 'faq' %}">FAQ</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+            <a href="{% url 'terms' %}">Terms &amp; Conditions</a>
+            <a href="{% url 'cookies' %}">Cookie Policy</a>
+            <a href="{% url 'disclaimer' %}">Disclaimer</a>
 
         </div>
 
-
-       
-
-
-<div class="footer-links">
-
-    <a href="{% url 'splash' %}">
-        Home
-    </a>
-
-    <a href="{% url 'about' %}">
-        About
-    </a>
-
-    <a href="{% url 'how_it_works' %}">
-        How It Works
-    </a>
-
-    <a href="{% url 'guides' %}">
-        Styling Guides
-    </a>
-
-    <a href="{% url 'faq' %}">
-        FAQ
-    </a>
-
-    <a href="{% url 'contact' %}">
-        Contact
-    </a>
-
-    <a href="{% url 'privacy_policy' %}">
-        Privacy Policy
-    </a>
-
-    <a href="{% url 'terms' %}">
-        Terms & Conditions
-    </a>
-
-    <a href="{% url 'cookies' %}">
-        Cookie Policy
-    </a>
-
-    <a href="{% url 'disclaimer' %}">
-        Disclaimer
-    </a>
-
-</div>
-
-
-
+    </div>
 
     <div class="copyright">
         © {% now "Y" %} STYRIVA. All rights reserved.
@@ -940,4 +751,3 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
-
